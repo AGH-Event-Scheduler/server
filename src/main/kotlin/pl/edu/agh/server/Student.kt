@@ -6,8 +6,9 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
 @Entity
-data class Student(val name: String, var age: Int) {
+data class Student(
+    var name: String,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0
-}
+    val id: Long? = null
+)

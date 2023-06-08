@@ -6,12 +6,12 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class DataLoader(private val studentRepository: StudentRepository) : CommandLineRunner {
     override fun run(vararg args: String?) {
-        val student = Student("test", 10)
+        val student = Student("test")
         studentRepository.save(student)
 
         val students = studentRepository.findAll()
         val student1 = students[0]
-        student1.age = 5
+        student1.name = "test change"
         studentRepository.save(student1)
     }
 }
