@@ -13,6 +13,13 @@ class OrganizationController(private val organizationService: OrganizationServic
     return organizationService.getAllOrganizations()
   }
 
+  @GetMapping("/{id}")
+  fun getOrganization(@PathVariable id: Long): ResponseEntity<Organization> {
+    return organizationService.getOrganization(id)?.let {
+      ResponseEntity.ok(it)
+    } ?: ResponseEntity.notFound().build()
+  }
+
   @PostMapping
   fun createOrganization(@RequestBody organization: Organization): ResponseEntity<Organization> {
     val createdOrganization = organizationService.createOrganization(organization)

@@ -18,6 +18,8 @@ data class Organization(
 
     var imageUrl: String = "https://i.stack.imgur.com/5ykYD.png",
 
+    var description: String = "",
+
     //TODO move to diffrent class after demo
     var isSubscribed: Boolean
 )
