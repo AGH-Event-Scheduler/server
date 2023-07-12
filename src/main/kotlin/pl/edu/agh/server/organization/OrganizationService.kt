@@ -17,7 +17,7 @@ class OrganizationService(private val organizationRepository: OrganizationReposi
           .orElse(null)
 
   fun getAllOrganizations(): List<Organization> =
-      organizationRepository.findAll()
+      organizationRepository.findAll().sortedWith(compareByDescending {it.name})
 
   fun getOrganization(id: Long): Organization? =
       organizationRepository.findById(id).orElse(null)
