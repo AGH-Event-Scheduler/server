@@ -1,23 +1,22 @@
 package pl.edu.agh.server.foundation.application
 
-import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import pl.edu.agh.server.foundation.domain.BasicIdentifiableEntity
+import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
 import javax.validation.Valid
 
-abstract class BasicIdentifiableCrudController<T : BasicIdentifiableEntity>(
-  private val repository: JpaRepository<T, Long>
-) : BasicIdentifiableReadController<T>(repository) {
+abstract class BaseIdentifiableCrudController<T : BasedentifiableEntity>(
+  private val repository: BaseRepository<T>
+) : BaseIdentifiableReadController<T>(repository) {
 
   @PostMapping
-  open fun create(@Valid @RequestBody entity: T): ResponseEntity<T> {
+  fun create(@Valid @RequestBody entity: T): ResponseEntity<T> {
     val createdEntity = repository.save(entity)
     return ResponseEntity.ok(createdEntity)
   }
 
   @PatchMapping("/{id}")
-  open fun update(
+  fun update(
     @PathVariable id: Long,
     @Valid @RequestBody updatedEntity: T
   ): ResponseEntity<T> {
@@ -34,7 +33,7 @@ abstract class BasicIdentifiableCrudController<T : BasicIdentifiableEntity>(
   }
 
   @DeleteMapping("/{id}")
-  open fun delete(@PathVariable id: Long): ResponseEntity<Void> {
+  fun delete(@PathVariable id: Long): ResponseEntity<Void> {
     if (!repository.existsById(id)) {
       return ResponseEntity.notFound().build()
     }

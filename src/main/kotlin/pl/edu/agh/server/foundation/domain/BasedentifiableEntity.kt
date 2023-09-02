@@ -12,7 +12,7 @@ import kotlin.reflect.full.memberProperties
 
 @MappedSuperclass
 @EqualsAndHashCode(of = ["id"])
-open class BasicIdentifiableEntity(
+open class BasedentifiableEntity(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Long? = null,
@@ -22,7 +22,7 @@ open class BasicIdentifiableEntity(
   var lastUpdatedDate: LocalDateTime = LocalDateTime.now()
 ) {
 
-  open fun updateFields(entity: BasicIdentifiableEntity) {
+  open fun updateFields(entity: BasedentifiableEntity) {
     val entityClass = this::class
     val targetClass = entity::class
 
