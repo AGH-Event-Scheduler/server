@@ -1,4 +1,4 @@
-package pl.edu.agh.server.foundation.application
+package pl.edu.agh.server.foundation.domain
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor

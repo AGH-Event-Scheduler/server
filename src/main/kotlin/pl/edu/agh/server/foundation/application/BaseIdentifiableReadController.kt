@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import pl.edu.agh.server.foundation.domain.BaseRepository
 import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
 
 @RestController

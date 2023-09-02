@@ -2,6 +2,7 @@ package pl.edu.agh.server.foundation.application
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import pl.edu.agh.server.foundation.domain.BaseRepository
 import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
 import javax.validation.Valid
 
