@@ -4,24 +4,22 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
-import lombok.Getter
-import lombok.Setter
+import lombok.EqualsAndHashCode
 import java.time.LocalDateTime
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.memberProperties
 
 @MappedSuperclass
-@Setter
-@Getter
+@EqualsAndHashCode(of = ["id"])
 open class BasicIdentifiableEntity(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private val id: Long? = null,
+  val id: Long? = null,
 
-  private val creationDate: LocalDateTime = LocalDateTime.now(),
+  val creationDate: LocalDateTime = LocalDateTime.now(),
 
-  private var lastUpdatedDate: LocalDateTime = LocalDateTime.now()
+  var lastUpdatedDate: LocalDateTime = LocalDateTime.now()
 ) {
 
   open fun updateFields(entity: BasicIdentifiableEntity) {
