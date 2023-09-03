@@ -9,11 +9,8 @@ COPY src/ src/
 RUN gradle build --no-daemon -x test
 
 FROM builder AS test
-WORKDIR /app
 
-COPY --from=builder /app/build/ .
-
-CMD ["gradle", "test"]
+CMD ["gradle", "test", "--warning-mode", "all"]
 
 FROM openjdk:17-jdk-slim AS app
 WORKDIR /app
