@@ -15,5 +15,6 @@ import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
 class Organization(
   var name: String,
   var imageUrl: String = "https://i.stack.imgur.com/5ykYD.png",
-  var isSubscribed: Boolean
+  var isSubscribed: Boolean = false,
+  var description: String = "",
 ) : BasedentifiableEntity()
