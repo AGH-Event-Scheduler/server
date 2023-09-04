@@ -8,6 +8,6 @@ import pl.edu.agh.server.foundation.application.BaseIdentifiableCrudController
 
 @RestController
 @RequestMapping("/api/students")
-class StudentCrudController(
+class StudentController(
   private val studentRepository: StudentRepository
 ) : BaseIdentifiableCrudController<Student>(studentRepository)
