@@ -8,6 +8,6 @@ class ServerApplicationTests {
 
     @Test
     fun contextLoads() {
-        assert(false);
+        assert(false)
     }
 }

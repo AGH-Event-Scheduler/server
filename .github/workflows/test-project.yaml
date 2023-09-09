@@ -2,7 +2,7 @@
 name: Test Project
 
 on:
-  push:
+  pull_request:
 
 jobs:
   test:
@@ -10,8 +10,5 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - uses: isbang/compose-action@v1.5.1
-      with:
-        compose-file: ./docker-compose.yaml
-        down-flags: --volumes
-        services: test
+    - name: Test
+      run: docker-compose up --force-recreate test

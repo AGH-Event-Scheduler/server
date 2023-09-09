@@ -1,11 +1,11 @@
 ---
-name: Test Formating
+name: Test Formatting
 
 on:
-  push:
+  pull_request:
 
 jobs:
-  formating:
+  formatting:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
