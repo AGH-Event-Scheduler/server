@@ -13,8 +13,8 @@ import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 @Data
 @EqualsAndHashCode(callSuper = true)
 class Organization(
-  var name: String,
-  var imageUrl: String = "https://i.stack.imgur.com/5ykYD.png",
-  var isSubscribed: Boolean = false,
-  var description: String = "",
+    var name: String,
+    var imageUrl: String = "https://i.stack.imgur.com/5ykYD.png",
+    var isSubscribed: Boolean = false,
+    var description: String = "",
 ) : BaseIdentifiableEntity()
