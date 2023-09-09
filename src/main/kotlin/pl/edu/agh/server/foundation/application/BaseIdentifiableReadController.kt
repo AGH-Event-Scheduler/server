@@ -6,11 +6,11 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.foundation.domain.BaseRepository
-import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
+import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @RestController
 @RequestMapping("/api")
-abstract class BaseIdentifiableReadController<T : BasedentifiableEntity>(
+abstract class BaseIdentifiableReadController<T : BaseIdentifiableEntity>(
   private val repository: BaseRepository<T>
 ) {
   @GetMapping("/{id}")

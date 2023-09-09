@@ -4,7 +4,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Table
 import lombok.EqualsAndHashCode
 import lombok.ToString
-import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
+import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
 @Table(name = "STUDENTS")
@@ -14,4 +14,4 @@ class Student(
   var albumNo: String,
   var name: String,
   var surname: String
-) : BasedentifiableEntity()
+) : BaseIdentifiableEntity()

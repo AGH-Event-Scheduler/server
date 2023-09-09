@@ -5,7 +5,7 @@ import jakarta.persistence.Table
 import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
-import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
+import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
 @Table(name = "Organizations")
@@ -17,4 +17,4 @@ class Organization(
   var imageUrl: String = "https://i.stack.imgur.com/5ykYD.png",
   var isSubscribed: Boolean = false,
   var description: String = "",
-) : BasedentifiableEntity()
+) : BaseIdentifiableEntity()

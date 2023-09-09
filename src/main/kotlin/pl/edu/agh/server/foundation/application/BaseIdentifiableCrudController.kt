@@ -3,10 +3,10 @@ package pl.edu.agh.server.foundation.application
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.foundation.domain.BaseRepository
-import pl.edu.agh.server.foundation.domain.BasedentifiableEntity
+import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 import javax.validation.Valid
 
-abstract class BaseIdentifiableCrudController<T : BasedentifiableEntity>(
+abstract class BaseIdentifiableCrudController<T : BaseIdentifiableEntity>(
   private val repository: BaseRepository<T>
 ) : BaseIdentifiableReadController<T>(repository) {
 
