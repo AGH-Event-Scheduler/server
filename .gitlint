@@ -1,0 +1,14 @@
+[general]
+ignore=body-is-missing
+
+[title-max-length]
+line-length=80
+
+[title-min-length]
+min-length=10
+
+[title-match-regex]
+regex=^(WIP )?\[(feat|refactor|chore|fix|test)\] .*$
+
+[body-min-length]
+min-length=5
