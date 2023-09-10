@@ -13,37 +13,36 @@ import kotlin.reflect.full.memberProperties
 @MappedSuperclass
 @EqualsAndHashCode(of = ["id"])
 open class BaseIdentifiableEntity(
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  val id: Long? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
 
-  val creationDate: LocalDateTime = LocalDateTime.now(),
+    val creationDate: LocalDateTime = LocalDateTime.now(),
 
-  var lastUpdatedDate: LocalDateTime = LocalDateTime.now()
+    var lastUpdatedDate: LocalDateTime = LocalDateTime.now(),
 ) {
 
-  open fun updateFields(entity: BaseIdentifiableEntity) {
-    val entityClass = this::class
-    val targetClass = entity::class
+    open fun updateFields(entity: BaseIdentifiableEntity) {
+        val entityClass = this::class
+        val targetClass = entity::class
 
-    entityClass.declaredMemberProperties.forEach { prop ->
-      if (prop.name != "id" && prop.name != "creationDate" && prop.name != "lastUpdatedDate") {
-        val thisProp = targetClass.memberProperties.find { it.name == prop.name }
-        thisProp?.let { targetProp ->
-          val entityValue = targetProp.getter.call(entity)
-          if (entityValue != null || (targetProp is KMutableProperty<*>)) {
-            if (targetProp is KMutableProperty<*>) {
-              (targetProp as KMutableProperty<*>).setter.call(this, entityValue)
+        entityClass.declaredMemberProperties.forEach { prop ->
+            if (prop.name != "id" && prop.name != "creationDate" && prop.name != "lastUpdatedDate") {
+                val thisProp = targetClass.memberProperties.find { it.name == prop.name }
+                thisProp?.let { targetProp ->
+                    val entityValue = targetProp.getter.call(entity)
+                    if (entityValue != null || (targetProp is KMutableProperty<*>)) {
+                        if (targetProp is KMutableProperty<*>) {
+                            (targetProp as KMutableProperty<*>).setter.call(this, entityValue)
+                        }
+                    }
+                }
             }
-          }
         }
-      }
+        updateLastUpdatedDate()
     }
-    updateLastUpdatedDate()
-  }
 
-  private fun updateLastUpdatedDate() {
-    lastUpdatedDate = LocalDateTime.now()
-  }
-
+    private fun updateLastUpdatedDate() {
+        lastUpdatedDate = LocalDateTime.now()
+    }
 }

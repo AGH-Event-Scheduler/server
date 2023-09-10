@@ -8,7 +8,7 @@ line-length=80
 min-length=10
 
 [title-match-regex]
-regex=^(WIP )?\[(feat|refactor|chore|fix)\] .*$
+regex=^(WIP )?\[(feat|refactor|chore|fix|test)\] .*$
 
 [body-min-length]
 min-length=5

@@ -11,7 +11,7 @@ import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 @ToString
 @EqualsAndHashCode(callSuper = true)
 class Student(
-  var albumNo: String,
-  var name: String,
-  var surname: String
+    var albumNo: String,
+    var name: String,
+    var surname: String,
 ) : BaseIdentifiableEntity()

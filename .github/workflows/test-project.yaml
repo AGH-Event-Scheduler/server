@@ -1,0 +1,16 @@
+---
+name: Test Project
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Test
+      run: |
+        docker-compose up --force-recreate --exit-code-from test
+        exit $?
