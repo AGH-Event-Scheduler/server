@@ -8,10 +8,6 @@ Install pre-commit
 pip install pre-commit
 ```
 
-```
-pre-commit install -t commit-msg
-```
-
 ## How to run?
 
 ### 1. As intellij project
