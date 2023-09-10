@@ -11,4 +11,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Test
-      run: docker-compose up --force-recreate test
+      run: |
+        docker-compose up --force-recreate test
+        exit $?
