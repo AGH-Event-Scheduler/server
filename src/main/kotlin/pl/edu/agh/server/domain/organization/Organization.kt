@@ -1,10 +1,11 @@
 package pl.edu.agh.server.domain.organization
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Table
+import com.fasterxml.jackson.annotation.JsonManagedReference
+import jakarta.persistence.*
 import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
+import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
@@ -17,4 +18,7 @@ class Organization(
     var imageUrl: String = "https://i.stack.imgur.com/5ykYD.png",
     var isSubscribed: Boolean = false,
     var description: String = "",
+    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    var events: List<Event> = listOf(),
 ) : BaseIdentifiableEntity()
