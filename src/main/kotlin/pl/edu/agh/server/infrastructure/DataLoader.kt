@@ -2,20 +2,26 @@ package pl.edu.agh.server.infrastructure
 
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Configuration
+import pl.edu.agh.server.domain.event.Event
+import pl.edu.agh.server.domain.event.EventRepository
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
+import java.time.LocalDateTime
+import java.util.*
 
 @Configuration
 class DataLoader(
     private val studentRepository: StudentRepository,
     private val organizationRepository: OrganizationRepository,
+    private val eventRepository: EventRepository,
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
         val student = Student("472924", "Kamil", "Błażewicz")
         studentRepository.save(student)
         createOrganizations()
+        createEvents()
     }
 
     private fun createOrganizations() {
@@ -68,5 +74,53 @@ class DataLoader(
                 ),
             ),
         )
+    }
+
+    private fun createEvents() {
+        var organizations = organizationRepository.findAll()
+        for (org: Organization in organizations) {
+            var events = listOf(
+                Event(
+                    name = "Test Event 1",
+                    imageUrl = org.imageUrl,
+                    organization = org,
+                    description = "Test event description 1",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().plusDays(1),
+                    endDate = LocalDateTime.now().plusDays(1).plusMinutes(90),
+                ),
+                Event(
+                    name = "Test Event 2",
+                    imageUrl = org.imageUrl,
+                    organization = org,
+                    description = "Test event description 2",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().plusDays(2),
+                    endDate = LocalDateTime.now().plusDays(2).plusMinutes(90),
+                ),
+                Event(
+                    name = "Test Event 3",
+                    imageUrl = org.imageUrl,
+                    organization = org,
+                    description = "Test event description 3",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().minusDays(2),
+                    endDate = LocalDateTime.now().minusDays(2).plusMinutes(90),
+                ),
+                Event(
+                    name = "Test Event 4",
+                    imageUrl = org.imageUrl,
+                    organization = org,
+                    description = "Test event description 4",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().minusDays(2),
+                    endDate = LocalDateTime.now().minusDays(2).plusMinutes(90),
+                ),
+            )
+
+            org.events = events
+            eventRepository.saveAll(events)
+            organizationRepository.save(org)
+        }
     }
 }
