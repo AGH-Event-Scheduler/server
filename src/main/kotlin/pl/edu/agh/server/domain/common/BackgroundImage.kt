@@ -8,11 +8,11 @@ import lombok.ToString
 @Embeddable
 @Data
 @ToString
-class Image(
-    @Column(length = 500)
+class BackgroundImage(
+    @Column(length = 500, name = "backgroundSmallUrl")
     var smallUrl: String,
-    @Column(length = 500)
+    @Column(length = 500, name = "backgroundMediumUrl")
     var mediumUrl: String,
-    @Column(length = 500)
+    @Column(length = 500, name = "backgroundBigUrl")
     var bigUrl: String,
 )

@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
-import pl.edu.agh.server.domain.common.Image
+import pl.edu.agh.server.domain.common.BackgroundImage
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 import java.time.LocalDateTime
@@ -18,7 +18,7 @@ class Event(
     var name: String,
 
     @Embedded
-    var backgroundImage: Image,
+    var backgroundImage: BackgroundImage,
 
     @Column(length = 1000)
     var description: String,

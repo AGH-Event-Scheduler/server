@@ -5,7 +5,8 @@ import jakarta.persistence.*
 import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
-import pl.edu.agh.server.domain.common.Image
+import pl.edu.agh.server.domain.common.BackgroundImage
+import pl.edu.agh.server.domain.common.LogoImage
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
@@ -18,20 +19,10 @@ class Organization(
     var name: String,
 
     @Embedded
-    @AttributeOverrides(
-        AttributeOverride(name = "smallUrl", column = Column(name = "logoSmallUrl", length = 500)),
-        AttributeOverride(name = "mediumUrl", column = Column(name = "logoMediumUrl", length = 500)),
-        AttributeOverride(name = "bigUrl", column = Column(name = "logoBigUrl", length = 500)),
-    )
-    var logoImage: Image,
+    var logoImage: LogoImage,
 
     @Embedded
-    @AttributeOverrides(
-        AttributeOverride(name = "smallUrl", column = Column(name = "backgroundSmallUrl", length = 500)),
-        AttributeOverride(name = "mediumUrl", column = Column(name = "backgroundMediumUrl", length = 500)),
-        AttributeOverride(name = "bigUrl", column = Column(name = "backgroundBigUrl", length = 500)),
-    )
-    var backgroundImage: Image,
+    var backgroundImage: BackgroundImage,
 
     var isSubscribed: Boolean = false, // TODO: Remove once users are implemented
 
