@@ -19,7 +19,7 @@ class EventController(
     fun getOrganizationEvents(
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
-        @RequestParam(name = "sort", defaultValue = "startDate,asc") sort: String,
+        @RequestParam(name = "sort", defaultValue = "startDate,desc") sort: String,
         @PathVariable id: Long,
     ): ResponseEntity<List<Event>> {
         return getAllWithSpecification(page, size, sort, eventBelongToOrganization(id))

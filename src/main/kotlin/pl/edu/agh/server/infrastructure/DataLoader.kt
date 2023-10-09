@@ -90,13 +90,31 @@ class DataLoader(
                     endDate = LocalDateTime.now().plusDays(1).plusMinutes(90),
                 ),
                 Event(
-                    name = "Test Event 1",
+                    name = "Test Event 2",
                     imageUrl = org.imageUrl,
                     organization = org,
                     description = "Test event description 2",
                     location = "AGH D17 4.26",
                     startDate = LocalDateTime.now().plusDays(2),
                     endDate = LocalDateTime.now().plusDays(2).plusMinutes(90),
+                ),
+                Event(
+                    name = "Test Event 3",
+                    imageUrl = org.imageUrl,
+                    organization = org,
+                    description = "Test event description 3",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().minusDays(2),
+                    endDate = LocalDateTime.now().minusDays(2).plusMinutes(90),
+                ),
+                Event(
+                    name = "Test Event 4",
+                    imageUrl = org.imageUrl,
+                    organization = org,
+                    description = "Test event description 4",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().minusDays(2),
+                    endDate = LocalDateTime.now().minusDays(2).plusMinutes(90),
                 ),
             )
 
