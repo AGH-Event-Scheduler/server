@@ -2,7 +2,7 @@
 name: Test Formatting
 
 on:
-  pull_request:
+  push:
 
 jobs:
   formatting:
