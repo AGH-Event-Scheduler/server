@@ -8,6 +8,8 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
+import java.time.LocalDateTime
+import java.util.*
 
 @Configuration
 class DataLoader(
@@ -83,12 +85,18 @@ class DataLoader(
                     imageUrl = org.imageUrl,
                     organization = org,
                     description = "Test event description 1",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().plusDays(1),
+                    endDate = LocalDateTime.now().plusDays(1).plusMinutes(90),
                 ),
                 Event(
                     name = "Test Event 1",
                     imageUrl = org.imageUrl,
                     organization = org,
                     description = "Test event description 2",
+                    location = "AGH D17 4.26",
+                    startDate = LocalDateTime.now().plusDays(2),
+                    endDate = LocalDateTime.now().plusDays(2).plusMinutes(90),
                 ),
             )
 
