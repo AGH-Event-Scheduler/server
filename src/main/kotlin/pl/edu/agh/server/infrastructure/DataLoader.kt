@@ -6,16 +6,21 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
+import pl.edu.agh.server.domain.user.*
 
 @Configuration
 class DataLoader(
     private val studentRepository: StudentRepository,
     private val organizationRepository: OrganizationRepository,
+    private val userRepository: UserRepository,
+    private val userService: UserService,
+    private val userDetailsService: UserDetailsService,
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
         val student = Student("472924", "Kamil", "Błażewicz")
         studentRepository.save(student)
         createOrganizations()
+        createUsers()
     }
 
     private fun createOrganizations() {
@@ -68,5 +73,22 @@ class DataLoader(
                 ),
             ),
         )
+    }
+
+    private fun createUsers() {
+        userRepository.saveAll(
+            listOf(
+                User(
+                    login = "admin",
+                    password = "admin",
+                ),
+                User(
+                    login = "user",
+                    password = "user",
+                ),
+            ),
+        )
+        val adminUser = userService.saveUserDetails(UserDetails(userRepository.findById(1).get(), "Kamil", "Błażewicz"))
+        userDetailsService.subscribeToOrganization(adminUser, organizationRepository.findById(1).get())
     }
 }

@@ -15,7 +15,7 @@ import kotlin.reflect.full.memberProperties
 open class BaseIdentifiableEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    var id: Long? = null,
 
     val creationDate: LocalDateTime = LocalDateTime.now(),
 
