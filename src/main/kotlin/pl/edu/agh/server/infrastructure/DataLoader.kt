@@ -104,12 +104,12 @@ class DataLoader(
         userRepository.saveAll(
             listOf(
                 User(
-                    login = "admin",
-                    password = "admin",
+                    email = "admin@agh.edu.pl",
+                    password = "admin123",
                 ),
                 User(
-                    login = "user",
-                    password = "user",
+                    email = "user@student.agh.edu.pl",
+                    password = "user1234",
                 ),
             ),
         )
@@ -118,9 +118,9 @@ class DataLoader(
     }
 
     private fun createEvents() {
-        var organizations = organizationRepository.findAll()
+        val organizations = organizationRepository.findAll()
         for (org: Organization in organizations) {
-            var events = listOf(
+            val events = listOf(
                 Event(
                     name = "Test Event 1",
                     backgroundImage = org.backgroundImage,
