@@ -113,8 +113,8 @@ class DataLoader(
                 ),
             ),
         )
-        val adminUser = userService.saveUserDetails(UserDetails(userRepository.findById(1).get(), "Kamil", "Błażewicz"))
-        userDetailsService.subscribeToOrganization(adminUser, organizationRepository.findById(1).get())
+        val kamilUser = userService.saveUserDetails(UserDetails(userRepository.findById(1).get(), "Kamil", "Błażewicz"))
+        userDetailsService.subscribeToOrganization(kamilUser, organizationRepository.findById(1).get())
     }
 
     private fun createEvents() {

@@ -16,4 +16,8 @@ class UserDetailsService(
         organization.addSubscriber(userDetails)
         organizationRepository.save(organization)
     }
+
+    fun getUserDetailsByUserId(userId: Long): UserDetails {
+        return userDetailsRepository.findByUserId(userId)
+    }
 }

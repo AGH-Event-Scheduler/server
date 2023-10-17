@@ -10,6 +10,7 @@ import pl.edu.agh.server.domain.common.LogoImage
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.user.UserDetails
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
+import kotlin.jvm.Transient
 
 @Entity
 @Table(name = "Organization")
@@ -25,6 +26,7 @@ class Organization(
     @Embedded
     var backgroundImage: BackgroundImage,
 
+    @Transient
     var isSubscribed: Boolean = false, // TODO: Remove once users are implemented
 
     @Column(length = 1000)
@@ -33,12 +35,12 @@ class Organization(
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     var events: List<Event> = listOf(),
-) : BaseIdentifiableEntity() {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_details_id")
     @JsonIgnore
-    var userDetails: MutableSet<UserDetails> = mutableSetOf()
+    var userDetails: MutableList<UserDetails> = mutableListOf(),
+) : BaseIdentifiableEntity() {
 
     fun addSubscriber(user: UserDetails) {
         userDetails.add(user)
