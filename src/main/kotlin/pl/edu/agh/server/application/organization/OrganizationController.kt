@@ -21,51 +21,29 @@ class OrganizationController(
 
     @GetMapping("/{userId}")
     fun getOrganizationsForUser(@PathVariable userId: Long): ResponseEntity<List<Organization>> {
-        val organizations = organizationRepository.findAll()
-            .map { organization ->
-                organization.apply {
-                    isSubscribed = organizationService.isSubscribedByUser(organization, userId)
-                }
-            }
-
-        return ResponseEntity.ok(organizations)
+        return ResponseEntity.ok(getOrganizationsWithSubscription(userId))
     }
 
     @GetMapping("/{userId}/subscribed")
     fun getOrganizationsSubscribedForUser(@PathVariable userId: Long): ResponseEntity<List<Organization>> {
-        val organizations = organizationRepository.findAll()
-            .filter { organization -> organizationService.isSubscribedByUser(organization, userId) }
-            .map { organization ->
-                organization.apply {
-                    isSubscribed = true
-                }
-            }
-
-        return ResponseEntity.ok(organizations)
+        return ResponseEntity.ok(getSubscribedOrganizations(userId))
     }
 
     @GetMapping("/details/{id}")
     fun getOrganizationById(@PathVariable id: Long): ResponseEntity<Organization> {
-        val organization = organizationRepository.findById(id)
-
-        return organization.map {
-            ResponseEntity.ok(it)
-        }.orElseGet {
-            ResponseEntity.notFound().build()
-        }
+        return organizationRepository.findById(id)
+            .map { ResponseEntity.ok(it) }
+            .orElseGet { ResponseEntity.notFound().build() }
     }
 
     @GetMapping("/details/{id}/{userId}")
     fun getOrganizationByIdAndUserId(@PathVariable id: Long, @PathVariable userId: Long): ResponseEntity<Organization> {
-        val organization = organizationRepository.findById(id)
-        return organization.map {
-            it.apply {
-                isSubscribed = organizationService.isSubscribedByUser(it, userId)
+        return organizationRepository.findById(id)
+            .map {
+                it.apply { isSubscribed = organizationService.isSubscribedByUser(it, userId) }
+                ResponseEntity.ok(it)
             }
-            ResponseEntity.ok(it)
-        }.orElseGet {
-            ResponseEntity.notFound().build()
-        }
+            .orElseGet { ResponseEntity.notFound().build() }
     }
 
     @PatchMapping("/details/{id}/subscription/{userId}")
@@ -74,12 +52,29 @@ class OrganizationController(
         @PathVariable userId: Long,
         @Valid @RequestBody updatedStatus: Boolean,
     ): ResponseEntity<Unit> {
-        val organization = organizationRepository.findById(id)
-        return organization.map {
-            organizationService.updateIsSubscribedStatus(it, updatedStatus, userId)
-            ResponseEntity.ok<Unit>(Unit)
-        }.orElseGet {
-            ResponseEntity.notFound().build()
+        return organizationRepository.findById(id)
+            .map {
+                organizationService.updateIsSubscribedStatus(it, updatedStatus, userId)
+                ResponseEntity.ok(Unit)
+            }
+            .orElseGet { ResponseEntity.notFound().build() }
+    }
+
+    private fun getOrganizationsWithSubscription(userId: Long): List<Organization> {
+        return organizationRepository.findAll().map { organization ->
+            organization.apply {
+                isSubscribed = organizationService.isSubscribedByUser(organization, userId)
+            }
         }
+    }
+
+    private fun getSubscribedOrganizations(userId: Long): List<Organization> {
+        return organizationRepository.findAll()
+            .filter { organization -> organizationService.isSubscribedByUser(organization, userId) }
+            .map { organization ->
+                organization.apply {
+                    isSubscribed = true
+                }
+            }
     }
 }
