@@ -1,5 +1,6 @@
 package pl.edu.agh.server.infrastructure
 
+import org.apache.commons.lang3.math.NumberUtils.toLong
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Configuration
 import pl.edu.agh.server.domain.common.BackgroundImage
@@ -10,7 +11,9 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
+import java.sql.Timestamp
 import java.time.LocalDateTime
+import kotlin.random.Random.Default.nextInt
 
 @Configuration
 class DataLoader(
@@ -98,6 +101,7 @@ class DataLoader(
     private fun createEvents() {
         var organizations = organizationRepository.findAll()
         for (org: Organization in organizations) {
+            var offset = nextInt(0, 30)
             var events = listOf(
                 Event(
                     name = "Test Event 1",
@@ -105,8 +109,8 @@ class DataLoader(
                     organization = org,
                     description = shortLoremIpsum(),
                     location = "AGH D17 4.26",
-                    startDate = LocalDateTime.now().plusDays(1),
-                    endDate = LocalDateTime.now().plusDays(1).plusMinutes(90),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString()))),
                 ),
                 Event(
                     name = "Test Event 2",
@@ -114,8 +118,8 @@ class DataLoader(
                     organization = org,
                     description = longLoremIpsum(),
                     location = "AGH D17 4.26",
-                    startDate = LocalDateTime.now().plusDays(2),
-                    endDate = LocalDateTime.now().plusDays(2).plusMinutes(90),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString()))),
                 ),
                 Event(
                     name = "Test Event 3",
@@ -123,8 +127,8 @@ class DataLoader(
                     organization = org,
                     description = mediumLoremIpsum(),
                     location = "AGH D17 4.26",
-                    startDate = LocalDateTime.now().minusDays(2),
-                    endDate = LocalDateTime.now().minusDays(2).plusMinutes(90),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString()))),
                 ),
                 Event(
                     name = "Test Event 4",
@@ -132,8 +136,8 @@ class DataLoader(
                     organization = org,
                     description = longLoremIpsum(),
                     location = "AGH D17 4.26",
-                    startDate = LocalDateTime.now().minusDays(3),
-                    endDate = LocalDateTime.now().minusDays(3).plusMinutes(120),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString()))),
                 ),
             )
 
