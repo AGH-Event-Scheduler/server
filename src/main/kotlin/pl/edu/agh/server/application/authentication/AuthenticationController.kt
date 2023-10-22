@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import pl.edu.agh.server.domain.authentication.AuthenticationService
-import pl.edu.agh.server.domain.user.User
 
 @RestController
 @RequestMapping("/api/authentication")
@@ -14,19 +13,13 @@ class AuthenticationController(
     private val authenticationService: AuthenticationService,
 ) {
 
-    @PostMapping("/login")
-    fun login(@RequestBody loginRequest: LoginRequest): ResponseEntity<User> {
-        val user = authenticationService.authenticate(loginRequest.email, loginRequest.password)
+    @PostMapping("/register")
+    fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthenticationResponse> {
+        return ResponseEntity.ok(authenticationService.register(request))
+    }
 
-        return if (user != null) {
-            ResponseEntity.ok(user)
-        } else {
-            ResponseEntity.badRequest().build()
-        }
+    @PostMapping("/authenticate")
+    fun authenticate(@RequestBody request: AuthenticationRequest): ResponseEntity<AuthenticationResponse> {
+        return ResponseEntity.ok(authenticationService.authenticate(request))
     }
 }
-
-data class LoginRequest(
-    val email: String,
-    val password: String,
-)
