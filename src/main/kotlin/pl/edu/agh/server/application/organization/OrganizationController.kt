@@ -54,9 +54,10 @@ class OrganizationController(
 
     @GetMapping("/{organizationId}")
     fun getOrganizationById(
+        request: HttpServletRequest,
         @PathVariable organizationId: Long,
     ): ResponseEntity<OrganizationDto> {
-        val organization = userOrganizationService.getOrganizationById(organizationId, null)
+        val organization = userOrganizationService.getOrganizationById(organizationId, getUserName(request))
         return ResponseEntity.ok(organization)
     }
 
