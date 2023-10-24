@@ -20,6 +20,13 @@ class AuthenticationController(
 
     @PostMapping("/authenticate")
     fun authenticate(@RequestBody request: AuthenticationRequest): ResponseEntity<AuthenticationResponse> {
-        return ResponseEntity.ok(authenticationService.authenticate(request))
+        var response: AuthenticationResponse? = null
+        try {
+            response = authenticationService.authenticate(request)
+        } catch (e: Exception) {
+            return ResponseEntity.badRequest().build()
+        }
+
+        return ResponseEntity.ok(response)
     }
 }

@@ -7,7 +7,6 @@ import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.dto.OrganizationDto
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.UserOrganizationService
-import pl.edu.agh.server.domain.user.User
 
 @RestController
 @RequestMapping("/api/organizations")
@@ -23,18 +22,18 @@ class OrganizationController(
     fun subscribeUserToOrganization(
         request: HttpServletRequest,
         @RequestParam organizationId: Long,
-    ): ResponseEntity<User> {
-        val user = userOrganizationService.subscribeUserToOrganization(getUserName(request), organizationId)
-        return ResponseEntity.ok(user)
+    ): ResponseEntity<Void> {
+        userOrganizationService.subscribeUserToOrganization(getUserName(request), organizationId)
+        return ResponseEntity.ok().build()
     }
 
     @PostMapping("/unsubscribe")
     fun unsubscribeUserFromOrganization(
         request: HttpServletRequest,
         @RequestParam organizationId: Long,
-    ): ResponseEntity<User> {
-        val user = userOrganizationService.unsubscribeUserFromOrganization(getUserName(request), organizationId)
-        return ResponseEntity.ok(user)
+    ): ResponseEntity<Void> {
+        userOrganizationService.unsubscribeUserFromOrganization(getUserName(request), organizationId)
+        return ResponseEntity.ok().build()
     }
 
     @GetMapping
