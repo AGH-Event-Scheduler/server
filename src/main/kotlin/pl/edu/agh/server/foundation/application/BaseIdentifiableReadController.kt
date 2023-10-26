@@ -29,7 +29,17 @@ abstract class BaseIdentifiableReadController<T : BaseIdentifiableEntity>(
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "id,asc") sort: String,
     ): ResponseEntity<List<T>> {
-        return getAllWithSpecification(page, size, sort)
+        return respondWithAllWithSpecification(page, size, sort)
+    }
+
+    protected fun respondWithAllWithSpecification(
+        page: Int,
+        size: Int,
+        sort: String,
+        specification: Specification<T>? = null,
+    ): ResponseEntity<List<T>> {
+        val entities = getAllWithSpecification(page, size, sort, specification)
+        return ResponseEntity.ok(entities)
     }
 
     protected fun getAllWithSpecification(
@@ -37,7 +47,7 @@ abstract class BaseIdentifiableReadController<T : BaseIdentifiableEntity>(
         size: Int,
         sort: String,
         specification: Specification<T>? = null,
-    ): ResponseEntity<List<T>> {
+    ): List<T> {
         val sortParams = sort.split(",")
         val sortBy = sortParams[0]
         val sortDirection = if (sortParams.size > 1) Sort.Direction.fromString(sortParams[1]) else Sort.Direction.ASC
@@ -48,7 +58,6 @@ abstract class BaseIdentifiableReadController<T : BaseIdentifiableEntity>(
         } else {
             repository.findAll(pageable).content
         }
-
-        return ResponseEntity.ok(entities)
+        return entities
     }
 }

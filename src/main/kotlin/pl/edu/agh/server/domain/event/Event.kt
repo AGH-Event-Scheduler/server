@@ -7,7 +7,7 @@ import lombok.ToString
 import pl.edu.agh.server.domain.common.BackgroundImage
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
-import java.time.LocalDateTime
+import java.util.*
 
 @Entity
 @Table(name = "Event")
@@ -23,9 +23,9 @@ class Event(
     @Column(length = 1000)
     var description: String,
 
-    var startDate: LocalDateTime,
+    var startDate: Date,
 
-    var endDate: LocalDateTime,
+    var endDate: Date,
 
     var location: String,
 
