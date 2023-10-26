@@ -3,6 +3,8 @@ package pl.edu.agh.server.infrastructure
 import org.apache.commons.lang3.math.NumberUtils.toLong
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Configuration
+import pl.edu.agh.server.application.authentication.RegisterRequest
+import pl.edu.agh.server.domain.authentication.AuthenticationService
 import pl.edu.agh.server.domain.common.BackgroundImage
 import pl.edu.agh.server.domain.common.LogoImage
 import pl.edu.agh.server.domain.event.Event
@@ -11,7 +13,6 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
-import pl.edu.agh.server.domain.user.UserRepository
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import kotlin.random.Random.Default.nextInt
@@ -20,7 +21,7 @@ import kotlin.random.Random.Default.nextInt
 class DataLoader(
     private val studentRepository: StudentRepository,
     private val organizationRepository: OrganizationRepository,
-    private val userRepository: UserRepository,
+    private val authenticationService: AuthenticationService,
     private val eventRepository: EventRepository,
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
@@ -93,20 +94,14 @@ class DataLoader(
     }
 
     private fun createUsers() {
-//        userRepository.saveAll(
-//            listOf(
-//                User(
-//                    email = "admin@agh.edu.pl",
-//                    password = "admin123",
-//                ),
-//                User(
-//                    email = "user@student.agh.edu.pl",
-//                    password = "user1234",
-//                ),
-//            ),
-//        )
-//        val kamilUser = userService.saveUserDetails(UserRelations(userRepository.findById(1).get(), "Kamil", "Błażewicz"))
-//        userDetailsService.subscribeToOrganization(kamilUser, organizationRepository.findById(1).get())
+        authenticationService.register(
+            RegisterRequest(
+                email = "admin@agh.edu.pl",
+                password = "admin123",
+                firstName = "admin",
+                lastName = "admin",
+            ),
+        )
     }
 
     private fun createEvents() {
@@ -121,7 +116,9 @@ class DataLoader(
                     description = shortLoremIpsum(),
                     location = "AGH D17 4.26",
                     startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
-                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                    ),
                 ),
                 Event(
                     name = "Test Event 2",
@@ -130,7 +127,9 @@ class DataLoader(
                     description = longLoremIpsum(),
                     location = "AGH D17 4.26",
                     startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).minusMinutes(toLong(offset.toString()))),
-                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().plusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                    ),
                 ),
                 Event(
                     name = "Test Event 3",
@@ -139,7 +138,9 @@ class DataLoader(
                     description = mediumLoremIpsum(),
                     location = "AGH D17 4.26",
                     startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2).minusMinutes(toLong(offset.toString()))),
-                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().minusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                    ),
                 ),
                 Event(
                     name = "Test Event 4",
@@ -148,7 +149,9 @@ class DataLoader(
                     description = longLoremIpsum(),
                     location = "AGH D17 4.26",
                     startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).minusMinutes(toLong(offset.toString()))),
-                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString())),
+                    ),
                 ),
             )
 
