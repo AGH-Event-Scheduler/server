@@ -1,31 +1,67 @@
 package pl.edu.agh.server.application.organization
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import pl.edu.agh.server.domain.organization.Organization
+import pl.edu.agh.server.config.JwtService
+import pl.edu.agh.server.domain.dto.OrganizationDto
 import pl.edu.agh.server.domain.organization.OrganizationRepository
-import pl.edu.agh.server.domain.organization.OrganizationService
-import pl.edu.agh.server.foundation.application.BaseIdentifiableCrudController
-import javax.validation.Valid
+import pl.edu.agh.server.domain.organization.UserOrganizationService
 
 @RestController
 @RequestMapping("/api/organizations")
 class OrganizationController(
     private val organizationRepository: OrganizationRepository,
-    private val organizationService: OrganizationService,
-) : BaseIdentifiableCrudController<Organization>(organizationRepository) {
+    private val userOrganizationService: UserOrganizationService,
+    private val jwtService: JwtService,
+) {
+    // TODO implement lastUpdatedDate updating when patching
+    // TODO implement pagination
 
-    @PatchMapping("/{id}/subscription")
-    fun updateSubscriptionStatus(
-        @PathVariable id: Long,
-        @Valid @RequestBody updatedStatus: Boolean,
-    ): ResponseEntity<Unit> {
-        val organization = organizationRepository.findById(id)
-        return organization.map { org ->
-            organizationService.updateIsSubscribedStatus(org, updatedStatus)
-            ResponseEntity.ok<Unit>(Unit)
-        }.orElseGet {
-            ResponseEntity.notFound().build()
-        }
+    @PostMapping("/subscribe")
+    fun subscribeUserToOrganization(
+        request: HttpServletRequest,
+        @RequestParam organizationId: Long,
+    ): ResponseEntity<Void> {
+        userOrganizationService.subscribeUserToOrganization(getUserName(request), organizationId)
+        return ResponseEntity.ok().build()
+    }
+
+    @PostMapping("/unsubscribe")
+    fun unsubscribeUserFromOrganization(
+        request: HttpServletRequest,
+        @RequestParam organizationId: Long,
+    ): ResponseEntity<Void> {
+        userOrganizationService.unsubscribeUserFromOrganization(getUserName(request), organizationId)
+        return ResponseEntity.ok().build()
+    }
+
+    @GetMapping
+    fun getAllOrganizationsWithStatusByUser(
+        request: HttpServletRequest,
+    ): ResponseEntity<List<OrganizationDto>> {
+        val organizations = userOrganizationService.getAllOrganizationsWithStatusByUser(getUserName(request))
+        return ResponseEntity.ok(organizations)
+    }
+
+    @GetMapping("/subscribed")
+    fun getSubscribedOrganizationsByUser(
+        request: HttpServletRequest,
+    ): ResponseEntity<List<OrganizationDto>> {
+        val organizations = userOrganizationService.getSubscribedOrganizationsByUser(getUserName(request))
+        return ResponseEntity.ok(organizations)
+    }
+
+    @GetMapping("/{organizationId}")
+    fun getOrganizationById(
+        request: HttpServletRequest,
+        @PathVariable organizationId: Long,
+    ): ResponseEntity<OrganizationDto> {
+        val organization = userOrganizationService.getOrganizationById(organizationId, getUserName(request))
+        return ResponseEntity.ok(organization)
+    }
+
+    private fun getUserName(request: HttpServletRequest): String {
+        return jwtService.extractUsername(request.getHeader("Authorization")!!.substring(7))
     }
 }
