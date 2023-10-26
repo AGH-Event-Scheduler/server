@@ -35,5 +35,22 @@ class EventSpecification {
                 null
             }
         }
+
+        fun eventFromOrganizationAndInDateRange(id: Long, date: Date, type: EventsType): Specification<Event> {
+            return Specification { root, query, criteriaBuilder ->
+                val predicate: Predicate = criteriaBuilder.and(
+                    criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), id),
+                    when (type) {
+                        EventsType.UPCOMING ->
+                            criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), date)
+                        EventsType.PAST ->
+                            criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), date)
+                    },
+                )
+
+                query.where(predicate)
+                null
+            }
+        }
     }
 }

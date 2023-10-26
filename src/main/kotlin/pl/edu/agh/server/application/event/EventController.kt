@@ -3,7 +3,6 @@ package pl.edu.agh.server.application.event
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import pl.edu.agh.server.application.event.EventSpecification.Companion.eventBelongToOrganization
 import pl.edu.agh.server.application.event.EventSpecification.Companion.eventInDateRange
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventRepository
@@ -25,9 +24,12 @@ class EventController(
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "startDate,desc") sort: String,
+        @RequestParam(name = "type", defaultValue = "UPCOMING") type: EventsType,
         @PathVariable id: Long,
     ): ResponseEntity<List<Event>> {
-        return respondWithAllWithSpecification(page, size, sort, eventBelongToOrganization(id))
+        val events = eventService
+            .getAllFromOrganizationInDateRange(page, size, sort, id, type)
+        return ResponseEntity.ok(events)
     }
 
     @GetMapping("/byDate")

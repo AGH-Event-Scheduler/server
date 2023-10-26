@@ -104,6 +104,15 @@ class DataLoader(
             var offset = nextInt(0, 30)
             var events = listOf(
                 Event(
+                    name = "Test Event 0",
+                    backgroundImage = org.backgroundImage,
+                    organization = org,
+                    description = shortLoremIpsum(),
+                    location = "AGH D17 4.26",
+                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusMinutes(45).minusMinutes(toLong(offset.toString()))),
+                ),
+                Event(
                     name = "Test Event 1",
                     backgroundImage = org.backgroundImage,
                     organization = org,
@@ -138,6 +147,24 @@ class DataLoader(
                     location = "AGH D17 4.26",
                     startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).minusMinutes(toLong(offset.toString()))),
                     endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString()))),
+                ),
+                Event(
+                    name = "Test Event 5",
+                    backgroundImage = org.backgroundImage,
+                    organization = org,
+                    description = shortLoremIpsum(),
+                    location = "AGH D17 4.26",
+                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
+                ),
+                Event(
+                    name = "Test Event 6",
+                    backgroundImage = org.backgroundImage,
+                    organization = org,
+                    description = shortLoremIpsum(),
+                    location = "AGH D17 4.26",
+                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
                 ),
             )
 
