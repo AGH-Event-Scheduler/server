@@ -42,7 +42,7 @@ class EventSpecification {
                     criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), id),
                     when (type) {
                         EventsType.UPCOMING ->
-                            criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), date)
+                            criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), date)
                         EventsType.PAST ->
                             criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), date)
                     },
