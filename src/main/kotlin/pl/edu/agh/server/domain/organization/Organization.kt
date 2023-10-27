@@ -24,12 +24,11 @@ class Organization(
     @Embedded
     var backgroundImage: BackgroundImage,
 
-    var isSubscribed: Boolean = false, // TODO: Remove once users are implemented
-
     @Column(length = 1000)
     var description: String,
 
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     var events: List<Event> = listOf(),
+
 ) : BaseIdentifiableEntity()
