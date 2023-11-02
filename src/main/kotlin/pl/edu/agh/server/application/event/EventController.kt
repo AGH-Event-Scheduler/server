@@ -76,6 +76,10 @@ class EventController(
         println(startDate)
         println(endDate)
 
+        eventService.createEvent(backgroundImage = backgroundImage)
+
         return ResponseEntity.ok("{\"message\":\"OK\"}")
     }
+
+    class EventCreationException(s: String) : RuntimeException(s)
 }
