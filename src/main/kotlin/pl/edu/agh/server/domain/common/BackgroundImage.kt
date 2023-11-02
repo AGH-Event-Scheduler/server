@@ -15,4 +15,10 @@ class BackgroundImage(
     var mediumUrl: String,
     @Column(length = 500, name = "backgroundBigUrl")
     var bigUrl: String,
-)
+) {
+    companion object {
+        val SMALL_SIZE = listOf(80, 45)
+        val MEDIUM_SIZE = listOf(160, 90)
+        val BIG_SIZE = listOf(320, 180)
+    }
+}

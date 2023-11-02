@@ -1,10 +1,11 @@
-package pl.edu.agh.server.domain.file
+package pl.edu.agh.server.domain.image
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -35,6 +36,12 @@ class ImageStorage(@Value("\${file.upload-dir}") private val uploadDir: String) 
         } catch (e: IOException) {
             throw ImageStorageException("Failed to save image: $filename")
         }
+    }
+
+    fun saveFile(image: Image, imageId: UUID, filename: String) {
+        val bufferedImage = BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB)
+        bufferedImage.createGraphics().drawImage(image, 0, 0, null)
+        return saveFile(bufferedImage, imageId, filename)
     }
 
     fun checkIfImageWithProperExtensions(multipartFile: MultipartFile): Boolean {
