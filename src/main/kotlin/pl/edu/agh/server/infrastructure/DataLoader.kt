@@ -125,7 +125,7 @@ class DataLoader(
         val organizations = organizationRepository.findAll()
         for (org: Organization in organizations) {
             var offset = nextInt(0, 30)
-            var events = listOf(
+            var events = mutableListOf(
                 Event(
                     name = "Test Event 0",
                     backgroundImage = org.backgroundImage,

@@ -29,6 +29,6 @@ class Organization(
 
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
-    var events: List<Event> = listOf(),
+    var events: MutableList<Event> = mutableListOf(),
 
 ) : BaseIdentifiableEntity()

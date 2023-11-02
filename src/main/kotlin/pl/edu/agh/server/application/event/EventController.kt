@@ -60,7 +60,7 @@ class EventController(
         @RequestParam("location") location: String,
         @RequestParam("startDate") startDateTimestamp: Long,
         @RequestParam("endDate") endDateTimestamp: Long,
-    ): ResponseEntity<String> {
+    ): ResponseEntity<Event> {
         val objectMapper = jacksonObjectMapper()
         val nameDictionary = objectMapper.readValue(name, Map::class.java)
         val descriptionDictionary = objectMapper.readValue(description, Map::class.java)
@@ -68,17 +68,17 @@ class EventController(
         val startDate = Date(startDateTimestamp)
         val endDate = Date(endDateTimestamp)
 
-        println(id)
-        println(backgroundImage)
-        println(nameDictionary)
-        println(descriptionDictionary)
-        println(locationDictionary)
-        println(startDate)
-        println(endDate)
+        val event = eventService.createEvent(
+            id = id,
+            backgroundImage = backgroundImage,
+            name = nameDictionary["pl"].toString(),
+            description = descriptionDictionary["pl"].toString(),
+            location = locationDictionary["pl"].toString(),
+            startDate = startDate,
+            endDate = endDate,
+        )
 
-        eventService.createEvent(backgroundImage = backgroundImage)
-
-        return ResponseEntity.ok("{\"message\":\"OK\"}")
+        return ResponseEntity.ok(event)
     }
 
     class EventCreationException(s: String) : RuntimeException(s)

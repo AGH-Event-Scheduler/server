@@ -17,7 +17,6 @@ class ImageController(private val imageStorage: ImageStorage) {
 
     @GetMapping("/{imageId}/{filename}", produces = [MediaType.IMAGE_PNG_VALUE])
     fun getImage(@PathVariable filename: String, @PathVariable imageId: UUID): ResponseEntity<Resource> {
-        println(filename)
         if (!filename.startsWith("small") && !filename.startsWith("medium") && !filename.startsWith("big")) {
             throw InvalidAttributeValueException("Incorrect filename")
         }

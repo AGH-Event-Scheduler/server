@@ -42,8 +42,16 @@ class EventService(private val eventRepository: EventRepository, private val org
     }
 
     fun createEvent(
+        id: Long,
         backgroundImage: MultipartFile,
-    ) {
+        name: String,
+        description: String,
+        location: String,
+        startDate: Date,
+        endDate: Date,
+    ): Event {
+        val organization = organizationRepository.findById(id).orElseThrow()
+
         if (!imageStorage.checkIfImageWithProperExtensions(backgroundImage)) {
             throw IncorrectFileUploadException("Uploaded file type is not supported")
         }
@@ -74,13 +82,25 @@ class EventService(private val eventRepository: EventRepository, private val org
         imageStorage.saveFile(mediumBackgroundImage, imageId, mediumName)
         imageStorage.saveFile(bigBackgroundImage, imageId, bigName)
 
-//        val newEvent = Event()
-//        val organizastion.update()
-//
-//        save(event)
-//        save(organization)
-//
-//        return Event
+        val newEvent = Event(
+            name = name,
+            description = description,
+            location = location,
+            startDate = startDate,
+            endDate = endDate,
+            organization = organization,
+            backgroundImage = BackgroundImage(
+                imageId = imageId,
+                smallFilename = smallName,
+                mediumFilename = mediumName,
+                bigFilename = bigName,
+            ),
+        )
+        organization.events.add(newEvent)
+        eventRepository.save(newEvent)
+        organizationRepository.save(organization)
+
+        return newEvent
     }
 
     class IncorrectFileUploadException(s: String) : RuntimeException(s)
