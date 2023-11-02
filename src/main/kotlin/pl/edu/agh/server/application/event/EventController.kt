@@ -1,8 +1,10 @@
 package pl.edu.agh.server.application.event
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.event.EventSpecification.Companion.eventInDateRange
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventRepository
@@ -47,5 +49,33 @@ class EventController(
         return ResponseEntity.ok(
             groupedEntities,
         )
+    }
+
+    @PostMapping("/organization/{id}")
+    fun createEventForOrganization(
+        @PathVariable id: Long,
+        @RequestParam("backgroundImage") backgroundImage: MultipartFile,
+        @RequestParam("name") name: String,
+        @RequestParam("description") description: String,
+        @RequestParam("location") location: String,
+        @RequestParam("startDate") startDateTimestamp: Long,
+        @RequestParam("endDate") endDateTimestamp: Long,
+    ): ResponseEntity<String> {
+        val objectMapper = jacksonObjectMapper()
+        val nameDictionary = objectMapper.readValue(name, Map::class.java)
+        val descriptionDictionary = objectMapper.readValue(description, Map::class.java)
+        val locationDictionary = objectMapper.readValue(location, Map::class.java)
+        val startDate = Date(startDateTimestamp)
+        val endDate = Date(endDateTimestamp)
+
+        println(id)
+        println(backgroundImage)
+        println(nameDictionary)
+        println(descriptionDictionary)
+        println(locationDictionary)
+        println(startDate)
+        println(endDate)
+
+        return ResponseEntity.ok("{\"message\":\"OK\"}")
     }
 }
