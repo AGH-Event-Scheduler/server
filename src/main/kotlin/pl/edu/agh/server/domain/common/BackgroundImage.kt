@@ -17,8 +17,8 @@ class BackgroundImage(
     var bigUrl: String,
 ) {
     companion object {
-        val SMALL_SIZE = listOf(80, 45)
-        val MEDIUM_SIZE = listOf(160, 90)
-        val BIG_SIZE = listOf(320, 180)
+        val SMALL_SIZE = listOf(640, 360)
+        val MEDIUM_SIZE = listOf(1280, 720)
+        val BIG_SIZE = listOf(1920, 1080)
     }
 }

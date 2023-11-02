@@ -39,7 +39,7 @@ class ImageStorage(@Value("\${file.upload-dir}") private val uploadDir: String) 
     }
 
     fun saveFile(image: Image, imageId: UUID, filename: String) {
-        val bufferedImage = BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB)
+        val bufferedImage = BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR)
         bufferedImage.createGraphics().drawImage(image, 0, 0, null)
         return saveFile(bufferedImage, imageId, filename)
     }
