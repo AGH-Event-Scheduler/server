@@ -59,7 +59,13 @@ class ImageStorage(@Value("\${file.upload-dir}") private val uploadDir: String) 
         return fileName.substring(lastDotIndex + 1).lowercase(Locale.getDefault())
     }
 
-    fun deleteImage(imageId: UUID) {}
+    fun getAllSavedImageIds(): List<UUID> {
+        return File(uploadDir).listFiles()?.map { UUID.fromString(it.nameWithoutExtension) }?.toList() ?: listOf()
+    }
+
+    fun deleteImage(imageId: UUID) {
+        File("$uploadDir/$imageId").deleteRecursively()
+    }
 
     fun getFile(imageId: UUID, filename: String): Resource {
         return FileSystemResource("$uploadDir/$imageId/$filename")

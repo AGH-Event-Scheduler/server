@@ -1,6 +1,7 @@
 package pl.edu.agh.server.infrastructure
 
 import org.apache.commons.lang3.math.NumberUtils.toLong
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Configuration
 import pl.edu.agh.server.application.authentication.RegisterRequest
@@ -30,13 +31,22 @@ class DataLoader(
     private val eventRepository: EventRepository,
     private val imageStorage: ImageStorage,
     private val imageResizeService: ImageResizeService,
+    @Value("\${file.ddl-auto}") private val fileDDLAuto: String,
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
         val student = Student("472924", "Kamil", "Błażewicz")
         studentRepository.save(student)
+
+        if (fileDDLAuto == "create-drop") {
+            removeImages()
+        }
         createOrganizations()
         createEvents()
         createUsers()
+    }
+
+    private fun removeImages() {
+        imageStorage.getAllSavedImageIds().forEach { imageStorage.deleteImage(it) }
     }
 
     private fun createOrganizations() {
