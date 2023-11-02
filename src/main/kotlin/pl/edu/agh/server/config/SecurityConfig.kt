@@ -25,6 +25,7 @@ class SecurityConfig(
             .authorizeHttpRequests()
             .requestMatchers(
                 "/api/authentication/**",
+                "/images/**",
             )
             .permitAll()
             .anyRequest()

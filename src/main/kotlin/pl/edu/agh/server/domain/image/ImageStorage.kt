@@ -19,7 +19,6 @@ class ImageStorage(@Value("\${file.upload-dir}") private val uploadDir: String) 
 
     fun createImageDirectory(imageId: UUID) {
         val path = "$uploadDir/$imageId"
-        println(path)
         val folder = File(path)
         if (folder.exists()) {
             throw ImageStorageException("ImageID is already in use")
@@ -39,7 +38,11 @@ class ImageStorage(@Value("\${file.upload-dir}") private val uploadDir: String) 
     }
 
     fun saveFile(image: Image, imageId: UUID, filename: String) {
-        val bufferedImage = BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR)
+        val bufferedImage = if (getFileExtension(filename) == "png") {
+            BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_4BYTE_ABGR)
+        } else {
+            BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR)
+        }
         bufferedImage.createGraphics().drawImage(image, 0, 0, null)
         return saveFile(bufferedImage, imageId, filename)
     }
@@ -59,7 +62,7 @@ class ImageStorage(@Value("\${file.upload-dir}") private val uploadDir: String) 
     fun deleteImage(imageId: UUID) {}
 
     fun getFile(imageId: UUID, filename: String): Resource {
-        return FileSystemResource("$uploadDir") // TODO
+        return FileSystemResource("$uploadDir/$imageId/$filename")
     }
 
     fun generateImageId(): UUID {

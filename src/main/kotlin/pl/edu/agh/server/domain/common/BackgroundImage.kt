@@ -4,17 +4,20 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import lombok.Data
 import lombok.ToString
+import java.util.UUID
 
 @Embeddable
 @Data
 @ToString
 class BackgroundImage(
-    @Column(length = 500, name = "backgroundSmallUrl")
-    var smallUrl: String,
-    @Column(length = 500, name = "backgroundMediumUrl")
-    var mediumUrl: String,
-    @Column(length = 500, name = "backgroundBigUrl")
-    var bigUrl: String,
+    @Column(name = "backgroundImageId")
+    var imageId: UUID,
+    @Column(name = "backgroundSmallFilename")
+    var smallFilename: String,
+    @Column(name = "backgroundMediumFilename")
+    var mediumFilename: String,
+    @Column(name = "backgroundBigFilename")
+    var bigFilename: String,
 ) {
     companion object {
         val SMALL_SIZE = listOf(640, 360)

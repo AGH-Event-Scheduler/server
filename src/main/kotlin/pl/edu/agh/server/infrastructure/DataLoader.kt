@@ -9,12 +9,17 @@ import pl.edu.agh.server.domain.common.BackgroundImage
 import pl.edu.agh.server.domain.common.LogoImage
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventRepository
+import pl.edu.agh.server.domain.image.ImageResizeService
+import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
+import java.awt.image.BufferedImage
+import java.io.File
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import javax.imageio.ImageIO
 import kotlin.random.Random.Default.nextInt
 
 @Configuration
@@ -23,6 +28,8 @@ class DataLoader(
     private val organizationRepository: OrganizationRepository,
     private val authenticationService: AuthenticationService,
     private val eventRepository: EventRepository,
+    private val imageStorage: ImageStorage,
+    private val imageResizeService: ImageResizeService,
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
         val student = Student("472924", "Kamil", "Błażewicz")
@@ -37,56 +44,56 @@ class DataLoader(
             listOf(
                 Organization(
                     name = "KN BIT",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/6vvcu0fN9x6damaH2chW1A/b7a014b13b6e355ccce4196712a5b2b4/bit-logo-black.jpg"),
-                    backgroundImage = createBackgroundImage("https://scontent-waw1-1.xx.fbcdn.net/v/t39.30808-6/326557612_1115707902439686_3600150035022229767_n.jpg?stp=dst-jpg_p640x640&_nc_cat=102&ccb=1-7&_nc_sid=52f669&_nc_ohc=69lLv7Rm9RcAX9jyR4k&_nc_ht=scontent-waw1-1.xx&oh=00_AfDYu77iHxecnVNVtRYWr_P9RsjAlWl8mK-M1VPyLGFIGQ&oe=652A0932"),
+                    logoImage = createLogoImage("logo-1.jpg"),
+                    backgroundImage = createBackgroundImage("bg-1.jpg"),
                     description = longLoremIpsum(),
                 ),
                 Organization(
                     name = "KN Osób Studiujących Socjologię",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/6lDoTg2CZHE6PXtFcMN3QU/ff7406cb993c922d0673217941691700/sygnet_z_podpisem_-na_jasne_t_____o-.png"),
-                    backgroundImage = createBackgroundImage("https://scontent-waw1-1.xx.fbcdn.net/v/t39.30808-6/348235559_1854105901637991_5866130343039219612_n.png?stp=dst-png_s960x960&_nc_cat=110&ccb=1-7&_nc_sid=52f669&_nc_ohc=KguFwPyDnkEAX8qaJCg&_nc_ht=scontent-waw1-1.xx&oh=00_AfALQNae7xP6QAGARTfBSCKamVH7tukpC3_uaZdCh7T5gg&oe=6529338C"),
+                    logoImage = createLogoImage("logo-2.png"),
+                    backgroundImage = createBackgroundImage("bg-2.png"),
                     description = mediumLoremIpsum(),
                 ),
                 Organization(
                     name = "BioMedical Innovations",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/13nZonPMXG0IdiKYepcazY/a75a6f11bc6a4b90d3828acab621e7fa/logo.png"),
-                    backgroundImage = createBackgroundImage("https://skn.agh.edu.pl/static/og-image-c72c98f019ad0e2b3a94f73693f8d457.png"),
+                    logoImage = createLogoImage("logo-3.jpeg"),
+                    backgroundImage = createBackgroundImage("bg-3.png"),
                     description = shortLoremIpsum(),
                 ),
                 Organization(
                     name = "Koło Naukowe Creative",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/2k6DY1kwOBQhahKuCbpIvc/bb03660786772eb34283a43d01f06163/creative_____kopia.jpg"),
-                    backgroundImage = createBackgroundImage("https://scontent-waw1-1.xx.fbcdn.net/v/t39.30808-6/291327502_537868148034721_130053540757400704_n.png?stp=dst-png_s960x960&_nc_cat=102&ccb=1-7&_nc_sid=52f669&_nc_ohc=Qg89GVzFNBMAX_M7Rah&_nc_ht=scontent-waw1-1.xx&oh=00_AfBVNToMzx-xyBPoVpvCvA2J-K1EqdGU0uyOomBisCB-3g&oe=652854D9"),
+                    logoImage = createLogoImage("logo-4.png"),
+                    backgroundImage = createBackgroundImage("bg-4.png"),
                     description = longLoremIpsum(),
                 ),
                 Organization(
                     name = "AGH Eko-Energia",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/6Clmj70XeHofaHaKs4gk9f/b8cae55e413d98254dc3573e50a50a2c/Logo_kwadrat.jpg"),
-                    backgroundImage = createBackgroundImage("https://energiaimy.pl/wp-content/uploads/2016/03/Eko_flat_left_2.png"),
+                    logoImage = createLogoImage("logo-5.jpg"),
+                    backgroundImage = createBackgroundImage("bg-5.png"),
                     description = mediumLoremIpsum(),
                 ),
                 Organization(
                     name = "Koło Naukowe Data Team",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/5lCSN4c2tjkX4XrIV0vCB/06b3b3ef735c8e2c0895a3c2284d24d8/338877992_6012870298833520_3324859086898778115_n.jpg"),
-                    backgroundImage = createBackgroundImage("https://opengraph.githubassets.com/78d00acc43ccdc2b371896258fd491689e2081f5475d8a7e4cbbfa45ae3067bf/Kolo-Naukowe-Data-Science-PW/Rekrutacja20"),
+                    logoImage = createLogoImage("logo-6.jpg"),
+                    backgroundImage = createBackgroundImage("bg-6.png"),
                     description = shortLoremIpsum(),
                 ),
                 Organization(
                     name = "KN 4 Society",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/72PtIIc5egzpyEgYvNBVyD/79a9c93385ce66132e2f6cf1ca0dd746/logo.jpeg"),
-                    backgroundImage = createBackgroundImage("https://scontent-waw1-1.xx.fbcdn.net/v/t39.30808-6/306754035_461041406064479_2917323435672627171_n.jpg?stp=dst-jpg_s960x960&_nc_cat=110&ccb=1-7&_nc_sid=52f669&_nc_ohc=zy9WEOVp8KQAX9xBFBR&_nc_ht=scontent-waw1-1.xx&oh=00_AfDabdP6bpfteYRum1BLuQgipSirENyJDfrXluRHOTHENA&oe=6528D813"),
+                    logoImage = createLogoImage("logo-7.jpeg"),
+                    backgroundImage = createBackgroundImage("bg-7.jpg"),
                     description = longLoremIpsum(),
                 ),
                 Organization(
                     name = "KN Energon",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/2hGRA4ipUETBw2l5dpxXFb/a6f465d9ca7566722c19b766f37505f3/LOGO.png"),
-                    backgroundImage = createBackgroundImage("http://www.knpg.agh.edu.pl/wp-content/uploads/2020/01/GLY_5139-1024x683.jpg"),
+                    logoImage = createLogoImage("logo-8.png"),
+                    backgroundImage = createBackgroundImage("bg-8.jpg"),
                     description = mediumLoremIpsum(),
                 ),
                 Organization(
                     name = "KN Larp AGH",
-                    logoImage = createLogoImage("https://images.ctfassets.net/hvenzvkwiy9m/5UnCBCqiKVBYXaUPlNGUuf/89ddbcf2160fe22dd6f320b39ff33bf8/logoAGHsygnet.png"),
-                    backgroundImage = createBackgroundImage("https://scontent-waw1-1.xx.fbcdn.net/v/t39.30808-6/332236117_207015225310006_7825365902212222981_n.jpg?stp=cp0_dst-jpg_e15_fr_q65&_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=YkTdhooIeZEAX9J_zHX&_nc_oc=AQkFuFMJ-3lyJxR0cp2vP3q1CqpfB6OE7LlbL7G77sVup5WbsiJ2RFP6IWCECur9E-g0MMpcgOmkILdsf9L9SPlS&_nc_ht=scontent-waw1-1.xx&oh=00_AfBcrUGNv-2Ci96lC1B27wUK7w7bThHr3TFOVyg2a-UhGQ&oe=6528D379"),
+                    logoImage = createLogoImage("logo-9.png"),
+                    backgroundImage = createBackgroundImage("bg-9.jpg"),
                     description = shortLoremIpsum(),
                 ),
             ),
@@ -188,12 +195,28 @@ class DataLoader(
         }
     }
 
-    private fun createBackgroundImage(url: String): BackgroundImage {
-        return BackgroundImage(url, url, url)
+    private fun createBackgroundImage(filename: String): BackgroundImage {
+        val image: BufferedImage = ImageIO.read(File("./mock-images/$filename"))
+        val imageId = imageStorage.generateImageId()
+        val extension = imageStorage.getFileExtension(filename)
+        imageStorage.createImageDirectory(imageId)
+        imageStorage.saveFile(imageResizeService.resize(image, BackgroundImage.BIG_SIZE[0], BackgroundImage.BIG_SIZE[1]), imageId, "big.$extension")
+        imageStorage.saveFile(imageResizeService.resize(image, BackgroundImage.MEDIUM_SIZE[0], BackgroundImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
+        imageStorage.saveFile(imageResizeService.resize(image, BackgroundImage.SMALL_SIZE[0], BackgroundImage.SMALL_SIZE[1]), imageId, "small.$extension")
+
+        return BackgroundImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }
 
-    private fun createLogoImage(url: String): LogoImage {
-        return LogoImage(url, url, url)
+    private fun createLogoImage(filename: String): LogoImage {
+        val image: BufferedImage = ImageIO.read(File("./mock-images/$filename"))
+        val imageId = imageStorage.generateImageId()
+        val extension = imageStorage.getFileExtension(filename)
+        imageStorage.createImageDirectory(imageId)
+        imageStorage.saveFile(imageResizeService.resize(image, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1]), imageId, "big.$extension")
+        imageStorage.saveFile(imageResizeService.resize(image, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
+        imageStorage.saveFile(imageResizeService.resize(image, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1]), imageId, "small.$extension")
+
+        return LogoImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }
 
     private fun longLoremIpsum(): String {
