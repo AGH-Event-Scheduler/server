@@ -1,5 +1,6 @@
 package pl.edu.agh.server.domain.image
 
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.awt.Image
@@ -53,5 +54,15 @@ class ImageService(private val imageStorage: ImageStorage) {
         imageStorage.deleteImage(imageId)
     }
 
+    fun getFile(imageId: UUID, filename: String): Resource {
+        val regex = Regex("^(big|medium|small)[.](png|jpg|jpeg)$")
+        if (!regex.matches(filename)) {
+            throw IncorrectFileAccessException("Incorrect filename provided")
+        }
+        return imageStorage.getFile(imageId, filename)
+    }
+
     class IncorrectFileUploadException(s: String) : RuntimeException(s)
+
+    class IncorrectFileAccessException(s: String) : RuntimeException(s)
 }

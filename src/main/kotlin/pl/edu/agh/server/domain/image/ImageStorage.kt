@@ -68,6 +68,11 @@ class ImageStorage(@Value("\${file.upload-dir}") private val uploadDir: String) 
     }
 
     fun getFile(imageId: UUID, filename: String): Resource {
+        val path = "$uploadDir/$imageId/$filename"
+        val file = File(path)
+        if (!file.exists()) {
+            throw ImageStorageException("Image does not exist")
+        }
         return FileSystemResource("$uploadDir/$imageId/$filename")
     }
 
