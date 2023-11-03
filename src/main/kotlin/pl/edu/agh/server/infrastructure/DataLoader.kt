@@ -32,17 +32,20 @@ class DataLoader(
     private val imageStorage: ImageStorage,
     private val imageService: ImageService,
     @Value("\${file.ddl-auto}") private val fileDDLAuto: String,
+    @Value("\${configuration.mock-data}") private val mockData: Boolean,
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
-        val student = Student("472924", "Kamil", "Błażewicz")
-        studentRepository.save(student)
-
         if (fileDDLAuto == "create-drop") {
             removeImages()
         }
-        createOrganizations()
-        createEvents()
-        createUsers()
+        if (mockData) {
+            val student = Student("472924", "Kamil", "Błażewicz")
+            studentRepository.save(student)
+
+            createOrganizations()
+            createEvents()
+            createUsers()
+        }
     }
 
     private fun removeImages() {
