@@ -1,10 +1,10 @@
 package pl.edu.agh.server.application.event
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.event.EventSpecification.Companion.eventInDateRange
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventRepository
@@ -51,26 +51,22 @@ class EventController(
         )
     }
 
-    @PostMapping("/organization/{id}")
+    @PostMapping("/organization/{organizationId}")
     fun createEventForOrganization(
-        @PathVariable id: Long,
-        @RequestParam("backgroundImage") backgroundImage: MultipartFile,
-        @RequestParam("name") name: String,
-        @RequestParam("description") description: String,
-        @RequestParam("location") location: String,
-        @RequestParam("startDate") startDateTimestamp: Long,
-        @RequestParam("endDate") endDateTimestamp: Long,
+        @PathVariable organizationId: Long,
+        @RequestBody eventCreationRequest: EventCreationRequest,
     ): ResponseEntity<Event> {
         val objectMapper = jacksonObjectMapper()
-        val nameDictionary = objectMapper.readValue(name, Map::class.java)
-        val descriptionDictionary = objectMapper.readValue(description, Map::class.java)
-        val locationDictionary = objectMapper.readValue(location, Map::class.java)
-        val startDate = Date(startDateTimestamp)
-        val endDate = Date(endDateTimestamp)
+        val nameDictionary = objectMapper.readValue(eventCreationRequest.name, Map::class.java)
+        val descriptionDictionary = objectMapper.readValue(eventCreationRequest.description, Map::class.java)
+        val locationDictionary = objectMapper.readValue(eventCreationRequest.location, Map::class.java)
+        val startDate = Date(eventCreationRequest.startDateTimestamp)
+        val endDate = Date(eventCreationRequest.endDateTimestamp)
 
+//        TODO pass multi language text
         val event = eventService.createEvent(
-            id = id,
-            backgroundImage = backgroundImage,
+            organizationId = organizationId,
+            backgroundImage = eventCreationRequest.backgroundImage,
             name = nameDictionary["pl"].toString(),
             description = descriptionDictionary["pl"].toString(),
             location = locationDictionary["pl"].toString(),
@@ -80,6 +76,4 @@ class EventController(
 
         return ResponseEntity.ok(event)
     }
-
-    class EventCreationException(s: String) : RuntimeException(s)
 }

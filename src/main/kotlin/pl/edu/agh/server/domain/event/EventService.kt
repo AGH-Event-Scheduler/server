@@ -1,5 +1,6 @@
 package pl.edu.agh.server.domain.event
 
+import jakarta.transaction.Transactional
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -38,8 +39,9 @@ class EventService(private val eventRepository: EventRepository, private val org
             ).content
     }
 
+    @Transactional
     fun createEvent(
-        id: Long,
+        organizationId: Long,
         backgroundImage: MultipartFile,
         name: String,
         description: String,
@@ -47,8 +49,9 @@ class EventService(private val eventRepository: EventRepository, private val org
         startDate: Date,
         endDate: Date,
     ): Event {
-        val organization = organizationRepository.findById(id).orElseThrow()
+        val organization = organizationRepository.findById(organizationId).orElseThrow()
 
+//        TODO make it transactional - remove created image on failure
         val savedBackgroundImage: BackgroundImage = imageService.createBackgroundImage(backgroundImage)
 
         val newEvent = Event(
