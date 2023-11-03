@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
-import pl.edu.agh.server.domain.common.BackgroundImage
+import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 import java.util.*

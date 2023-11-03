@@ -6,12 +6,12 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Configuration
 import pl.edu.agh.server.application.authentication.RegisterRequest
 import pl.edu.agh.server.domain.authentication.AuthenticationService
-import pl.edu.agh.server.domain.common.BackgroundImage
-import pl.edu.agh.server.domain.common.LogoImage
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventRepository
-import pl.edu.agh.server.domain.image.ImageResizeService
+import pl.edu.agh.server.domain.image.BackgroundImage
+import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.image.ImageStorage
+import pl.edu.agh.server.domain.image.LogoImage
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
@@ -30,7 +30,7 @@ class DataLoader(
     private val authenticationService: AuthenticationService,
     private val eventRepository: EventRepository,
     private val imageStorage: ImageStorage,
-    private val imageResizeService: ImageResizeService,
+    private val imageService: ImageService,
     @Value("\${file.ddl-auto}") private val fileDDLAuto: String,
 ) : CommandLineRunner {
     override fun run(vararg args: String?) {
@@ -210,9 +210,9 @@ class DataLoader(
         val imageId = imageStorage.generateImageId()
         val extension = imageStorage.getFileExtension(filename)
         imageStorage.createImageDirectory(imageId)
-        imageStorage.saveFile(imageResizeService.resize(image, BackgroundImage.BIG_SIZE[0], BackgroundImage.BIG_SIZE[1]), imageId, "big.$extension")
-        imageStorage.saveFile(imageResizeService.resize(image, BackgroundImage.MEDIUM_SIZE[0], BackgroundImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
-        imageStorage.saveFile(imageResizeService.resize(image, BackgroundImage.SMALL_SIZE[0], BackgroundImage.SMALL_SIZE[1]), imageId, "small.$extension")
+        imageStorage.saveFile(imageService.resize(image, BackgroundImage.BIG_SIZE[0], BackgroundImage.BIG_SIZE[1]), imageId, "big.$extension")
+        imageStorage.saveFile(imageService.resize(image, BackgroundImage.MEDIUM_SIZE[0], BackgroundImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
+        imageStorage.saveFile(imageService.resize(image, BackgroundImage.SMALL_SIZE[0], BackgroundImage.SMALL_SIZE[1]), imageId, "small.$extension")
 
         return BackgroundImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }
@@ -222,9 +222,9 @@ class DataLoader(
         val imageId = imageStorage.generateImageId()
         val extension = imageStorage.getFileExtension(filename)
         imageStorage.createImageDirectory(imageId)
-        imageStorage.saveFile(imageResizeService.resize(image, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1]), imageId, "big.$extension")
-        imageStorage.saveFile(imageResizeService.resize(image, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
-        imageStorage.saveFile(imageResizeService.resize(image, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1]), imageId, "small.$extension")
+        imageStorage.saveFile(imageService.resize(image, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1]), imageId, "big.$extension")
+        imageStorage.saveFile(imageService.resize(image, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
+        imageStorage.saveFile(imageService.resize(image, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1]), imageId, "small.$extension")
 
         return LogoImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }

@@ -1,4 +1,4 @@
-package pl.edu.agh.server.domain.common
+package pl.edu.agh.server.domain.image
 
 import jakarta.persistence.Column
 import jakarta.persistence.Embeddable

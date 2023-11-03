@@ -5,9 +5,9 @@ import jakarta.persistence.*
 import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
-import pl.edu.agh.server.domain.common.BackgroundImage
-import pl.edu.agh.server.domain.common.LogoImage
 import pl.edu.agh.server.domain.event.Event
+import pl.edu.agh.server.domain.image.BackgroundImage
+import pl.edu.agh.server.domain.image.LogoImage
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
