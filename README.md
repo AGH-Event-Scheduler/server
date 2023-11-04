@@ -8,6 +8,18 @@ Install pre-commit
 pip install pre-commit
 ```
 
+Setup image folder
+
+```
+mkdir images
+```
+
+Setup docker test reports folder
+
+```
+mkdir docker-test-reports
+```
+
 ## How to run?
 
 ### 1. As intellij project
