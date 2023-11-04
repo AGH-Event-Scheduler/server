@@ -14,8 +14,11 @@ services:
     - DATASOURCE_DB_NAME=aes_db
     - DATASOURCE_USERNAME=postgres
     - DATASOURCE_PASSWORD=postgres
+    - FILE_UPLOAD_DIRECTORY=/app/images
     ports:
     - 8080:8080
+    volumes:
+    - image-volume:/app/images
   db:
     image: postgres:latest
     restart: always
@@ -40,8 +43,9 @@ services:
     - DATASOURCE_DB_NAME=test_aes_db
     - DATASOURCE_USERNAME=postgres
     - DATASOURCE_PASSWORD=postgres
-#    volumes:
-#      - ./docker-test-reports:/app/build/reports
+    - FILE_UPLOAD_DIRECTORY=/app/images
+    volumes:
+    - ./docker-test-reports:/app/build/reports
   test-db:
     image: postgres:latest
     restart: always
@@ -54,4 +58,6 @@ services:
 
 volumes:
   db-volume:
+    driver: local
+  image-volume:
     driver: local

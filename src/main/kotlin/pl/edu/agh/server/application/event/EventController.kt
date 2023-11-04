@@ -1,5 +1,7 @@
 package pl.edu.agh.server.application.event
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -47,5 +49,31 @@ class EventController(
         return ResponseEntity.ok(
             groupedEntities,
         )
+    }
+
+    @PostMapping("/organization/{organizationId}")
+    fun createEventForOrganization(
+        @PathVariable organizationId: Long,
+        @RequestBody eventCreationRequest: EventCreationRequest,
+    ): ResponseEntity<Event> {
+        val objectMapper = jacksonObjectMapper()
+        val nameDictionary = objectMapper.readValue(eventCreationRequest.name, Map::class.java)
+        val descriptionDictionary = objectMapper.readValue(eventCreationRequest.description, Map::class.java)
+        val locationDictionary = objectMapper.readValue(eventCreationRequest.location, Map::class.java)
+        val startDate = Date(eventCreationRequest.startDateTimestamp)
+        val endDate = Date(eventCreationRequest.endDateTimestamp)
+
+//        TODO pass multi language text
+        val event = eventService.createEvent(
+            organizationId = organizationId,
+            backgroundImage = eventCreationRequest.backgroundImage,
+            name = nameDictionary["pl"].toString(),
+            description = descriptionDictionary["pl"].toString(),
+            location = locationDictionary["pl"].toString(),
+            startDate = startDate,
+            endDate = endDate,
+        )
+
+        return ResponseEntity.ok(event)
     }
 }

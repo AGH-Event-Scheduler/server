@@ -1,16 +1,21 @@
 package pl.edu.agh.server.domain.event
 
+import jakarta.transaction.Transactional
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.event.EventSpecification.Companion.eventFromOrganizationAndInDateRange
 import pl.edu.agh.server.application.event.EventsType
+import pl.edu.agh.server.domain.image.BackgroundImage
+import pl.edu.agh.server.domain.image.ImageService
+import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import java.time.Instant
 import java.util.*
 
 @Service
-class EventService(private val eventRepository: EventRepository, private val organizationRepository: OrganizationRepository) {
+class EventService(private val eventRepository: EventRepository, private val organizationRepository: OrganizationRepository, private val imageStorage: ImageStorage, private val imageService: ImageService) {
     fun getAllFromOrganizationInDateRange(
         page: Int,
         size: Int,
@@ -32,5 +37,37 @@ class EventService(private val eventRepository: EventRepository, private val org
                 ),
                 pageable,
             ).content
+    }
+
+    @Transactional
+    fun createEvent(
+        organizationId: Long,
+        backgroundImage: MultipartFile,
+        name: String,
+        description: String,
+        location: String,
+        startDate: Date,
+        endDate: Date,
+    ): Event {
+        val organization = organizationRepository.findById(organizationId).orElseThrow()
+
+//        TODO make it transactional - remove created image on failure
+        val savedBackgroundImage: BackgroundImage = imageService.createBackgroundImage(backgroundImage)
+
+        val newEvent = Event(
+            name = name,
+            description = description,
+            location = location,
+            startDate = startDate,
+            endDate = endDate,
+            organization = organization,
+            backgroundImage = savedBackgroundImage,
+        )
+
+        organization.events.add(newEvent)
+        eventRepository.save(newEvent)
+        organizationRepository.save(organization)
+
+        return newEvent
     }
 }

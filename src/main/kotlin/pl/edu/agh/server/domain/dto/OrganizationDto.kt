@@ -2,8 +2,8 @@ package pl.edu.agh.server.domain.dto
 
 import lombok.AllArgsConstructor
 import lombok.NoArgsConstructor
-import pl.edu.agh.server.domain.common.BackgroundImage
-import pl.edu.agh.server.domain.common.LogoImage
+import pl.edu.agh.server.domain.image.BackgroundImage
+import pl.edu.agh.server.domain.image.LogoImage
 import java.time.LocalDateTime
 
 @AllArgsConstructor
