@@ -64,7 +64,7 @@ class AuthenticationService(
             val accessToken = jwtService.generateToken(user)
             revokeAllUserTokens(user.id!!)
             saveUserToken(user, accessToken)
-            val authenticationResponse = AuthenticationResponse(accessToken, refreshToken)
+            val authenticationResponse = AuthenticationResponse(accessToken, jwtService.generateRefreshToken(user))
             ObjectMapper().writeValue(response.outputStream, authenticationResponse)
         }
     }
