@@ -1,5 +1,8 @@
 package pl.edu.agh.server.application.authentication
 
+import io.jsonwebtoken.io.IOException
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -28,5 +31,11 @@ class AuthenticationController(
         }
 
         return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/refresh")
+    @Throws(IOException::class)
+    fun refresh(request: HttpServletRequest, response: HttpServletResponse) {
+        authenticationService.refresh(request, response)
     }
 }
