@@ -2,8 +2,6 @@ package pl.edu.agh.server.domain.event
 
 import jakarta.transaction.Transactional
 import org.modelmapper.ModelMapper
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.event.EventSpecification.Companion.eventFromOrganizationAndInDateRange
@@ -16,6 +14,7 @@ import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.translation.TranslationService
+import pl.edu.agh.server.foundation.application.BaseServiceUtilities
 import java.time.Instant
 import java.util.*
 
@@ -27,7 +26,7 @@ class EventService(
     private val imageService: ImageService,
     private val translationService: TranslationService,
     private val modelMapper: ModelMapper,
-) {
+) : BaseServiceUtilities<Event>(eventRepository) {
     fun getAllFromOrganizationInDateRange(
         page: Int,
         size: Int,
@@ -36,22 +35,13 @@ class EventService(
         type: EventsType,
         language: LanguageOption,
     ): List<EventDTO> {
-        val sortParams = sort.split(",")
-        val sortBy = sortParams[0]
-        val sortDirection = if (sortParams.size > 1) Sort.Direction.fromString(sortParams[1]) else Sort.Direction.ASC
-        val pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy))
-
         val organizationAndDateSpec = eventFromOrganizationAndInDateRange(
             organizationId,
             Date.from(Instant.now()),
             type,
         )
-        val events = eventRepository
-            .findAll(
-                organizationAndDateSpec,
-                pageable,
-            ).content
 
+        val events = getAllWithSpecificationPageable(page, size, sort, organizationAndDateSpec)
         return getWithTranslations(events, language)
     }
 
@@ -87,7 +77,17 @@ class EventService(
         return newEvent
     }
 
-    fun getWithTranslations(events: List<Event>, language: LanguageOption): List<EventDTO> {
+    fun getEvent(id: Long, language: LanguageOption): Optional<EventDTO> {
+        val event = eventRepository.findById(id)
+        return getWithTranslations(event.get(), language)
+    }
+
+    fun getAllInDateRange(page: Int, size: Int, sort: String, startDate: Date, endDate: Date, language: LanguageOption): List<EventDTO> {
+        val events = getAllWithSpecificationPageable(page, size, sort, eventInDateRange(startDate, endDate))
+        return getWithTranslations(events, language)
+    }
+
+    private fun getWithTranslations(events: List<Event>, language: LanguageOption): List<EventDTO> {
         val translationIds = mutableListOf<UUID>()
         events.forEach {
             translationIds.add(it.name)
@@ -110,22 +110,7 @@ class EventService(
         return eventDTOs
     }
 
-    fun getEvent(id: Long, language: LanguageOption): EventDTO? {
-        val event = eventRepository.findById(id)
-        if (event.isPresent) {
-            return getWithTranslations(listOf(event.get()), language).first()
-        }
-
-        return null
-    }
-
-    fun getAllInDateRange(page: Int, size: Int, sort: String, startDate: Date, endDate: Date, language: LanguageOption): List<EventDTO> {
-        val sortParams = sort.split(",")
-        val sortBy = sortParams[0]
-        val sortDirection = if (sortParams.size > 1) Sort.Direction.fromString(sortParams[1]) else Sort.Direction.ASC
-        val pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy))
-
-        val events = eventRepository.findAll(eventInDateRange(startDate, endDate), pageable).content
-        return getWithTranslations(events, language)
+    private fun getWithTranslations(event: Event, language: LanguageOption): Optional<EventDTO> {
+        return Optional.ofNullable(getWithTranslations(listOf(event), language).firstOrNull())
     }
 }

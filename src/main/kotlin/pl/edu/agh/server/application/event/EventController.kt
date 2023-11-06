@@ -84,8 +84,8 @@ class EventController(
         @PathVariable id: Long,
     ): ResponseEntity<EventDTO> {
         val event = eventService.getEvent(id, language)
-        return if (event != null) {
-            ResponseEntity.ok(event)
+        return if (event.isPresent) {
+            ResponseEntity.ok(event.get())
         } else {
             ResponseEntity.notFound().build()
         }

@@ -38,11 +38,11 @@ abstract class BaseIdentifiableReadController<T : BaseIdentifiableEntity>(
         sort: String,
         specification: Specification<T>? = null,
     ): ResponseEntity<List<T>> {
-        val entities = getAllWithSpecification(page, size, sort, specification)
+        val entities = getAllWithSpecificationPageable(page, size, sort, specification)
         return ResponseEntity.ok(entities)
     }
 
-    protected fun getAllWithSpecification(
+    protected fun getAllWithSpecificationPageable(
         page: Int,
         size: Int,
         sort: String,
