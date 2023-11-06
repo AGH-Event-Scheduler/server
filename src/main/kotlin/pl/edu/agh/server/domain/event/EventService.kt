@@ -34,7 +34,7 @@ class EventService(
         sort: String,
         organizationId: Long,
         type: EventsType,
-        language: LanguageOption
+        language: LanguageOption,
     ): List<EventDTO> {
         val sortParams = sort.split(",")
         val sortBy = sortParams[0]
@@ -127,8 +127,5 @@ class EventService(
 
         val events = eventRepository.findAll(eventInDateRange(startDate, endDate), pageable).content
         return getWithTranslations(events, language)
-
-
     }
-
 }

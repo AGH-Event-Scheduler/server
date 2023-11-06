@@ -21,7 +21,7 @@ class TranslationService(private val translationRepository: TranslationRepositor
 
     fun getTranslations(
         translationIdList: List<UUID>,
-        language: LanguageOption
+        language: LanguageOption,
     ): List<Translation> {
         return translationRepository.findByTranslationIdInAndLanguage(translationIdList, language)
     }

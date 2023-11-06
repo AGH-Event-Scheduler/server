@@ -41,7 +41,7 @@ class EventController(
         @RequestParam(name = "startDate", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") startDate: Date,
         @RequestParam(name = "endDate", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") endDate: Date,
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
-        ): ResponseEntity<SortedMap<String, List<EventDTO>>> {
+    ): ResponseEntity<SortedMap<String, List<EventDTO>>> {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
         val groupedEntities: SortedMap<String, List<EventDTO>> =
             eventService.getAllInDateRange(page, size, sort, startDate, endDate, language)
@@ -83,7 +83,7 @@ class EventController(
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         @PathVariable id: Long,
     ): ResponseEntity<EventDTO> {
-        val event = eventService.getEvent(id, language);
+        val event = eventService.getEvent(id, language)
         return if (event != null) {
             ResponseEntity.ok(event)
         } else {

@@ -15,5 +15,5 @@ import java.util.UUID
 class Translation(
     var translationId: UUID,
     var content: String,
-    var language: LanguageOption
+    var language: LanguageOption,
 ) : BaseIdentifiableEntity()

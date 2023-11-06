@@ -17,5 +17,5 @@ data class EventDTO(
     var backgroundImage: BackgroundImage? = null,
     var organizationId: Int? = null,
     var creationDate: String? = null,
-    var lastUpdatedDate: String? = null
+    var lastUpdatedDate: String? = null,
 )

@@ -4,8 +4,6 @@ import jakarta.persistence.criteria.*
 import org.springframework.data.jpa.domain.Specification
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.organization.Organization
-import pl.edu.agh.server.domain.translation.LanguageOption
-import pl.edu.agh.server.domain.translation.Translation
 import java.util.*
 
 class EventSpecification {
@@ -39,7 +37,7 @@ class EventSpecification {
         fun eventFromOrganizationAndInDateRange(
             organizationId: Long,
             date: Date,
-            type: EventsType
+            type: EventsType,
         ): Specification<Event> {
             return Specification { root, query, criteriaBuilder ->
                 val predicate: Predicate = criteriaBuilder.and(

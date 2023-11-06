@@ -144,62 +144,62 @@ class DataLoader(
                 Translation(
                     translationId = translationId1,
                     content = "Testowy event 0",
-                    language = LanguageOption.PL
+                    language = LanguageOption.PL,
                 ),
                 Translation(
                     translationId = translationId2,
                     content = "Testowy opis 0",
-                    language = LanguageOption.PL
+                    language = LanguageOption.PL,
                 ),
                 Translation(
                     translationId = translationId3,
                     content = "Testowa lokalizacja 0",
-                    language = LanguageOption.PL
+                    language = LanguageOption.PL,
                 ),
                 Translation(
                     translationId = translationId4,
                     content = "Testowy event 1",
-                    language = LanguageOption.PL
+                    language = LanguageOption.PL,
                 ),
                 Translation(
                     translationId = translationId5,
                     content = "Testowy opis 1",
-                    language = LanguageOption.PL
+                    language = LanguageOption.PL,
                 ),
                 Translation(
                     translationId = translationId6,
                     content = "Testowa lokalizacja 1",
-                    language = LanguageOption.PL
+                    language = LanguageOption.PL,
                 ),
                 Translation(
                     translationId = translationId1,
                     content = "Test event 0",
-                    language = LanguageOption.EN
+                    language = LanguageOption.EN,
                 ),
                 Translation(
                     translationId = translationId2,
                     content = "Test description 0",
-                    language = LanguageOption.EN
+                    language = LanguageOption.EN,
                 ),
                 Translation(
                     translationId = translationId3,
                     content = "Test location 0",
-                    language = LanguageOption.EN
+                    language = LanguageOption.EN,
                 ),
                 Translation(
                     translationId = translationId4,
                     content = "Test event 1",
-                    language = LanguageOption.EN
+                    language = LanguageOption.EN,
                 ),
                 Translation(
                     translationId = translationId5,
                     content = "Test description 1",
-                    language = LanguageOption.EN
+                    language = LanguageOption.EN,
                 ),
                 Translation(
                     translationId = translationId6,
                     content = "Test location 1",
-                    language = LanguageOption.EN
+                    language = LanguageOption.EN,
                 ),
             )
             val events = mutableListOf(
