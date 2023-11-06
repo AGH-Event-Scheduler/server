@@ -1,19 +1,17 @@
 package pl.edu.agh.server.application.event
 
-import jakarta.persistence.criteria.CriteriaBuilder
-import jakarta.persistence.criteria.CriteriaQuery
-import jakarta.persistence.criteria.Predicate
-import jakarta.persistence.criteria.Root
+import jakarta.persistence.criteria.*
 import org.springframework.data.jpa.domain.Specification
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.organization.Organization
-import java.util.Date
+import java.util.*
 
 class EventSpecification {
     companion object {
-        fun eventBelongToOrganization(id: Long): Specification<Event> {
+        fun eventBelongToOrganization(organizationId: Long): Specification<Event> {
             return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
-                val predicate: Predicate = criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), id)
+                val predicate: Predicate =
+                    criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), organizationId)
                 query.where(predicate)
                 null
             }
@@ -36,10 +34,14 @@ class EventSpecification {
             }
         }
 
-        fun eventFromOrganizationAndInDateRange(id: Long, date: Date, type: EventsType): Specification<Event> {
+        fun eventFromOrganizationAndInDateRange(
+            organizationId: Long,
+            date: Date,
+            type: EventsType,
+        ): Specification<Event> {
             return Specification { root, query, criteriaBuilder ->
                 val predicate: Predicate = criteriaBuilder.and(
-                    criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), id),
+                    criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), organizationId),
                     when (type) {
                         EventsType.UPCOMING ->
                             criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), date)

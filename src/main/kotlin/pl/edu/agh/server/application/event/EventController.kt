@@ -1,25 +1,23 @@
 package pl.edu.agh.server.application.event
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import pl.edu.agh.server.application.event.EventSpecification.Companion.eventInDateRange
+import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.event.Event
-import pl.edu.agh.server.domain.event.EventRepository
 import pl.edu.agh.server.domain.event.EventService
-import pl.edu.agh.server.foundation.application.BaseIdentifiableCrudController
+import pl.edu.agh.server.domain.translation.LanguageOption
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.SortedMap
+import java.util.*
 
 @RestController
 @RequestMapping("/api/events")
 class EventController(
     private val eventService: EventService,
-    private val eventRepository: EventRepository,
-) : BaseIdentifiableCrudController<Event>(eventRepository) {
+) {
 
     @GetMapping("/organization/{id}")
     fun getOrganizationEvents(
@@ -27,10 +25,11 @@ class EventController(
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "startDate,desc") sort: String,
         @RequestParam(name = "type", defaultValue = "UPCOMING") type: EventsType,
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         @PathVariable id: Long,
-    ): ResponseEntity<List<Event>> {
+    ): ResponseEntity<List<EventDTO>> {
         val events = eventService
-            .getAllFromOrganizationInDateRange(page, size, sort, id, type)
+            .getAllFromOrganizationInDateRange(page, size, sort, id, type, language)
         return ResponseEntity.ok(events)
     }
 
@@ -41,11 +40,14 @@ class EventController(
         @RequestParam(name = "sort", defaultValue = "startDate,asc") sort: String,
         @RequestParam(name = "startDate", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") startDate: Date,
         @RequestParam(name = "endDate", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") endDate: Date,
-    ): ResponseEntity<SortedMap<String, List<Event>>> {
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
+    ): ResponseEntity<SortedMap<String, List<EventDTO>>> {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-        val groupedEntities: SortedMap<String, List<Event>> = getAllWithSpecification(page, size, sort, eventInDateRange(startDate, endDate))
-            .groupBy { dateFormat.format(it.startDate) }
-            .toSortedMap()
+        val groupedEntities: SortedMap<String, List<EventDTO>> =
+            eventService.getAllInDateRange(page, size, sort, startDate, endDate, language)
+                .groupBy { dateFormat.format(it.startDate) }
+                .toSortedMap()
+
         return ResponseEntity.ok(
             groupedEntities,
         )
@@ -57,23 +59,35 @@ class EventController(
         @RequestBody eventCreationRequest: EventCreationRequest,
     ): ResponseEntity<Event> {
         val objectMapper = jacksonObjectMapper()
-        val nameDictionary = objectMapper.readValue(eventCreationRequest.name, Map::class.java)
-        val descriptionDictionary = objectMapper.readValue(eventCreationRequest.description, Map::class.java)
-        val locationDictionary = objectMapper.readValue(eventCreationRequest.location, Map::class.java)
+        val nameMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.name)
+        val descriptionMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.description)
+        val locationMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.location)
         val startDate = Date(eventCreationRequest.startDateTimestamp)
         val endDate = Date(eventCreationRequest.endDateTimestamp)
 
-//        TODO pass multi language text
         val event = eventService.createEvent(
             organizationId = organizationId,
             backgroundImage = eventCreationRequest.backgroundImage,
-            name = nameDictionary["pl"].toString(),
-            description = descriptionDictionary["pl"].toString(),
-            location = locationDictionary["pl"].toString(),
+            nameMap = nameMap,
+            descriptionMap = descriptionMap,
+            locationMap = locationMap,
             startDate = startDate,
             endDate = endDate,
         )
 
         return ResponseEntity.ok(event)
+    }
+
+    @GetMapping("/{id}")
+    fun getEvent(
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
+        @PathVariable id: Long,
+    ): ResponseEntity<EventDTO> {
+        val event = eventService.getEvent(id, language)
+        return if (event.isPresent) {
+            ResponseEntity.ok(event.get())
+        } else {
+            ResponseEntity.notFound().build()
+        }
     }
 }
