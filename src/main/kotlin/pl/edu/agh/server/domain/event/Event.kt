@@ -15,19 +15,18 @@ import java.util.*
 @Data
 @EqualsAndHashCode(callSuper = true)
 class Event(
-    var name: String,
+    var name: UUID,
 
     @Embedded
     var backgroundImage: BackgroundImage,
 
-    @Column(length = 1000)
-    var description: String,
+    var description: UUID,
 
     var startDate: Date,
 
     var endDate: Date,
 
-    var location: String,
+    var location: UUID,
 
     @ManyToOne
     @JoinColumn(name = "organization_id")
