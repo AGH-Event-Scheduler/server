@@ -27,6 +27,7 @@ class EventService(
     private val translationService: TranslationService,
     private val modelMapper: ModelMapper,
 ) : BaseServiceUtilities<Event>(eventRepository) {
+
     fun getAllFromOrganizationInDateRange(
         page: Int,
         size: Int,
@@ -54,7 +55,7 @@ class EventService(
         locationMap: Map<LanguageOption, String>,
         startDate: Date,
         endDate: Date,
-    ): Event {
+    ): EventDTO {
         val organization = organizationRepository.findById(organizationId).orElseThrow()
 
 //        TODO make it transactional - remove created image on failure
@@ -74,7 +75,7 @@ class EventService(
         eventRepository.save(newEvent)
         organizationRepository.save(organization)
 
-        return newEvent
+        return modelMapper.map(newEvent, EventDTO::class.java)
     }
 
     fun getEvent(id: Long, language: LanguageOption): Optional<EventDTO> {

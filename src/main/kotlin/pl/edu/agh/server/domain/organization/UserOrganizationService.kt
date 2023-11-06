@@ -1,6 +1,7 @@
 package pl.edu.agh.server.domain.organization
 
 import org.modelmapper.ModelMapper
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pl.edu.agh.server.domain.dto.OrganizationDto
@@ -24,7 +25,7 @@ class UserOrganizationService(
         val organization = organizationRepository.findById(organizationId)
             .orElseThrow { throw OrganizationNotFoundException(organizationId) }
 
-        user.organizations.add(organization)
+        user.followedOrganizations.add(organization)
         return userRepository.save(user)
     }
 
@@ -34,24 +35,23 @@ class UserOrganizationService(
         val organization = organizationRepository.findById(organizationId)
             .orElseThrow { throw OrganizationNotFoundException(organizationId) }
 
-        user.organizations.remove(organization)
+        user.followedOrganizations.remove(organization)
         return userRepository.save(user)
     }
 
-    fun getAllOrganizationsWithStatusByUser(userName: String?): List<OrganizationDto> {
-        val allOrganizations = organizationRepository.findAll()
+    fun getAllOrganizationsWithStatusByUserWithSpecification(userName: String?, specification: Specification<Organization>? = null): List<OrganizationDto> {
+        val allOrganizations = organizationRepository.findAll(specification)
+        val followedOrganizations = userName?.let { userService.getSubscribedOrganizationsByUser(it) } ?: mutableSetOf()
         return allOrganizations.map {
             val organizationDto = modelMapper.map(it, OrganizationDto::class.java)
-            if (userName != null) {
-                organizationDto.isSubscribed = userService.isUserSubscribedToOrganization(userName, it.id!!)
-            }
+            organizationDto.isSubscribed = followedOrganizations.contains(it)
             organizationDto
         }
     }
 
     fun getSubscribedOrganizationsByUser(userName: String): List<OrganizationDto> {
         val user = userRepository.findByEmail(userName).orElseThrow { throw UserNotFoundException(userName) }
-        return user.organizations.map {
+        return user.followedOrganizations.map {
             modelMapper.map(it, OrganizationDto::class.java).apply { isSubscribed = true }
         }
     }
@@ -60,10 +60,9 @@ class UserOrganizationService(
         val organization = organizationRepository.findById(organizationId)
             .orElseThrow { throw OrganizationNotFoundException(organizationId) }
 
-        val organizationDto = modelMapper.map(organization, OrganizationDto::class.java)
-
-        if (userName != null) {
-            organizationDto.isSubscribed = userService.isUserSubscribedToOrganization(userName, organizationId)
+        val followedOrganizations = userName?.let { userService.getSubscribedOrganizationsByUser(it) } ?: mutableSetOf()
+        val organizationDto = modelMapper.map(organization, OrganizationDto::class.java).apply {
+            isSubscribed = followedOrganizations.contains(organization)
         }
 
         return organizationDto

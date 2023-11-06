@@ -7,7 +7,6 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.domain.dto.EventDTO
-import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventService
 import pl.edu.agh.server.domain.translation.LanguageOption
 import java.text.SimpleDateFormat
@@ -57,7 +56,7 @@ class EventController(
     fun createEventForOrganization(
         @PathVariable organizationId: Long,
         @RequestBody eventCreationRequest: EventCreationRequest,
-    ): ResponseEntity<Event> {
+    ): ResponseEntity<EventDTO> {
         val objectMapper = jacksonObjectMapper()
         val nameMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.name)
         val descriptionMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.description)

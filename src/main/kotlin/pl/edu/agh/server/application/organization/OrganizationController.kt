@@ -40,7 +40,7 @@ class OrganizationController(
     fun getAllOrganizationsWithStatusByUser(
         request: HttpServletRequest,
     ): ResponseEntity<List<OrganizationDto>> {
-        val organizations = userOrganizationService.getAllOrganizationsWithStatusByUser(getUserName(request))
+        val organizations = userOrganizationService.getAllOrganizationsWithStatusByUserWithSpecification(getUserName(request))
         return ResponseEntity.ok(organizations)
     }
 
