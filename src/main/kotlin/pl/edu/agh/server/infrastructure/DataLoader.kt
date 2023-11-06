@@ -1,12 +1,15 @@
 package pl.edu.agh.server.infrastructure
 
+import org.apache.commons.lang3.math.NumberUtils.toLong
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.authentication.RegisterRequest
 import pl.edu.agh.server.domain.authentication.AuthenticationService
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventRepository
+import pl.edu.agh.server.domain.event.EventService
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.image.ImageStorage
@@ -15,9 +18,13 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
+import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.translation.TranslationRepository
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.*
 import javax.imageio.ImageIO
 import kotlin.random.Random.Default.nextInt
@@ -31,6 +38,7 @@ class DataLoader(
     private val imageStorage: ImageStorage,
     private val imageService: ImageService,
     private val translationRepository: TranslationRepository,
+    private val eventService: EventService,
     @Value("\${file.ddl-auto}") private val fileDDLAuto: String,
     @Value("\${configuration.mock-data}") private val mockData: Boolean,
 ) : CommandLineRunner {
@@ -126,86 +134,93 @@ class DataLoader(
 
     private fun createEvents() {
         val organizations = organizationRepository.findAll()
+        val events = mutableListOf<Event>()
+        // backgroundImage = null ----> backgroundImage = org.backgroundImage
         for (org: Organization in organizations) {
             val offset = nextInt(0, 30)
-            val events = mutableListOf<Event>(
-//                Event(
-//                    name = translationId1,
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = translationId2,
-//                    location = translationId3,
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusMinutes(45).minusMinutes(toLong(offset.toString()))),
-//                ),
-//                Event(
-//                    name = translationId4,
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = translationId5,
-//                    location = translationId6,
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 2",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = longLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().plusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 3",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = mediumLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().minusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 4",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = longLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 5",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = shortLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
-//                ),
-//                Event(
-//                    name = "Test Event 6",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = shortLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
-//                ),
-            )
+            events.addAll(listOf(
+                eventService.createEvent(
+                    organizationId = org.id!!,
+                    backgroundImage = null,
+                    nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 1", LanguageOption.EN to "Test event 1"),
+                    locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                    descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).minusMinutes(toLong(offset.toString()))),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusMinutes(45).minusMinutes(toLong(offset.toString()))),
+                    backgroundImageSkip = true
+                ),
+                eventService.createEvent(
+                    organizationId = org.id!!,
+                    backgroundImage = null,
+                    nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 2", LanguageOption.EN to "Test event 2"),
+                    locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                    descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString()))),
+                    backgroundImageSkip = true
+                ),
+                eventService.createEvent(
+                    organizationId = org.id!!,
+                    backgroundImage = null,
+                    nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 3", LanguageOption.EN to "Test event 3"),
+                    locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                    descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().plusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                    ),
+                    backgroundImageSkip = true
+                ),
+                eventService.createEvent(
+                    organizationId = org.id!!,
+                    backgroundImage = null,
+                    nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 4", LanguageOption.EN to "Test event 4"),
+                    locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                    descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                    ),
+                    backgroundImageSkip = true
+                ),
+                eventService.createEvent(
+                    organizationId = org.id!!,
+                    backgroundImage = null,
+                    nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 5", LanguageOption.EN to "Test event 5"),
+                    locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                    descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(
+                        LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString())),
+                    ),
+                    backgroundImageSkip = true
+                ),
+                eventService.createEvent(
+                    organizationId = org.id!!,
+                    backgroundImage = null,
+                    nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 6", LanguageOption.EN to "Test event 6"),
+                    locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                    descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
+                    backgroundImageSkip = true
+                ),
+                eventService.createEvent(
+                    organizationId = org.id!!,
+                    backgroundImage = null,
+                    nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 7", LanguageOption.EN to "Test event 7"),
+                    locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                    descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).minusMinutes(toLong(offset.toString()))),
+                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
+                    backgroundImageSkip = true
+                ),
+            ))
 
             org.events = events
-//            eventRepository.saveAll(events)
+            eventRepository.saveAll(events)
             organizationRepository.save(org)
-//            translationRepository.saveAll(translations)
         }
     }
 
@@ -249,5 +264,13 @@ class DataLoader(
 
     private fun shortLoremIpsum(): String {
         return "Mauris sed pulvinar justo, vel rutrum est. Donec sem justo, rhoncus quis posuere ut, finibus sed turpis. Aliquam pharetra venenatis sem vitae pretium. Cras semper eleifend tortor et imperdiet. Maecenas dictum consectetur nisi eu luctus. Suspendisse eu rutrum magna. Vivamus placerat blandit sem, a aliquet nisi lobortis sed. "
+    }
+
+    private fun shortLoremIpsumEn(): String {
+        return "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself."
+    }
+
+    private fun shortLoremIpsumPl(): String {
+        return "Ale muszę wam wytłumaczyć, jak narodziła się ta błędna koncepcja denuncjacji przyjemności i chwalebnego bólu, a ja dam wam kompletną relację z systemu i objaśnię prawdziwe nauki wielkiego odkrywcy prawdy, mistrza-budowniczego ludzkiego szczęścia. Nikt nie odrzuca, nie lubi lub unika przyjemności samej w sobie."
     }
 }

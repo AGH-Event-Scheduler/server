@@ -41,24 +41,35 @@ class EventService(
             type,
         )
 
-        val events = getAllWithSpecificationPageable(page, size, sort, organizationAndDateSpec)
+        val sortNew = when (type) {
+            EventsType.PAST -> "startDate,desc"
+            EventsType.UPCOMING -> "startDate,asc"
+        }
+
+        val events = getAllWithSpecificationPageable(page, size, sortNew, organizationAndDateSpec)
         return getWithTranslations(events, language)
     }
 
     @Transactional
     fun createEvent(
         organizationId: Long,
-        backgroundImage: MultipartFile,
+        backgroundImage: MultipartFile?,
         nameMap: Map<LanguageOption, String>,
         descriptionMap: Map<LanguageOption, String>,
         locationMap: Map<LanguageOption, String>,
         startDate: Date,
         endDate: Date,
+        backgroundImageSkip: Boolean = false
     ): Event {
         val organization = organizationRepository.findById(organizationId).orElseThrow()
-
+        val savedBackgroundImage: BackgroundImage
 //        TODO make it transactional - remove created image on failure
-        val savedBackgroundImage: BackgroundImage = imageService.createBackgroundImage(backgroundImage)
+        if (!backgroundImageSkip && backgroundImage != null) {
+            savedBackgroundImage = imageService.createBackgroundImage(backgroundImage)
+        }
+        else {
+            savedBackgroundImage = organization.backgroundImage
+        }
 
         val newEvent = Event(
             name = translationService.createTranslation(nameMap),

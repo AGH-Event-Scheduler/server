@@ -26,6 +26,7 @@ import java.util.*
 class Translation(
     @Column(name = "translation_id")
     var translationId: UUID,
+    @Column(length = 1000)
     var content: String,
     var language: LanguageOption,
 ) : BaseIdentifiableEntity()
