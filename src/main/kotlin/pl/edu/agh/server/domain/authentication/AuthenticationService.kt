@@ -13,11 +13,13 @@ import pl.edu.agh.server.application.authentication.AuthenticationResponse
 import pl.edu.agh.server.application.authentication.RegisterRequest
 import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.authentication.token.Token
+import pl.edu.agh.server.domain.authentication.token.TokenCategory
 import pl.edu.agh.server.domain.authentication.token.TokenRepository
 import pl.edu.agh.server.domain.user.Role
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
 import java.io.IOException
+import java.util.*
 
 @Service
 class AuthenticationService(
@@ -37,17 +39,21 @@ class AuthenticationService(
         )
         userRepository.save(user)
         val accessToken = jwtService.generateToken(user)
-        saveUserToken(user, accessToken)
-        return AuthenticationResponse(accessToken, jwtService.generateRefreshToken(user))
+        val refreshToken = jwtService.generateRefreshToken(user)
+        saveUserToken(user, accessToken, TokenCategory.ACCESS)
+        saveUserToken(user, refreshToken, TokenCategory.REFRESH)
+        return AuthenticationResponse(accessToken, refreshToken)
     }
 
     fun authenticate(request: AuthenticationRequest): AuthenticationResponse {
         authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
         val user = userRepository.findByEmail(request.email).orElseThrow { throw Exception("User not found") }
-        revokeAllUserTokens(user.id!!)
+        revokeAllUserAccessTokens(user.id!!)
         val accessToken = jwtService.generateToken(user)
-        saveUserToken(user, accessToken)
-        return AuthenticationResponse(accessToken, jwtService.generateRefreshToken(user))
+        val refreshToken = jwtService.generateRefreshToken(user)
+        saveUserToken(user, accessToken, TokenCategory.ACCESS)
+        saveUserToken(user, refreshToken, TokenCategory.REFRESH)
+        return AuthenticationResponse(accessToken, refreshToken)
     }
 
     @Throws(IOException::class)
@@ -62,19 +68,21 @@ class AuthenticationService(
         val user: User = userRepository.findByEmail(username).orElseThrow()
         if (jwtService.isTokenValid(refreshToken, user)) {
             val accessToken = jwtService.generateToken(user)
-            revokeAllUserTokens(user.id!!)
-            saveUserToken(user, accessToken)
-            val authenticationResponse = AuthenticationResponse(accessToken, jwtService.generateRefreshToken(user))
+            val newRefreshToken = jwtService.generateRefreshToken(user)
+            saveUserToken(user, accessToken, TokenCategory.ACCESS)
+            saveUserToken(user, newRefreshToken, TokenCategory.REFRESH)
+            revokeRefreshToken(refreshToken)
+            val authenticationResponse = AuthenticationResponse(accessToken, newRefreshToken)
             ObjectMapper().writeValue(response.outputStream, authenticationResponse)
         }
     }
 
-    private fun saveUserToken(user: User, jwtToken: String) {
-        val token: Token = Token(user = user, token = jwtToken)
+    private fun saveUserToken(user: User, jwtToken: String, category: TokenCategory) {
+        val token: Token = Token(user = user, token = jwtToken, category = category)
         tokenRepository.save(token)
     }
 
-    private fun revokeAllUserTokens(userId: Long) {
+    private fun revokeAllUserAccessTokens(userId: Long) {
         val validUserTokens: List<Token> = tokenRepository.findAllValidTokenByUser(userId)
         if (validUserTokens.isEmpty()) return
         validUserTokens.forEach {
@@ -84,5 +92,22 @@ class AuthenticationService(
             }
         }
         tokenRepository.saveAll(validUserTokens)
+    }
+
+    private fun revokeRefreshToken(token: String) {
+        val refreshToken: Optional<Token> = tokenRepository.findByToken(token)
+        if (!refreshToken.isPresent) return
+        refreshToken.get().apply {
+            revoked = true
+            expired = true
+        }
+        tokenRepository.save(refreshToken.get())
+    }
+
+    fun logout(refreshToken: String) {
+        val user = userRepository.findByEmail(jwtService.extractUsername(refreshToken))
+            .orElseThrow { throw Exception("User not found") }
+        revokeAllUserAccessTokens(user.id!!)
+        revokeRefreshToken(refreshToken)
     }
 }

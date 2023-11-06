@@ -8,20 +8,21 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
+import pl.edu.agh.server.domain.authentication.token.TokenRepository
 import java.security.Key
 import java.util.*
 
 @Service
-class JwtService {
+class JwtService(val tokenRepository: TokenRepository) {
 
     @Value("\${application.security.jwt.secret}")
     lateinit var secretKey: String // create bean for creating secret key
 
     @Value("\${application.security.jwt.expirationTimeMs}")
-    lateinit var accessTokenExpirationTime: Number // create bean for creating secret key
+    lateinit var accessTokenExpirationTime: Number
 
     @Value("\${application.security.jwt.refresh-token.expirationTimeMs}")
-    lateinit var refreshExpirationTime: Number // create bean for creating secret key
+    lateinit var refreshExpirationTime: Number
 
     fun extractUsername(token: String): String {
         return extractClaims(token, Claims::getSubject)
@@ -37,8 +38,13 @@ class JwtService {
     }
 
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
-        val username = extractUsername(token)
-        return username == userDetails.username && !isTokenExpired(token)
+        return isTokenSignedWithCorrectKey(token) &&
+            isTokenRevoked(token) &&
+            extractUsername(token) == userDetails.username && !isTokenExpired(token)
+    }
+
+    fun isTokenRevoked(token: String): Boolean {
+        return tokenRepository.findByToken(token).map { it.revoked && it.expired }.orElse(false)
     }
 
     fun isTokenExpired(token: String): Boolean {
@@ -62,6 +68,15 @@ class JwtService {
 
     fun extractAllClaims(token: String): Claims {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).body
+    }
+
+    fun isTokenSignedWithCorrectKey(token: String): Boolean {
+        return try {
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).body
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun getSigningKey(): Key {

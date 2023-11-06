@@ -4,10 +4,7 @@ import io.jsonwebtoken.io.IOException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.domain.authentication.AuthenticationService
 
 @RestController
@@ -37,5 +34,12 @@ class AuthenticationController(
     @Throws(IOException::class)
     fun refresh(request: HttpServletRequest, response: HttpServletResponse) {
         authenticationService.refresh(request, response)
+    }
+
+    @PostMapping("/logout")
+    @Throws(IOException::class)
+    fun logout(request: HttpServletRequest, @RequestParam("refreshToken") refreshToken: String): ResponseEntity<Void> {
+        authenticationService.logout(refreshToken)
+        return ResponseEntity.ok().build()
     }
 }
