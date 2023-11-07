@@ -8,6 +8,8 @@ import pl.edu.agh.server.application.event.EventSpecification.Companion.eventFro
 import pl.edu.agh.server.application.event.EventSpecification.Companion.eventInDateRange
 import pl.edu.agh.server.application.event.EventsType
 import pl.edu.agh.server.domain.dto.EventDTO
+import pl.edu.agh.server.domain.exception.EventNotFoundException
+import pl.edu.agh.server.domain.exception.TranslationNotFoundException
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.image.ImageStorage
@@ -88,9 +90,9 @@ class EventService(
         return newEvent
     }
 
-    fun getEvent(id: Long, language: LanguageOption): Optional<EventDTO> {
-        val event = eventRepository.findById(id)
-        return getWithTranslations(event.get(), language)
+    fun getEvent(id: Long, language: LanguageOption): EventDTO {
+        val event = eventRepository.findById(id).orElseThrow { EventNotFoundException(id) }
+        return getWithTranslations(event, language).orElseThrow { TranslationNotFoundException() }
     }
 
     fun getAllInDateRange(page: Int, size: Int, sort: String, startDate: Date, endDate: Date, language: LanguageOption): List<EventDTO> {

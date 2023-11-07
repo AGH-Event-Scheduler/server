@@ -5,10 +5,11 @@ import lombok.NoArgsConstructor
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.LogoImage
 import java.time.LocalDateTime
+import java.util.*
 
 @AllArgsConstructor
 @NoArgsConstructor
-data class OrganizationDto(
+data class OrganizationDTO(
     var name: String? = null,
     var isSubscribed: Boolean? = null,
     var logoImage: LogoImage? = null,

@@ -4,9 +4,10 @@ import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
-import pl.edu.agh.server.domain.dto.OrganizationDto
+import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.UserOrganizationService
+import pl.edu.agh.server.domain.translation.LanguageOption
 
 @RestController
 @RequestMapping("/api/organizations")
@@ -39,25 +40,28 @@ class OrganizationController(
     @GetMapping
     fun getAllOrganizationsWithStatusByUser(
         request: HttpServletRequest,
-    ): ResponseEntity<List<OrganizationDto>> {
-        val organizations = userOrganizationService.getAllOrganizationsWithStatusByUser(getUserName(request))
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
+        ): ResponseEntity<List<OrganizationDTO>> {
+        val organizations = userOrganizationService.getAllOrganizationsWithStatusByUser(getUserName(request), language)
         return ResponseEntity.ok(organizations)
     }
 
     @GetMapping("/subscribed")
     fun getSubscribedOrganizationsByUser(
         request: HttpServletRequest,
-    ): ResponseEntity<List<OrganizationDto>> {
-        val organizations = userOrganizationService.getSubscribedOrganizationsByUser(getUserName(request))
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
+        ): ResponseEntity<List<OrganizationDTO>> {
+        val organizations = userOrganizationService.getSubscribedOrganizationsByUser(getUserName(request), language)
         return ResponseEntity.ok(organizations)
     }
 
     @GetMapping("/{organizationId}")
     fun getOrganizationById(
         request: HttpServletRequest,
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         @PathVariable organizationId: Long,
-    ): ResponseEntity<OrganizationDto> {
-        val organization = userOrganizationService.getOrganizationById(organizationId, getUserName(request))
+    ): ResponseEntity<OrganizationDTO> {
+        val organization = userOrganizationService.getOrganizationById(organizationId, getUserName(request), language)
         return ResponseEntity.ok(organization)
     }
 
