@@ -90,20 +90,20 @@ class EventService(
     }
 
     fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
-        val organizations: Set<Organization> = mutableSetOf()
-        events.forEach { organizations.plus(it.organization) }
+        val organizations = mutableSetOf<Organization>()
+        events.forEach { organizations.add(it.organization) }
 
         val organizationDTOs = userOrganizationService.transformToOrganizationDTO(organizations.toList(), language, userName)
         val organizationMap = organizationDTOs.associateBy({ it.id }, { it })
 
-        val translationIds = mutableListOf<UUID>()
+        val translationIds = mutableSetOf<UUID>()
         events.forEach {
             translationIds.add(it.name)
             translationIds.add(it.description)
             translationIds.add(it.location)
         }
 
-        val translations = translationService.getTranslations(translationIds, language)
+        val translations = translationService.getTranslations(translationIds.toList(), language)
         val translationsMap = translations.associateBy({ it.translationId }, { it.content })
 
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
