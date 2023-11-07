@@ -1,7 +1,6 @@
 package pl.edu.agh.server.foundation.application
 
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 import pl.edu.agh.server.foundation.domain.BaseRepository
@@ -9,22 +8,26 @@ import pl.edu.agh.server.foundation.domain.BaseRepository
 abstract class BaseServiceUtilities<T : BaseIdentifiableEntity>(
     private val repository: BaseRepository<T>,
 ) {
-    protected fun getAllWithSpecificationPageable(
-        page: Int,
-        size: Int,
-        sort: String,
-        specification: Specification<T>? = null,
+    open fun getAllWithSpecificationPageable(
+        specification: Specification<T>,
+        pageable: PageRequest,
     ): List<T> {
-        val sortParams = sort.split(",")
-        val sortBy = sortParams[0]
-        val sortDirection = if (sortParams.size > 1) Sort.Direction.fromString(sortParams[1]) else Sort.Direction.ASC
-        val pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy))
+        return repository.findAll(specification, pageable).content
+    }
 
-        val entities = if (specification != null) {
-            repository.findAll(specification, pageable).content
-        } else {
-            repository.findAll(pageable).content
-        }
-        return entities
+    open fun getAllWithSpecification(
+        specification: Specification<T>,
+    ): List<T> {
+        return repository.findAll(specification)
+    }
+
+    open fun getAllWithPageable(
+        pageable: PageRequest,
+    ): List<T> {
+        return repository.findAll(pageable).content
+    }
+
+    open fun getAll(): List<T> {
+        return repository.findAll()
     }
 }

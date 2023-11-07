@@ -7,9 +7,11 @@ import org.springframework.transaction.annotation.Transactional
 import pl.edu.agh.server.domain.dto.OrganizationDto
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
+import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.domain.user.UserService
+import java.util.*
 
 @Service
 class UserOrganizationService(
@@ -66,5 +68,14 @@ class UserOrganizationService(
         }
 
         return organizationDto
+    }
+
+    fun transformToOrganizationDTO(organizations: List<Organization>, language: LanguageOption, userName: String? = null): List<OrganizationDto> {
+//        TODO: implement once translations are done
+        return organizations.map { modelMapper.map(it, OrganizationDto::class.java) }
+    }
+
+    fun transformToOrganizationDTO(organization: Organization, language: LanguageOption, userName: String? = null): Optional<OrganizationDto> {
+        return Optional.ofNullable(transformToOrganizationDTO(listOf(organization), language, userName).firstOrNull())
     }
 }

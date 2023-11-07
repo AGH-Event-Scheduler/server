@@ -2,48 +2,54 @@ package pl.edu.agh.server.domain.event
 
 import jakarta.transaction.Transactional
 import org.modelmapper.ModelMapper
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import pl.edu.agh.server.application.event.EventSpecification.Companion.eventFromOrganizationAndInDateRange
-import pl.edu.agh.server.application.event.EventSpecification.Companion.eventInDateRange
-import pl.edu.agh.server.application.event.EventsType
 import pl.edu.agh.server.domain.dto.EventDTO
+import pl.edu.agh.server.domain.exception.EventNotFoundException
+import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
-import pl.edu.agh.server.domain.image.ImageStorage
+import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
+import pl.edu.agh.server.domain.organization.UserOrganizationService
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.translation.TranslationService
+import pl.edu.agh.server.domain.user.User
+import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.foundation.application.BaseServiceUtilities
-import java.time.Instant
 import java.util.*
 
 @Service
 class EventService(
+    private val userRepository: UserRepository,
     private val eventRepository: EventRepository,
-    private val organizationRepository: OrganizationRepository,
-    private val imageStorage: ImageStorage,
-    private val imageService: ImageService,
-    private val translationService: TranslationService,
     private val modelMapper: ModelMapper,
+    private val translationService: TranslationService,
+    private val organizationRepository: OrganizationRepository,
+    private val imageService: ImageService,
+    private val userOrganizationService: UserOrganizationService,
 ) : BaseServiceUtilities<Event>(eventRepository) {
 
-    fun getAllFromOrganizationInDateRange(
-        page: Int,
-        size: Int,
-        sort: String,
-        organizationId: Long,
-        type: EventsType,
-        language: LanguageOption,
-    ): List<EventDTO> {
-        val organizationAndDateSpec = eventFromOrganizationAndInDateRange(
-            organizationId,
-            Date.from(Instant.now()),
-            type,
-        )
+    @Transactional
+    fun saveEventForUser(userName: String, eventId: Long): User {
+        val user = userRepository.findByEmail(userName).orElseThrow { throw UserNotFoundException(userName) }
+        val event = eventRepository.findById(eventId)
+            .orElseThrow { throw EventNotFoundException(eventId) }
 
-        val events = getAllWithSpecificationPageable(page, size, sort, organizationAndDateSpec)
-        return getWithTranslations(events, language)
+        user.savedEvents.add(event)
+        return userRepository.save(user)
+    }
+
+    @Transactional
+    fun removeEventForUser(userName: String, organizationId: Long): User {
+        val user = userRepository.findByEmail(userName).orElseThrow { throw UserNotFoundException(userName) }
+        val event = eventRepository.findById(organizationId)
+            .orElseThrow { throw EventNotFoundException(organizationId) }
+
+        user.savedEvents.remove(event)
+        return userRepository.save(user)
     }
 
     @Transactional
@@ -55,7 +61,7 @@ class EventService(
         locationMap: Map<LanguageOption, String>,
         startDate: Date,
         endDate: Date,
-    ): EventDTO {
+    ): Event {
         val organization = organizationRepository.findById(organizationId).orElseThrow()
 
 //        TODO make it transactional - remove created image on failure
@@ -75,20 +81,21 @@ class EventService(
         eventRepository.save(newEvent)
         organizationRepository.save(organization)
 
-        return modelMapper.map(newEvent, EventDTO::class.java)
+        return newEvent
     }
 
-    fun getEvent(id: Long, language: LanguageOption): Optional<EventDTO> {
-        val event = eventRepository.findById(id)
-        return getWithTranslations(event.get(), language)
+    fun getEvent(eventId: Long): Event {
+        return eventRepository.findById(eventId)
+            .orElseThrow { throw EventNotFoundException(eventId) }
     }
 
-    fun getAllInDateRange(page: Int, size: Int, sort: String, startDate: Date, endDate: Date, language: LanguageOption): List<EventDTO> {
-        val events = getAllWithSpecificationPageable(page, size, sort, eventInDateRange(startDate, endDate))
-        return getWithTranslations(events, language)
-    }
+    fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
+        val organizations: Set<Organization> = mutableSetOf()
+        events.forEach { organizations.plus(it.organization) }
 
-    private fun getWithTranslations(events: List<Event>, language: LanguageOption): List<EventDTO> {
+        val organizationDTOs = userOrganizationService.transformToOrganizationDTO(organizations.toList(), language, userName)
+        val organizationMap = organizationDTOs.associateBy({ it.id }, { it })
+
         val translationIds = mutableListOf<UUID>()
         events.forEach {
             translationIds.add(it.name)
@@ -99,19 +106,31 @@ class EventService(
         val translations = translationService.getTranslations(translationIds, language)
         val translationsMap = translations.associateBy({ it.translationId }, { it.content })
 
+        val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
+
         val eventDTOs = events.map {
             modelMapper.map(it, EventDTO::class.java)
                 .apply {
-                    name = translationsMap[it.name] ?: ""
-                    location = translationsMap[it.location] ?: ""
-                    description = translationsMap[it.description] ?: ""
+                    nameTranslated = translationsMap[it.name] ?: ""
+                    locationTranslated = translationsMap[it.location] ?: ""
+                    descriptionTranslated = translationsMap[it.description] ?: ""
+                    isSaved = (user.isPresent) && user.get().savedEvents.contains(it)
+                    underOrganization = organizationMap[it.organization.id]
                 }
         }
 
         return eventDTOs
     }
 
-    private fun getWithTranslations(event: Event, language: LanguageOption): Optional<EventDTO> {
-        return Optional.ofNullable(getWithTranslations(listOf(event), language).firstOrNull())
+//    FIXME use function from base service once NullPointerException is fixed
+    override fun getAllWithSpecificationPageable(
+        specification: Specification<Event>,
+        pageable: PageRequest,
+    ): List<Event> {
+        return eventRepository.findAll(specification, pageable).content
+    }
+
+    fun transformToEventDTO(event: Event, language: LanguageOption, userName: String? = null): Optional<EventDTO> {
+        return Optional.ofNullable(transformToEventDTO(listOf(event), language, userName).firstOrNull())
     }
 }

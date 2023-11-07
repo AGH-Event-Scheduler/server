@@ -9,14 +9,14 @@ import java.util.*
 @NoArgsConstructor
 data class EventDTO(
     var id: Long? = null,
-    var name: String? = null,
-    var description: String? = null,
-    var location: String? = null,
+    var nameTranslated: String? = null,
+    var descriptionTranslated: String? = null,
+    var locationTranslated: String? = null,
     var startDate: Date? = null,
     var endDate: Date? = null,
     var backgroundImage: BackgroundImage? = null,
-    var organization: OrganizationDto? = null,
-    var isSaved: Boolean = false,
-    var creationDate: String? = null,
-    var lastUpdatedDate: String? = null,
+    var underOrganization: OrganizationDto? = null,
+    var isSaved: Boolean? = null,
+    var creationDate: Date? = null,
+    var lastUpdatedDate: Date? = null,
 )
