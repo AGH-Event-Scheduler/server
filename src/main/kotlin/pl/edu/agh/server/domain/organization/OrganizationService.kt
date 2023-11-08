@@ -53,11 +53,6 @@ class OrganizationService(
         return organizationRepository.findAll(specification, pageable).content
     }
 
-//    FIXME use function from base service once NullPointerException is fixed
-    override fun getAllWithPageable(pageable: PageRequest): List<Organization> {
-        return organizationRepository.findAll(pageable).content
-    }
-
     fun transformToOrganizationDTO(organizations: List<Organization>, language: LanguageOption, userName: String? = null): List<OrganizationDto> {
 //        TODO: implement once translations are done
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()

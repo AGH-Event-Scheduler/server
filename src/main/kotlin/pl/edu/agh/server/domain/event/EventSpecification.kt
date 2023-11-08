@@ -42,6 +42,16 @@ class EventSpecification {
             }
         }
 
+        fun eventFromFollowedByUser(userName: String): Specification<Event> {
+            return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
+                val join = root.join<Event, User>("savedByUsers")
+                criteriaBuilder.and(
+                    criteriaBuilder.equal(join.get<String>("email"), userName),
+                    criteriaBuilder.isMember(root.get<Organization>("organization"), join.get<MutableSet<Organization>>("followedOrganizations")),
+                )
+            }
+        }
+
         fun eventInDateRangeType(
             date: Date,
             type: EventsType,

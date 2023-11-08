@@ -21,7 +21,7 @@ abstract class BaseControllerUtilities<T : BaseIdentifiableEntity>(
         return PageRequest.of(page, size, Sort.by(sortDirection, sortBy))
     }
 
-    protected fun getUserName(request: HttpServletRequest): String {
+    protected open fun getUserName(request: HttpServletRequest): String {
         return jwtService.extractUsername(request.getHeader("Authorization")!!.substring(7))
     }
 }

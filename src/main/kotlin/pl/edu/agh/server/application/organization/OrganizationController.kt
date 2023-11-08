@@ -1,6 +1,7 @@
 package pl.edu.agh.server.application.organization
 
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
@@ -45,25 +46,16 @@ class OrganizationController(
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "id,desc") sort: String,
+        @RequestParam(name = "subscribedOnly", defaultValue = false.toString()) subscribedOnly: Boolean,
         request: HttpServletRequest,
     ): ResponseEntity<List<OrganizationDto>> {
         val organizations = organizationService.transformToOrganizationDTO(
-            organizationService.getAllWithPageable(createPageRequest(page, size, sort)),
-            LanguageOption.PL,
-            getUserName(request),
-        )
-        return ResponseEntity.ok(organizations)
-    }
-
-    @GetMapping("/subscribed")
-    fun getSubscribedOrganizationsByUser(
-        @RequestParam(name = "page", defaultValue = "0") page: Int,
-        @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
-        @RequestParam(name = "sort", defaultValue = "id,desc") sort: String,
-        request: HttpServletRequest,
-    ): ResponseEntity<List<OrganizationDto>> {
-        val organizations = organizationService.transformToOrganizationDTO(
-            organizationService.getAllWithSpecificationPageable(organizationFollowedByUser(getUserName(request)), createPageRequest(page, size, sort)),
+            organizationService.getAllWithSpecificationPageable(
+                Specification.allOf(
+                    if (subscribedOnly) organizationFollowedByUser(getUserName(request)) else null,
+                ),
+                createPageRequest(page, size, sort),
+            ),
             LanguageOption.PL,
             getUserName(request),
         )
@@ -83,5 +75,10 @@ class OrganizationController(
                 getUserName(request),
             ).orElseThrow { throw OrganizationNotFoundException(organizationId) },
         )
+    }
+
+//    FIXME use function from base controller once NullPointerException is fixed
+    override fun getUserName(request: HttpServletRequest): String {
+        return jwtService.extractUsername(request.getHeader("Authorization")!!.substring(7))
     }
 }
