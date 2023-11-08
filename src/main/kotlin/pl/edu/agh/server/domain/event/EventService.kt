@@ -13,7 +13,7 @@ import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
-import pl.edu.agh.server.domain.organization.UserOrganizationService
+import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.translation.TranslationService
 import pl.edu.agh.server.domain.user.User
@@ -29,27 +29,27 @@ class EventService(
     private val translationService: TranslationService,
     private val organizationRepository: OrganizationRepository,
     private val imageService: ImageService,
-    private val userOrganizationService: UserOrganizationService,
+    private val organizationService: OrganizationService,
 ) : BaseServiceUtilities<Event>(eventRepository) {
 
     @Transactional
-    fun saveEventForUser(userName: String, eventId: Long): User {
+    fun saveEventForUser(userName: String, eventId: Long) {
         val user = userRepository.findByEmail(userName).orElseThrow { throw UserNotFoundException(userName) }
         val event = eventRepository.findById(eventId)
             .orElseThrow { throw EventNotFoundException(eventId) }
 
         user.savedEvents.add(event)
-        return userRepository.save(user)
+        userRepository.save(user)
     }
 
     @Transactional
-    fun removeEventForUser(userName: String, organizationId: Long): User {
+    fun removeEventForUser(userName: String, organizationId: Long) {
         val user = userRepository.findByEmail(userName).orElseThrow { throw UserNotFoundException(userName) }
         val event = eventRepository.findById(organizationId)
             .orElseThrow { throw EventNotFoundException(organizationId) }
 
         user.savedEvents.remove(event)
-        return userRepository.save(user)
+        userRepository.save(user)
     }
 
     @Transactional
@@ -89,11 +89,19 @@ class EventService(
             .orElseThrow { throw EventNotFoundException(eventId) }
     }
 
+//    FIXME use function from base service once NullPointerException is fixed
+    override fun getAllWithSpecificationPageable(
+        specification: Specification<Event>,
+        pageable: PageRequest,
+    ): List<Event> {
+        return eventRepository.findAll(specification, pageable).content
+    }
+
     fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
         val organizations = mutableSetOf<Organization>()
         events.forEach { organizations.add(it.organization) }
 
-        val organizationDTOs = userOrganizationService.transformToOrganizationDTO(organizations.toList(), language, userName)
+        val organizationDTOs = organizationService.transformToOrganizationDTO(organizations.toList(), language, userName)
         val organizationMap = organizationDTOs.associateBy({ it.id }, { it })
 
         val translationIds = mutableSetOf<UUID>()
@@ -120,14 +128,6 @@ class EventService(
         }
 
         return eventDTOs
-    }
-
-//    FIXME use function from base service once NullPointerException is fixed
-    override fun getAllWithSpecificationPageable(
-        specification: Specification<Event>,
-        pageable: PageRequest,
-    ): List<Event> {
-        return eventRepository.findAll(specification, pageable).content
     }
 
     fun transformToEventDTO(event: Event, language: LanguageOption, userName: String? = null): Optional<EventDTO> {
