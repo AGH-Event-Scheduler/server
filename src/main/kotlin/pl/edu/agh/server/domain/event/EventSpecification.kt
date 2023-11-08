@@ -42,12 +42,11 @@ class EventSpecification {
             }
         }
 
-        fun eventFromFollowedByUser(userName: String): Specification<Event> {
+//        FIXME: Do it on userName if possible
+        fun eventFromFollowedByUser(user: User): Specification<Event> {
             return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
-                val join = root.join<Event, User>("savedByUsers")
                 criteriaBuilder.and(
-                    criteriaBuilder.equal(join.get<String>("email"), userName),
-                    criteriaBuilder.isMember(root.get<Organization>("organization"), join.get<MutableSet<Organization>>("followedOrganizations")),
+                    criteriaBuilder.isMember(user, root.get<Organization>("organization").get<MutableSet<User>>("followedByUsers")),
                 )
             }
         }

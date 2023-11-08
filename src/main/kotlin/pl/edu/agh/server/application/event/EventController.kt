@@ -19,6 +19,7 @@ import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRa
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventSavedByUser
 import pl.edu.agh.server.domain.exception.EventNotFoundException
 import pl.edu.agh.server.domain.translation.LanguageOption
+import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.foundation.application.BaseControllerUtilities
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -28,6 +29,7 @@ import java.util.*
 @RequestMapping("/api/events")
 class EventController(
     private val eventService: EventService,
+    private val userService: UserService,
     private val jwtService: JwtService,
 ) : BaseControllerUtilities<Event>(jwtService) {
 
@@ -45,7 +47,7 @@ class EventController(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
     ): ResponseEntity<Void> {
-        eventService.saveEventForUser(getUserName(request), eventId)
+        eventService.removeEventForUser(getUserName(request), eventId)
         return ResponseEntity.ok().build()
     }
 
@@ -137,12 +139,13 @@ class EventController(
         request: HttpServletRequest,
     ): List<EventDTO> {
         val userName = getUserName(request)
+        val user = userService.getUserByEmail(userName)
 
         return eventService.transformToEventDTO(
             eventService.getAllWithSpecificationPageable(
                 Specification.allOf(
                     if (savedOnly) eventSavedByUser(userName) else null,
-                    if (fromFollowedOnly) eventFromFollowedByUser(userName) else null,
+                    if (fromFollowedOnly) eventFromFollowedByUser(user) else null,
                     if (type != null) eventInDateRangeType(Date.from(Instant.now()), type) else null, // TODO replace this with simple eventInDateRange
                     if (organizationId != null) eventBelongToOrganization(organizationId) else null,
                     if (startDate != null && endDate != null) eventInDateRange(startDate, endDate) else null,

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.exception.EventNotFoundException
+import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
@@ -62,7 +63,7 @@ class EventService(
         startDate: Date,
         endDate: Date,
     ): Event {
-        val organization = organizationRepository.findById(organizationId).orElseThrow()
+        val organization = organizationRepository.findById(organizationId).orElseThrow { OrganizationNotFoundException(organizationId) }
 
 //        TODO make it transactional - remove created image on failure
         val savedBackgroundImage: BackgroundImage = imageService.createBackgroundImage(backgroundImage)
