@@ -17,7 +17,6 @@ import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventFromFoll
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRange
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRangeType
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventSavedByUser
-import pl.edu.agh.server.domain.exception.EventNotFoundException
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.foundation.application.BaseControllerUtilities
@@ -113,7 +112,7 @@ class EventController(
             endDate = endDate,
         )
 
-        return ResponseEntity.ok(eventService.transformToEventDTO(event, LanguageOption.PL, getUserName(request)).orElseThrow { RuntimeException() })
+        return ResponseEntity.ok(eventService.transformToEventDTO(event, LanguageOption.PL, getUserName(request)))
     }
 
     @GetMapping("/{id}")
@@ -122,7 +121,7 @@ class EventController(
         @PathVariable id: Long,
         request: HttpServletRequest,
     ): ResponseEntity<EventDTO> {
-        return ResponseEntity.ok(eventService.transformToEventDTO(eventService.getEvent(id), language, getUserName(request)).orElseThrow { throw EventNotFoundException(id) })
+        return ResponseEntity.ok(eventService.transformToEventDTO(eventService.getEvent(id), language, getUserName(request)))
     }
 
     private fun getAllFilteredEventDTOs(

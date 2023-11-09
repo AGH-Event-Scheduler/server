@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.dto.OrganizationDto
-import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
@@ -73,7 +72,7 @@ class OrganizationController(
                 organization,
                 LanguageOption.PL,
                 getUserName(request),
-            ).orElseThrow { throw OrganizationNotFoundException(organizationId) },
+            ),
         )
     }
 

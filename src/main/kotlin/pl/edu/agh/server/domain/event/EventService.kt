@@ -119,8 +119,8 @@ class EventService(
         return eventDTOs
     }
 
-    fun transformToEventDTO(event: Event, language: LanguageOption, userName: String? = null): Optional<EventDTO> {
-        return Optional.ofNullable(transformToEventDTO(listOf(event), language, userName).firstOrNull())
+    fun transformToEventDTO(event: Event, language: LanguageOption, userName: String? = null): EventDTO {
+        return transformToEventDTO(listOf(event), language, userName).first()
     }
 
     private fun getTranslationsMap(events: List<Event>, language: LanguageOption): Map<UUID, String> {

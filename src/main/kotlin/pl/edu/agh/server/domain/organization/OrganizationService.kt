@@ -63,7 +63,7 @@ class OrganizationService(
         }
     }
 
-    fun transformToOrganizationDTO(organization: Organization, language: LanguageOption, userName: String? = null): Optional<OrganizationDto> {
-        return Optional.ofNullable(transformToOrganizationDTO(listOf(organization), language, userName).firstOrNull())
+    fun transformToOrganizationDTO(organization: Organization, language: LanguageOption, userName: String? = null): OrganizationDto {
+        return transformToOrganizationDTO(listOf(organization), language, userName).first()
     }
 }
