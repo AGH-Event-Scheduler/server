@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.EventDTO
+import pl.edu.agh.server.domain.dto.OrganizationDto
 import pl.edu.agh.server.domain.exception.EventNotFoundException
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
@@ -99,21 +100,8 @@ class EventService(
     }
 
     fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
-        val organizations = mutableSetOf<Organization>()
-        events.forEach { organizations.add(it.organization) }
-
-        val organizationDTOs = organizationService.transformToOrganizationDTO(organizations.toList(), language, userName)
-        val organizationMap = organizationDTOs.associateBy({ it.id }, { it })
-
-        val translationIds = mutableSetOf<UUID>()
-        events.forEach {
-            translationIds.add(it.name)
-            translationIds.add(it.description)
-            translationIds.add(it.location)
-        }
-
-        val translations = translationService.getTranslations(translationIds.toList(), language)
-        val translationsMap = translations.associateBy({ it.translationId }, { it.content })
+        val organizationMap = getOrganizationDtoMap(events, language, userName)
+        val translationsMap = getTranslationsMap(events, language)
 
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
 
@@ -133,5 +121,25 @@ class EventService(
 
     fun transformToEventDTO(event: Event, language: LanguageOption, userName: String? = null): Optional<EventDTO> {
         return Optional.ofNullable(transformToEventDTO(listOf(event), language, userName).firstOrNull())
+    }
+
+    private fun getTranslationsMap(events: List<Event>, language: LanguageOption): Map<UUID, String> {
+        val translationIds = mutableSetOf<UUID>()
+        events.forEach {
+            translationIds.add(it.name)
+            translationIds.add(it.description)
+            translationIds.add(it.location)
+        }
+
+        val translations = translationService.getTranslations(translationIds.toList(), language)
+        return translations.associateBy({ it.translationId }, { it.content })
+    }
+
+    private fun getOrganizationDtoMap(events: List<Event>, language: LanguageOption, userName: String?): Map<Long, OrganizationDto> {
+        val organizations = mutableSetOf<Organization>()
+        events.forEach { organizations.add(it.organization) }
+
+        val organizationDTOs = organizationService.transformToOrganizationDTO(organizations.toList(), language, userName)
+        return organizationDTOs.associateBy({ it.id!! }, { it })
     }
 }
