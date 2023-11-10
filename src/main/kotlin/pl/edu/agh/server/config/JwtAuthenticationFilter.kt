@@ -40,10 +40,7 @@ class JwtAuthenticationFilter(
         val username: String = jwtService.extractUsername(jwt)
         if (SecurityContextHolder.getContext().authentication == null) {
             val userDetails: UserDetails = userDetailsService.loadUserByUsername(username)
-            val isTokenValid: Boolean = tokenRepository.findByToken(jwt)
-                .map { t -> !t.expired && !t.revoked }
-                .orElse(false)
-            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+            if (jwtService.isTokenValid(jwt, userDetails)) {
                 val authentication = UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,

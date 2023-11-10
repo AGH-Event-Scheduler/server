@@ -25,7 +25,7 @@ class JwtService(val tokenRepository: TokenRepository) {
     lateinit var refreshExpirationTime: Number
 
     fun extractUsername(token: String): String {
-        return extractClaims(token, Claims::getSubject)
+        return extractClaims(token, Claims::subject)
     }
 
     fun <T> extractClaims(token: String, claimsResolver: (Claims) -> T): T {
@@ -39,16 +39,16 @@ class JwtService(val tokenRepository: TokenRepository) {
 
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean {
         return isTokenSignedWithCorrectKey(token) &&
-            isTokenRevoked(token) &&
+            !isTokenRevokedOrExpired(token) &&
             extractUsername(token) == userDetails.username && !isTokenExpired(token)
     }
 
-    fun isTokenRevoked(token: String): Boolean {
+    fun isTokenRevokedOrExpired(token: String): Boolean {
         return tokenRepository.findByToken(token).map { it.revoked && it.expired }.orElse(false)
     }
 
     fun isTokenExpired(token: String): Boolean {
-        return extractClaims(token, Claims::getExpiration).before(Date(System.currentTimeMillis()))
+        return extractClaims(token, Claims::expiration).before(Date(System.currentTimeMillis()))
     }
 
     fun generateToken(extraClaims: Map<String, Any>, userDetails: UserDetails): String {

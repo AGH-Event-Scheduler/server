@@ -78,7 +78,7 @@ class AuthenticationService(
     }
 
     private fun saveUserToken(user: User, jwtToken: String, category: TokenCategory) {
-        val token: Token = Token(user = user, token = jwtToken, category = category)
+        val token = Token(user = user, token = jwtToken, category = category)
         tokenRepository.save(token)
     }
 
