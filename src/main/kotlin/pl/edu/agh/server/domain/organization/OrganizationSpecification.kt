@@ -13,5 +13,13 @@ class OrganizationSpecification {
                 criteriaBuilder.equal(join.get<String>("email"), userName)
             }
         }
+
+        fun organizationWithNameLike(name: String): Specification<Organization> {
+//            TODO: update this function once translations are done
+            val nameLowerCase = name.lowercase(Locale.getDefault())
+            return Specification { root: Root<Organization>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
+                criteriaBuilder.like(criteriaBuilder.lower(root.get<String>("name")), "%$nameLowerCase%")
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationFollowedByUser
+import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationWithNameLike
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.foundation.application.BaseControllerUtilities
 
@@ -46,12 +47,14 @@ class OrganizationController(
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "id,desc") sort: String,
         @RequestParam(name = "subscribedOnly", defaultValue = false.toString()) subscribedOnly: Boolean,
+        @RequestParam(name = "name", required = false) name: String?,
         request: HttpServletRequest,
     ): ResponseEntity<List<OrganizationDto>> {
         val organizations = organizationService.transformToOrganizationDTO(
             organizationService.getAllWithSpecificationPageable(
                 Specification.allOf(
                     if (subscribedOnly) organizationFollowedByUser(getUserName(request)) else null,
+                    if (name != null) organizationWithNameLike(name) else null,
                 ),
                 createPageRequest(page, size, sort),
             ),
