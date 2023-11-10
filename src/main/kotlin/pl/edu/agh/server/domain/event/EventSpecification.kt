@@ -4,6 +4,8 @@ import jakarta.persistence.criteria.*
 import org.springframework.data.jpa.domain.Specification
 import pl.edu.agh.server.application.event.EventsType
 import pl.edu.agh.server.domain.organization.Organization
+import pl.edu.agh.server.domain.translation.LanguageOption
+import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.user.User
 import java.util.*
 
@@ -67,6 +69,16 @@ class EventSpecification {
 
                 query.where(predicate)
                 null
+            }
+        }
+
+        fun eventWithNameLike(name: String, languageOption: LanguageOption): Specification<Event> {
+            val nameLowerCase = name.lowercase(Locale.getDefault())
+            println(nameLowerCase)
+            return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
+                val join = root.join<Event, Translation>("name", JoinType.INNER)
+                join.on(criteriaBuilder.equal(join.get<LanguageOption>("language"), languageOption))
+                criteriaBuilder.like(criteriaBuilder.lower(join.get<String>("content")), "%$nameLowerCase%")
             }
         }
     }

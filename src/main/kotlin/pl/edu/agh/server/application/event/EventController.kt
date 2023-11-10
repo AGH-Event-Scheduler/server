@@ -17,6 +17,7 @@ import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventFromFoll
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRange
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRangeType
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventSavedByUser
+import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventWithNameLike
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.foundation.application.BaseControllerUtilities
@@ -62,9 +63,10 @@ class EventController(
         @RequestParam(name = "organizationId", required = false) organizationId: Long?,
         @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") startDate: Date?,
         @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") endDate: Date?,
+        @RequestParam(name = "name", required = false) name: String?,
         request: HttpServletRequest,
     ): ResponseEntity<List<EventDTO>> {
-        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, request)
+        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, request)
         return ResponseEntity.ok(
             entities,
         )
@@ -82,10 +84,11 @@ class EventController(
         @RequestParam(name = "organizationId", required = false) organizationId: Long?,
         @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") startDate: Date?,
         @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") endDate: Date?,
+        @RequestParam(name = "name", required = false) name: String?,
         request: HttpServletRequest,
     ): ResponseEntity<SortedMap<String, List<EventDTO>>> {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, request)
+        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, request)
         return ResponseEntity.ok(entities.groupBy { dateFormat.format(it.startDate) }.toSortedMap())
     }
 
@@ -135,6 +138,7 @@ class EventController(
         organizationId: Long?,
         startDate: Date?,
         endDate: Date?,
+        name: String?,
         request: HttpServletRequest,
     ): List<EventDTO> {
         val userName = getUserName(request)
@@ -148,6 +152,7 @@ class EventController(
                     if (type != null) eventInDateRangeType(Date.from(Instant.now()), type) else null, // TODO replace this with simple eventInDateRange
                     if (organizationId != null) eventBelongToOrganization(organizationId) else null,
                     if (startDate != null && endDate != null) eventInDateRange(startDate, endDate) else null,
+                    if (name != null) eventWithNameLike(name, language) else null,
                 ),
                 createPageRequest(page, size, sort),
             ),
