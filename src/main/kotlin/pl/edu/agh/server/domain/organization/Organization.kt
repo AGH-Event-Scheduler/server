@@ -8,6 +8,7 @@ import lombok.ToString
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.LogoImage
+import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
@@ -30,5 +31,8 @@ class Organization(
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     var events: MutableList<Event> = mutableListOf(),
+
+    @ManyToMany(mappedBy = "followedOrganizations")
+    var followedByUsers: MutableSet<User> = mutableSetOf(),
 
 ) : BaseIdentifiableEntity()
