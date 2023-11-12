@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode
 import lombok.ToString
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.organization.Organization
+import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 import java.util.*
@@ -17,18 +18,21 @@ import java.util.*
 @Data
 @EqualsAndHashCode(callSuper = true)
 class Event(
-    var name: UUID,
+    @OneToMany(fetch = FetchType.EAGER)
+    var name: MutableSet<Translation>,
 
     @Embedded
     var backgroundImage: BackgroundImage,
 
-    var description: UUID,
+    @OneToMany(fetch = FetchType.EAGER)
+    var description: MutableSet<Translation>,
 
     var startDate: Date,
 
     var endDate: Date,
 
-    var location: UUID,
+    @OneToMany(fetch = FetchType.EAGER)
+    var location: MutableSet<Translation>,
 
     @ManyToOne
     @JoinColumn(name = "organization_id")

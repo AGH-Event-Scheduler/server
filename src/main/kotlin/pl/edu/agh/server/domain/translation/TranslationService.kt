@@ -9,24 +9,9 @@ class TranslationService(private val translationRepository: TranslationRepositor
     @Transactional
     fun createTranslation(
         contentLanguageMap: Map<LanguageOption, String>,
-    ): UUID {
-        val translationId = generateTranslationId()
-
-        LanguageOption.values().forEach {
-            translationRepository.save(Translation(translationId, contentLanguageMap[it].toString(), it))
-        }
-
-        return translationId
-    }
-
-    fun getTranslations(
-        translationIdList: List<UUID>,
-        language: LanguageOption,
-    ): List<Translation> {
-        return translationRepository.findByTranslationIdInAndLanguage(translationIdList, language)
-    }
-
-    private fun generateTranslationId(): UUID {
-        return UUID.randomUUID()
+    ): MutableSet<Translation> {
+        return LanguageOption.values().map {
+            translationRepository.save(Translation(contentLanguageMap[it].toString(), it))
+        }.toMutableSet()
     }
 }

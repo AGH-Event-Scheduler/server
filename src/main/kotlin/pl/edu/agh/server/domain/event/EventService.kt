@@ -17,6 +17,7 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.translation.LanguageOption
+import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.translation.TranslationService
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
@@ -101,16 +102,15 @@ class EventService(
 
     fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
         val organizationMap = getOrganizationDtoMap(events, language, userName)
-        val translationsMap = getTranslationsMap(events, language)
 
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
 
         val eventDTOs = events.map {
             modelMapper.map(it, EventDTO::class.java)
                 .apply {
-                    nameTranslated = translationsMap[it.name] ?: ""
-                    locationTranslated = translationsMap[it.location] ?: ""
-                    descriptionTranslated = translationsMap[it.description] ?: ""
+                    nameTranslated = getTranslatedContent(it.name, language)
+                    locationTranslated = getTranslatedContent(it.location, language)
+                    descriptionTranslated = getTranslatedContent(it.description, language)
                     isSaved = (user.isPresent) && user.get().savedEvents.contains(it)
                     underOrganization = organizationMap[it.organization.id]
                 }
@@ -123,16 +123,8 @@ class EventService(
         return transformToEventDTO(listOf(event), language, userName).first()
     }
 
-    private fun getTranslationsMap(events: List<Event>, language: LanguageOption): Map<UUID, String> {
-        val translationIds = mutableSetOf<UUID>()
-        events.forEach {
-            translationIds.add(it.name)
-            translationIds.add(it.description)
-            translationIds.add(it.location)
-        }
-
-        val translations = translationService.getTranslations(translationIds.toList(), language)
-        return translations.associateBy({ it.translationId }, { it.content })
+    private fun getTranslatedContent(translations: Set<Translation>, language: LanguageOption): String {
+        return translations.first { translation -> translation.language === language }.content
     }
 
     private fun getOrganizationDtoMap(events: List<Event>, language: LanguageOption, userName: String?): Map<Long, OrganizationDto> {
