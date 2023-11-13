@@ -1,6 +1,7 @@
 package pl.edu.agh.server.config
 
 import org.modelmapper.ModelMapper
+import org.modelmapper.convention.MatchingStrategies
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -46,6 +47,9 @@ class ApplicationConfig(private val userRepository: UserRepository) {
 
     @Bean
     fun modelMapper(): ModelMapper {
-        return ModelMapper()
+        val modelMapper = ModelMapper()
+        modelMapper.configuration.setAmbiguityIgnored(true)
+        modelMapper.configuration.setMatchingStrategy(MatchingStrategies.STRICT)
+        return modelMapper
     }
 }

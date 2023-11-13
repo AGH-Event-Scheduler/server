@@ -5,7 +5,8 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
 import lombok.EqualsAndHashCode
-import java.time.LocalDateTime
+import java.time.Instant
+import java.util.Date
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.memberProperties
@@ -17,9 +18,9 @@ open class BaseIdentifiableEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    val creationDate: LocalDateTime = LocalDateTime.now(),
+    val creationDate: Date = Date.from(Instant.now()),
 
-    var lastUpdatedDate: LocalDateTime = LocalDateTime.now(),
+    var lastUpdatedDate: Date = Date.from(Instant.now()),
 ) {
 
     open fun updateFields(entity: BaseIdentifiableEntity) {
@@ -43,6 +44,6 @@ open class BaseIdentifiableEntity(
     }
 
     private fun updateLastUpdatedDate() {
-        lastUpdatedDate = LocalDateTime.now()
+        lastUpdatedDate = Date.from(Instant.now())
     }
 }
