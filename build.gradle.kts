@@ -6,6 +6,8 @@ plugins {
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
     kotlin("plugin.jpa") version "1.7.22"
+    kotlin("plugin.lombok") version "1.9.20"
+    id("io.freefair.lombok") version "8.1.0"
 }
 
 group = "pl.edu.agh"

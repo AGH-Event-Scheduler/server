@@ -1,10 +1,10 @@
 package pl.edu.agh.server.application.authentication
 
+import io.jsonwebtoken.io.IOException
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.domain.authentication.AuthenticationService
 
 @RestController
@@ -14,8 +14,9 @@ class AuthenticationController(
 ) {
 
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthenticationResponse> {
-        return ResponseEntity.ok(authenticationService.register(request))
+    fun register(@RequestBody request: RegisterRequest): ResponseEntity<Void> {
+        authenticationService.register(request)
+        return ResponseEntity.ok().build()
     }
 
     @PostMapping("/authenticate")
@@ -28,5 +29,17 @@ class AuthenticationController(
         }
 
         return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/refresh")
+    @Throws(IOException::class)
+    fun refresh(request: HttpServletRequest, response: HttpServletResponse) {
+        authenticationService.refresh(request, response)
+    }
+
+    @PostMapping("/logout")
+    fun logout(request: HttpServletRequest, @RequestParam("refreshToken") refreshToken: String): ResponseEntity<Void> {
+        authenticationService.logout(refreshToken)
+        return ResponseEntity.ok().build()
     }
 }
