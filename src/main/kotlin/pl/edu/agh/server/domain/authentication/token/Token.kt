@@ -18,6 +18,4 @@ class Token(
     var type: TokenType = TokenType.BEARER
 
     var revoked: Boolean = false
-
-    var expired: Boolean = false
 }

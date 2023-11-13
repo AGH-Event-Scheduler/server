@@ -29,7 +29,7 @@ class AuthenticationService(
     private val authenticationManager: AuthenticationManager,
     private val tokenRepository: TokenRepository,
 ) {
-    fun register(request: RegisterRequest): AuthenticationResponse {
+    fun register(request: RegisterRequest) {
         val user = User(
             email = request.email,
             password = passwordEncoder.encode(request.password),
@@ -38,11 +38,6 @@ class AuthenticationService(
             role = Role.USER,
         )
         userRepository.save(user)
-        val accessToken = jwtService.generateToken(user)
-        val refreshToken = jwtService.generateRefreshToken(user)
-        saveUserToken(user, accessToken, TokenCategory.ACCESS)
-        saveUserToken(user, refreshToken, TokenCategory.REFRESH)
-        return AuthenticationResponse(accessToken, refreshToken)
     }
 
     fun authenticate(request: AuthenticationRequest): AuthenticationResponse {
@@ -87,7 +82,6 @@ class AuthenticationService(
         if (validUserTokens.isEmpty()) return
         validUserTokens.forEach {
             it.apply {
-                expired = true
                 revoked = true
             }
         }
@@ -99,7 +93,6 @@ class AuthenticationService(
         if (!refreshToken.isPresent) return
         refreshToken.get().apply {
             revoked = true
-            expired = true
         }
         tokenRepository.save(refreshToken.get())
     }

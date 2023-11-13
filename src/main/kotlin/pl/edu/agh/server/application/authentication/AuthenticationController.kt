@@ -14,8 +14,9 @@ class AuthenticationController(
 ) {
 
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<AuthenticationResponse> {
-        return ResponseEntity.ok(authenticationService.register(request))
+    fun register(@RequestBody request: RegisterRequest): ResponseEntity<Void> {
+        authenticationService.register(request)
+        return ResponseEntity.ok().build()
     }
 
     @PostMapping("/authenticate")
@@ -37,7 +38,6 @@ class AuthenticationController(
     }
 
     @PostMapping("/logout")
-    @Throws(IOException::class)
     fun logout(request: HttpServletRequest, @RequestParam("refreshToken") refreshToken: String): ResponseEntity<Void> {
         authenticationService.logout(refreshToken)
         return ResponseEntity.ok().build()

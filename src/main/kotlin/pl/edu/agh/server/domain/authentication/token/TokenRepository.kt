@@ -9,7 +9,7 @@ interface TokenRepository : JpaRepository<Token, Long> {
     @Query(
         value = " select t from Token t" +
             " inner join User u on t.user.id = u.id " +
-            "where u.id = :id and (t.expired = false or t.revoked = false) and t.category = 'ACCESS'",
+            "where u.id = :id and  t.revoked = false and t.category = 'ACCESS'",
     )
     fun findAllValidTokenByUser(id: Long?): List<Token>
 
