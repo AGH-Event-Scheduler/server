@@ -126,15 +126,29 @@ class DataLoader(
 
     private fun createEvents() {
         val organizations = organizationRepository.findAll()
+//        translationRepository.save(
+//            Translation(
+//                tId,
+//                "PL",
+//                LanguageOption.PL,
+//            ),
+//        )
+//        translationRepository.save(
+//            Translation(
+//                tId,
+//                "EN",
+//                LanguageOption.EN,
+//            ),
+//        )
         for (org: Organization in organizations) {
             val offset = nextInt(0, 30)
             val events = mutableListOf<Event>(
 //                Event(
-//                    name = translationId1,
+//                    name = tId,
 //                    backgroundImage = org.backgroundImage,
 //                    organization = org,
-//                    description = translationId2,
-//                    location = translationId3,
+//                    description = tId,
+//                    location = tId,
 //                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).minusMinutes(toLong(offset.toString()))),
 //                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusMinutes(45).minusMinutes(toLong(offset.toString()))),
 //                ),
