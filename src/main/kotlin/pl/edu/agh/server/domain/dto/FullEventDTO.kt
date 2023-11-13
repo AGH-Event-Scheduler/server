@@ -18,4 +18,5 @@ data class FullEventDTO(
     var backgroundImage: BackgroundImage? = null,
     var creationDate: Date? = null,
     var lastUpdatedDate: Date? = null,
+    var canceled: Boolean? = null,
 )

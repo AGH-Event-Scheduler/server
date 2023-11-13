@@ -57,6 +57,22 @@ class EventService(
     }
 
     @Transactional
+    fun cancelEvent(eventId: Long) {
+        val event = eventRepository.findById(eventId)
+            .orElseThrow { throw EventNotFoundException(eventId) }
+        event.canceled = true
+        eventRepository.save(event)
+    }
+
+    @Transactional
+    fun reenableEvent(eventId: Long) {
+        val event = eventRepository.findById(eventId)
+            .orElseThrow { throw EventNotFoundException(eventId) }
+        event.canceled = false
+        eventRepository.save(event)
+    }
+
+    @Transactional
     fun createEvent(
         organizationId: Long,
         backgroundImage: MultipartFile,

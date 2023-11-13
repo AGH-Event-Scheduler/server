@@ -81,5 +81,11 @@ class EventSpecification {
                 criteriaBuilder.like(criteriaBuilder.lower(join.get<String>("content")), "%$nameLowerCase%")
             }
         }
+
+        fun eventNotCanceled(): Specification<Event> {
+            return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
+                criteriaBuilder.isFalse(root.get<Boolean>("canceled"))
+            }
+        }
     }
 }

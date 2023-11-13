@@ -19,4 +19,5 @@ data class EventDTO(
     var isSaved: Boolean? = null,
     var creationDate: Date? = null,
     var lastUpdatedDate: Date? = null,
+    var canceled: Boolean? = null,
 )

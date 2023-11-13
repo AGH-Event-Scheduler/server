@@ -17,6 +17,7 @@ import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventBelongTo
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventFromFollowedByUser
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRange
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRangeType
+import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventNotCanceled
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventSavedByUser
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventWithNameLike
 import pl.edu.agh.server.domain.translation.LanguageOption
@@ -58,6 +59,7 @@ class EventController(
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "startDate,desc") sort: String,
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
+        @RequestParam(name = "showCanceled", defaultValue = false.toString()) showCanceled: Boolean,
         @RequestParam(name = "savedOnly", defaultValue = false.toString()) savedOnly: Boolean,
         @RequestParam(name = "fromFollowedOnly", defaultValue = false.toString()) fromFollowedOnly: Boolean,
         @RequestParam(name = "type", required = false) type: EventsType?,
@@ -67,7 +69,7 @@ class EventController(
         @RequestParam(name = "name", required = false) name: String?,
         request: HttpServletRequest,
     ): ResponseEntity<List<EventDTO>> {
-        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, request)
+        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, showCanceled, request)
         return ResponseEntity.ok(
             entities,
         )
@@ -79,6 +81,7 @@ class EventController(
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "startDate,desc") sort: String,
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
+        @RequestParam(name = "showCanceled", defaultValue = false.toString()) showCanceled: Boolean,
         @RequestParam(name = "savedOnly", defaultValue = false.toString()) savedOnly: Boolean,
         @RequestParam(name = "fromFollowedOnly", defaultValue = false.toString()) fromFollowedOnly: Boolean,
         @RequestParam(name = "type", required = false) type: EventsType?,
@@ -89,7 +92,7 @@ class EventController(
         request: HttpServletRequest,
     ): ResponseEntity<SortedMap<String, List<EventDTO>>> {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, request)
+        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, showCanceled, request)
         return ResponseEntity.ok(entities.groupBy { dateFormat.format(it.startDate) }.toSortedMap())
     }
 
@@ -162,6 +165,24 @@ class EventController(
         return ResponseEntity.ok(eventService.transformToFullEventDTO(eventService.getEvent(id)))
     }
 
+    @PostMapping("/cancel")
+    fun cancelEvent(
+        request: HttpServletRequest,
+        @RequestParam eventId: Long,
+    ): ResponseEntity<Void> {
+        eventService.cancelEvent(eventId)
+        return ResponseEntity.ok().build()
+    }
+
+    @PostMapping("/reenable")
+    fun reenableEvent(
+        request: HttpServletRequest,
+        @RequestParam eventId: Long,
+    ): ResponseEntity<Void> {
+        eventService.reenableEvent(eventId)
+        return ResponseEntity.ok().build()
+    }
+
     private fun getAllFilteredEventDTOs(
         page: Int,
         size: Int,
@@ -174,6 +195,7 @@ class EventController(
         startDate: Date?,
         endDate: Date?,
         name: String?,
+        showCanceled: Boolean,
         request: HttpServletRequest,
     ): List<EventDTO> {
         val userName = getUserName(request)
@@ -182,6 +204,7 @@ class EventController(
         return eventService.transformToEventDTO(
             eventService.getAllWithSpecificationPageable(
                 Specification.allOf(
+                    if (!showCanceled) eventNotCanceled() else null,
                     if (savedOnly) eventSavedByUser(userName) else null,
                     if (fromFollowedOnly) eventFromFollowedByUser(user) else null,
                     if (type != null) eventInDateRangeType(Date.from(Instant.now()), type) else null, // TODO replace this with simple eventInDateRange
