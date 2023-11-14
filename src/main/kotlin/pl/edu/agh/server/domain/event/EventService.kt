@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.EventDTO
+import pl.edu.agh.server.domain.dto.FullEventDTO
 import pl.edu.agh.server.domain.dto.OrganizationDto
 import pl.edu.agh.server.domain.exception.EventNotFoundException
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
@@ -56,6 +57,22 @@ class EventService(
     }
 
     @Transactional
+    fun cancelEvent(eventId: Long) {
+        val event = eventRepository.findById(eventId)
+            .orElseThrow { throw EventNotFoundException(eventId) }
+        event.canceled = true
+        eventRepository.save(event)
+    }
+
+    @Transactional
+    fun reenableEvent(eventId: Long) {
+        val event = eventRepository.findById(eventId)
+            .orElseThrow { throw EventNotFoundException(eventId) }
+        event.canceled = false
+        eventRepository.save(event)
+    }
+
+    @Transactional
     fun createEvent(
         organizationId: Long,
         backgroundImage: MultipartFile,
@@ -87,6 +104,35 @@ class EventService(
         return newEvent
     }
 
+    @Transactional
+    fun updateEvent(
+        eventId: Long,
+        backgroundImage: MultipartFile?,
+        nameMap: Map<LanguageOption, String>,
+        descriptionMap: Map<LanguageOption, String>,
+        locationMap: Map<LanguageOption, String>,
+        startDate: Date,
+        endDate: Date,
+    ): Event {
+        val event = eventRepository.findById(eventId).orElseThrow { throw EventNotFoundException(eventId) }
+
+//        TODO make it transactional - remove previous image and current on failure
+        if (backgroundImage != null) {
+            val savedBackgroundImage: BackgroundImage = imageService.createBackgroundImage(backgroundImage)
+            event.backgroundImage = savedBackgroundImage
+        }
+
+        event.name = translationService.createTranslation(nameMap)
+        event.description = translationService.createTranslation(descriptionMap)
+        event.location = translationService.createTranslation(locationMap)
+        event.startDate = startDate
+        event.endDate = endDate
+
+        eventRepository.save(event)
+
+        return event
+    }
+
     fun getEvent(eventId: Long): Event {
         return eventRepository.findById(eventId)
             .orElseThrow { throw EventNotFoundException(eventId) }
@@ -98,6 +144,23 @@ class EventService(
         pageable: PageRequest,
     ): List<Event> {
         return eventRepository.findAll(specification, pageable).content
+    }
+
+    fun transformToFullEventDTO(events: List<Event>): List<FullEventDTO> {
+        val fullEventDTOs = events.map {
+            modelMapper.map(it, FullEventDTO::class.java)
+                .apply {
+                    nameMap = getTranslationMap(it.name)
+                    descriptionMap = getTranslationMap(it.description)
+                    locationMap = getTranslationMap(it.location)
+                }
+        }
+
+        return fullEventDTOs
+    }
+
+    fun transformToFullEventDTO(event: Event): FullEventDTO {
+        return transformToFullEventDTO(listOf(event)).first()
     }
 
     fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
@@ -124,7 +187,11 @@ class EventService(
     }
 
     private fun getTranslatedContent(translations: Set<Translation>, language: LanguageOption): String {
-        return translations.first { translation -> translation.language === language }.content
+        return translations.firstOrNull { translation -> translation.language === language }?.content ?: ""
+    }
+
+    private fun getTranslationMap(translations: Set<Translation>): Map<LanguageOption, String> {
+        return translations.associateBy({ it.language }, { it.content })
     }
 
     private fun getOrganizationDtoMap(events: List<Event>, language: LanguageOption, userName: String?): Map<Long, OrganizationDto> {

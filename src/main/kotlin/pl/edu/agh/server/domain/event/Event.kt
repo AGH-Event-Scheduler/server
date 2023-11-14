@@ -31,6 +31,8 @@ class Event(
 
     var endDate: Date,
 
+    var canceled: Boolean = false,
+
     @OneToMany(fetch = FetchType.EAGER)
     var location: MutableSet<Translation>,
 
