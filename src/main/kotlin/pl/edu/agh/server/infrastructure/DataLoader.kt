@@ -13,9 +13,12 @@ import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.image.LogoImage
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
+import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
 import pl.edu.agh.server.domain.translation.TranslationRepository
+import pl.edu.agh.server.domain.user.UserRepository
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.*
@@ -31,6 +34,8 @@ class DataLoader(
     private val imageStorage: ImageStorage,
     private val imageService: ImageService,
     private val translationRepository: TranslationRepository,
+    private val userRepository: UserRepository,
+    private val organizationService: OrganizationService,
     @Value("\${file.ddl-auto}") private val fileDDLAuto: String,
     @Value("\${configuration.mock-data}") private val mockData: Boolean,
 ) : CommandLineRunner {
@@ -45,6 +50,7 @@ class DataLoader(
             createOrganizations()
             createEvents()
             createUsers()
+            assignRoles()
         }
     }
 
@@ -214,9 +220,21 @@ class DataLoader(
         val imageId = imageStorage.generateImageId()
         val extension = imageStorage.getFileExtension(filename)
         imageStorage.createImageDirectory(imageId)
-        imageStorage.saveFile(imageService.resize(image, BackgroundImage.BIG_SIZE[0], BackgroundImage.BIG_SIZE[1]), imageId, "big.$extension")
-        imageStorage.saveFile(imageService.resize(image, BackgroundImage.MEDIUM_SIZE[0], BackgroundImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
-        imageStorage.saveFile(imageService.resize(image, BackgroundImage.SMALL_SIZE[0], BackgroundImage.SMALL_SIZE[1]), imageId, "small.$extension")
+        imageStorage.saveFile(
+            imageService.resize(image, BackgroundImage.BIG_SIZE[0], BackgroundImage.BIG_SIZE[1]),
+            imageId,
+            "big.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, BackgroundImage.MEDIUM_SIZE[0], BackgroundImage.MEDIUM_SIZE[1]),
+            imageId,
+            "medium.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, BackgroundImage.SMALL_SIZE[0], BackgroundImage.SMALL_SIZE[1]),
+            imageId,
+            "small.$extension",
+        )
 
         return BackgroundImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }
@@ -226,9 +244,21 @@ class DataLoader(
         val imageId = imageStorage.generateImageId()
         val extension = imageStorage.getFileExtension(filename)
         imageStorage.createImageDirectory(imageId)
-        imageStorage.saveFile(imageService.resize(image, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1]), imageId, "big.$extension")
-        imageStorage.saveFile(imageService.resize(image, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
-        imageStorage.saveFile(imageService.resize(image, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1]), imageId, "small.$extension")
+        imageStorage.saveFile(
+            imageService.resize(image, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1]),
+            imageId,
+            "big.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1]),
+            imageId,
+            "medium.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1]),
+            imageId,
+            "small.$extension",
+        )
 
         return LogoImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }
@@ -249,5 +279,10 @@ class DataLoader(
 
     private fun shortLoremIpsum(): String {
         return "Mauris sed pulvinar justo, vel rutrum est. Donec sem justo, rhoncus quis posuere ut, finibus sed turpis. Aliquam pharetra venenatis sem vitae pretium. Cras semper eleifend tortor et imperdiet. Maecenas dictum consectetur nisi eu luctus. Suspendisse eu rutrum magna. Vivamus placerat blandit sem, a aliquet nisi lobortis sed. "
+    }
+
+    private fun assignRoles() {
+        val admin = userRepository.findByEmail("admin@agh.edu.pl").get()
+        organizationService.assignUserRole(1, admin.id!!, OrganizationRole.ADMIN)
     }
 }

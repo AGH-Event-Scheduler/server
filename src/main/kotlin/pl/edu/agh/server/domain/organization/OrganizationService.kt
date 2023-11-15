@@ -11,7 +11,9 @@ import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
-import pl.edu.agh.server.domain.user.UserService
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
+import pl.edu.agh.server.domain.user.organizationroles.UserOrganizationRole
+import pl.edu.agh.server.domain.user.organizationroles.UserOrganizationRoleRepository
 import pl.edu.agh.server.foundation.application.BaseServiceUtilities
 import java.util.*
 
@@ -19,8 +21,8 @@ import java.util.*
 class OrganizationService(
     private val userRepository: UserRepository,
     private val organizationRepository: OrganizationRepository,
-    private val userService: UserService,
     private val modelMapper: ModelMapper,
+    private val userOrganizationRoleRepository: UserOrganizationRoleRepository,
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
 
     @Transactional
@@ -48,12 +50,19 @@ class OrganizationService(
             .orElseThrow { throw OrganizationNotFoundException(organizationId) }
     }
 
-//    FIXME use function from base service once NullPointerException is fixed
-    override fun getAllWithSpecificationPageable(specification: Specification<Organization>, pageable: PageRequest): List<Organization> {
+    //    FIXME use function from base service once NullPointerException is fixed
+    override fun getAllWithSpecificationPageable(
+        specification: Specification<Organization>,
+        pageable: PageRequest,
+    ): List<Organization> {
         return organizationRepository.findAll(specification, pageable).content
     }
 
-    fun transformToOrganizationDTO(organizations: List<Organization>, language: LanguageOption, userName: String? = null): List<OrganizationDto> {
+    fun transformToOrganizationDTO(
+        organizations: List<Organization>,
+        language: LanguageOption,
+        userName: String? = null,
+    ): List<OrganizationDto> {
 //        TODO: implement once translations are done
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
         return organizations.map {
@@ -63,7 +72,30 @@ class OrganizationService(
         }
     }
 
-    fun transformToOrganizationDTO(organization: Organization, language: LanguageOption, userName: String? = null): OrganizationDto {
+    fun transformToOrganizationDTO(
+        organization: Organization,
+        language: LanguageOption,
+        userName: String? = null,
+    ): OrganizationDto {
         return transformToOrganizationDTO(listOf(organization), language, userName).first()
+    }
+
+    @Transactional
+    fun assignUserRole(organizationId: Long, userId: Long, role: OrganizationRole) {
+        if (!userOrganizationRoleRepository.existsByOrganizationIdAndUserIdAndRole(organizationId, userId, role)) {
+            val organization = organizationRepository.findById(organizationId).orElseThrow()
+            val user = userRepository.findById(userId).orElseThrow()
+
+            val newAssignment = UserOrganizationRole(
+                user = user,
+                organization = organization,
+                role = role,
+            )
+
+            userOrganizationRoleRepository.save(newAssignment)
+
+            user.userOrganizationRoles.add(newAssignment)
+            userRepository.save(user)
+        }
     }
 }

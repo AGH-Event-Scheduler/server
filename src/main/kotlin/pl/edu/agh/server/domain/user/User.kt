@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.organization.Organization
+import pl.edu.agh.server.domain.user.organizationroles.UserOrganizationRole
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
@@ -55,6 +56,9 @@ class User(
 
     @OneToMany(mappedBy = "user")
     private val tokens: List<Token> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val userOrganizationRoles: MutableList<UserOrganizationRole> = mutableListOf()
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(role.name))
