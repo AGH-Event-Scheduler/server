@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.event.Event
+import pl.edu.agh.server.domain.notification.Notification
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
@@ -52,6 +53,9 @@ class User(
         inverseJoinColumns = [JoinColumn(name = "event_id")],
     )
     val savedEvents: MutableSet<Event> = mutableSetOf()
+
+    @OneToMany
+    private val seenNotifications: Set<Notification> = mutableSetOf()
 
     @OneToMany(mappedBy = "user")
     private val tokens: List<Token> = mutableListOf()
