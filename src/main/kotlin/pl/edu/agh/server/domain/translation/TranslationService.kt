@@ -10,7 +10,7 @@ class TranslationService(private val translationRepository: TranslationRepositor
     fun createTranslation(
         contentLanguageMap: Map<LanguageOption, String>,
     ): MutableSet<Translation> {
-        return LanguageOption.values().map {
+        return LanguageOption.entries.map {
             translationRepository.save(Translation(contentLanguageMap[it].toString(), it))
         }.toMutableSet()
     }

@@ -7,9 +7,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
-import pl.edu.agh.server.domain.exception.TranslationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.translation.LanguageOption
+import pl.edu.agh.server.domain.translation.Translation
+import pl.edu.agh.server.domain.translation.TranslationService
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.domain.user.UserService
@@ -20,8 +21,6 @@ import java.util.*
 class OrganizationService(
     private val userRepository: UserRepository,
     private val organizationRepository: OrganizationRepository,
-    private val userService: UserService,
-    private val translationService: TranslationService,
     private val modelMapper: ModelMapper,
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
 
@@ -55,17 +54,22 @@ class OrganizationService(
         return organizationRepository.findAll(specification, pageable).content
     }
 
-    fun transformToOrganizationDTO(organizations: List<Organization>, language: LanguageOption, userName: String? = null): List<OrganizationDto> {
+    fun transformToOrganizationDTO(organizations: List<Organization>, language: LanguageOption, userName: String? = null): List<OrganizationDTO> {
 //        TODO: implement once translations are done
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
         return organizations.map {
-            modelMapper.map(it, OrganizationDto::class.java).apply {
+            modelMapper.map(it, OrganizationDTO::class.java).apply {
                 isSubscribed = (user.isPresent) && user.get().followedOrganizations.contains(it)
+                description = getTranslatedContent(it.description, language)
+                name = getTranslatedContent(it.name, language)
             }
         }
     }
+    private fun getTranslatedContent(translations: Set<Translation>, language: LanguageOption): String {
+        return translations.firstOrNull { translation -> translation.language === language }?.content ?: ""
+    }
 
-    fun transformToOrganizationDTO(organization: Organization, language: LanguageOption, userName: String? = null): OrganizationDto {
+    fun transformToOrganizationDTO(organization: Organization, language: LanguageOption, userName: String? = null): OrganizationDTO {
         return transformToOrganizationDTO(listOf(organization), language, userName).first()
     }
 }

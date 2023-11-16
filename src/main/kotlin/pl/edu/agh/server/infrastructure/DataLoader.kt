@@ -61,64 +61,64 @@ class DataLoader(
     }
 
     private fun createOrganizations() {
-        organizationRepository.saveAll(
-            listOf(
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-1.jpg"),
-                    backgroundImage = createBackgroundImage("bg-1.jpg"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-2.png"),
-                    backgroundImage = createBackgroundImage("bg-2.png"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-3.jpeg"),
-                    backgroundImage = createBackgroundImage("bg-3.png"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-4.png"),
-                    backgroundImage = createBackgroundImage("bg-4.png"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-5.jpg"),
-                    backgroundImage = createBackgroundImage("bg-5.png"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-6.jpg"),
-                    backgroundImage = createBackgroundImage("bg-6.png"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-7.jpeg"),
-                    backgroundImage = createBackgroundImage("bg-7.jpg"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-8.png"),
-                    backgroundImage = createBackgroundImage("bg-8.jpg"),
-                    description = UUID.randomUUID(),
-                ),
-                Organization(
-                    name = UUID.randomUUID(),
-                    logoImage = createLogoImage("logo-9.png"),
-                    backgroundImage = createBackgroundImage("bg-9.jpg"),
-                    description = UUID.randomUUID(),
-                ),
-            ),
-        )
+//        organizationRepository.saveAll(
+//            listOf(
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-1.jpg"),
+//                    backgroundImage = createBackgroundImage("bg-1.jpg"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-2.png"),
+//                    backgroundImage = createBackgroundImage("bg-2.png"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-3.jpeg"),
+//                    backgroundImage = createBackgroundImage("bg-3.png"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-4.png"),
+//                    backgroundImage = createBackgroundImage("bg-4.png"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-5.jpg"),
+//                    backgroundImage = createBackgroundImage("bg-5.png"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-6.jpg"),
+//                    backgroundImage = createBackgroundImage("bg-6.png"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-7.jpeg"),
+//                    backgroundImage = createBackgroundImage("bg-7.jpg"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-8.png"),
+//                    backgroundImage = createBackgroundImage("bg-8.jpg"),
+//                    description = UUID.randomUUID(),
+//                ),
+//                Organization(
+//                    name = UUID.randomUUID(),
+//                    logoImage = createLogoImage("logo-9.png"),
+//                    backgroundImage = createBackgroundImage("bg-9.jpg"),
+//                    description = UUID.randomUUID(),
+//                ),
+//            ),
+//        )
     }
 
     private fun createUsers() {

@@ -8,6 +8,7 @@ import lombok.ToString
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.LogoImage
+import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 import java.util.*
@@ -18,7 +19,8 @@ import java.util.*
 @Data
 @EqualsAndHashCode(callSuper = true)
 class Organization(
-    var name: UUID,
+    @OneToMany(fetch = FetchType.EAGER)
+    var name: MutableSet<Translation>,
 
     @Embedded
     var logoImage: LogoImage,
@@ -26,7 +28,8 @@ class Organization(
     @Embedded
     var backgroundImage: BackgroundImage,
 
-    var description: UUID,
+    @OneToMany(fetch = FetchType.EAGER)
+    var description: MutableSet<Translation>,
 
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore

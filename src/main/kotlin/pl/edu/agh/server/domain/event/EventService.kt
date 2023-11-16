@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.dto.FullEventDTO
-import pl.edu.agh.server.domain.dto.OrganizationDto
+import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.exception.EventNotFoundException
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
@@ -171,7 +171,7 @@ class EventService(
     }
 
     fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
-        val organizationMap = getOrganizationDtoMap(events, language, userName)
+        val organizationMap = getOrganizationDTOMap(events, language, userName)
 
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
 
@@ -201,7 +201,7 @@ class EventService(
         return translations.associateBy({ it.language }, { it.content })
     }
 
-    private fun getOrganizationDtoMap(events: List<Event>, language: LanguageOption, userName: String?): Map<Long, OrganizationDto> {
+    private fun getOrganizationDTOMap(events: List<Event>, language: LanguageOption, userName: String?): Map<Long, OrganizationDTO> {
         val organizations = mutableSetOf<Organization>()
         events.forEach { organizations.add(it.organization) }
 
