@@ -16,6 +16,6 @@ data class OrganizationDTO(
     var backgroundImage: BackgroundImage? = null,
     var description: String? = null,
     var id: Long? = null,
-    var creationDate: LocalDateTime? = null,
-    var lastUpdatedDate: LocalDateTime? = null,
+    var creationDate: Date? = null,
+    var lastUpdatedDate: Date? = null,
 )

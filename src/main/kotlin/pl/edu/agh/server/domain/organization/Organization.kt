@@ -8,6 +8,7 @@ import lombok.ToString
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.LogoImage
+import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 import java.util.*
 
@@ -31,4 +32,7 @@ class Organization(
     @JsonIgnore
     var events: MutableList<Event> = mutableListOf(),
 
-    ) : BaseIdentifiableEntity()
+    @ManyToMany(mappedBy = "followedOrganizations")
+    var followedByUsers: MutableSet<User> = mutableSetOf(),
+
+) : BaseIdentifiableEntity()

@@ -1,6 +1,5 @@
 package pl.edu.agh.server.domain.translation
 
-import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
@@ -16,7 +15,7 @@ import java.util.*
     uniqueConstraints = [
         UniqueConstraint(
             name = "UniqueTranslationIdAndLanguage",
-            columnNames = ["translation_id", "language"],
+            columnNames = ["id", "language"],
         ),
     ],
 )

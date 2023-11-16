@@ -9,6 +9,8 @@ import lombok.ToString
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import pl.edu.agh.server.domain.authentication.token.Token
+import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
@@ -36,11 +38,23 @@ class User(
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-        name = "user_organizations",
+        name = "user_followed_organizations",
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "organization_id")],
     )
-    val organizations: MutableSet<Organization> = mutableSetOf()
+    val followedOrganizations: MutableSet<Organization> = mutableSetOf()
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "user_saved_events",
+        joinColumns = [JoinColumn(name = "user_id")],
+        inverseJoinColumns = [JoinColumn(name = "event_id")],
+    )
+    val savedEvents: MutableSet<Event> = mutableSetOf()
+
+    @OneToMany(mappedBy = "user")
+    private val tokens: List<Token> = mutableListOf()
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(role.name))
