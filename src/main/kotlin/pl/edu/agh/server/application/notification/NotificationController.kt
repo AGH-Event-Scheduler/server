@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.dto.NotificationDTO
 import pl.edu.agh.server.domain.notification.Notification
+import pl.edu.agh.server.domain.notification.NotificationDTOTranslateService
 import pl.edu.agh.server.domain.notification.NotificationService
 import pl.edu.agh.server.domain.notification.NotificationSpecification.Companion.notificationForAdmins
 import pl.edu.agh.server.domain.notification.NotificationSpecification.Companion.notificationForAllUsers
@@ -23,6 +24,7 @@ import pl.edu.agh.server.foundation.application.BaseControllerUtilities
 @RequestMapping("/api/feed")
 class NotificationController(
     private val notificationService: NotificationService,
+    private val notificationDTOTranslateService: NotificationDTOTranslateService,
     private val jwtService: JwtService,
     private val userService: UserService,
 ) : BaseControllerUtilities<Notification>(jwtService) {
@@ -47,7 +49,7 @@ class NotificationController(
             ),
             createPageRequest(page, size, sort),
         )
-        return notificationService.transformToNotificationDTO(notifications, language, getUserName(request))
+        return notificationDTOTranslateService.transformToNotificationDTO(notifications, language, user)
     }
 
 //    FIXME use function from base controller once NullPointerException is fixed
