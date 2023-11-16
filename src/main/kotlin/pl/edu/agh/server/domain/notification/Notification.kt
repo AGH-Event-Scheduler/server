@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode
 import lombok.ToString
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.organization.Organization
+import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
@@ -29,16 +30,19 @@ class Notification(
 
 //    For filtering
     @ManyToMany
-    var forFollowersOfOrganizations: Set<Organization> = mutableSetOf(),
+    var seenByUsers: MutableSet<User> = mutableSetOf(),
 
     @ManyToMany
-    var forWritersOfOrganizations: Set<Organization> = mutableSetOf(),
+    var forFollowersOfOrganizations: MutableSet<Organization> = mutableSetOf(),
 
     @ManyToMany
-    var forDirectorsOfOrganizations: Set<Organization> = mutableSetOf(),
+    var forWritersOfOrganizations: MutableSet<Organization> = mutableSetOf(),
 
     @ManyToMany
-    var forUsersWithSavedEvents: Set<Event> = mutableSetOf(),
+    var forDirectorsOfOrganizations: MutableSet<Organization> = mutableSetOf(),
+
+    @ManyToMany
+    var forUsersWithSavedEvents: MutableSet<Event> = mutableSetOf(),
 
     var forAdmins: Boolean = true,
 

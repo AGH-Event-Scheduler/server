@@ -41,7 +41,6 @@ class NotificationService(
         val newNotification = Notification(
             type = NotificationType.EVENT_CREATE,
             regardingEvent = event,
-            regardingOrganization = event.organization,
             forFollowersOfOrganizations = mutableSetOf(event.organization),
             forWritersOfOrganizations = mutableSetOf(event.organization),
             forDirectorsOfOrganizations = mutableSetOf(event.organization),
@@ -55,7 +54,7 @@ class NotificationService(
         val newNotification = Notification(
             type = NotificationType.EVENT_UPDATE,
             regardingEvent = event,
-            regardingOrganization = event.organization,
+            forUsersWithSavedEvents = mutableSetOf(event),
             forFollowersOfOrganizations = mutableSetOf(event.organization),
             forWritersOfOrganizations = mutableSetOf(event.organization),
             forDirectorsOfOrganizations = mutableSetOf(event.organization),
@@ -69,7 +68,7 @@ class NotificationService(
         val newNotification = Notification(
             type = NotificationType.EVENT_CANCEL,
             regardingEvent = event,
-            regardingOrganization = event.organization,
+            forUsersWithSavedEvents = mutableSetOf(event),
             forFollowersOfOrganizations = mutableSetOf(event.organization),
             forWritersOfOrganizations = mutableSetOf(event.organization),
             forDirectorsOfOrganizations = mutableSetOf(event.organization),
@@ -83,7 +82,7 @@ class NotificationService(
         val newNotification = Notification(
             type = NotificationType.EVENT_REENABLE,
             regardingEvent = event,
-            regardingOrganization = event.organization,
+            forUsersWithSavedEvents = mutableSetOf(event),
             forFollowersOfOrganizations = mutableSetOf(event.organization),
             forWritersOfOrganizations = mutableSetOf(event.organization),
             forDirectorsOfOrganizations = mutableSetOf(event.organization),

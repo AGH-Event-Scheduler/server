@@ -54,8 +54,8 @@ class User(
     )
     val savedEvents: MutableSet<Event> = mutableSetOf()
 
-    @OneToMany
-    private val seenNotifications: Set<Notification> = mutableSetOf()
+    @ManyToMany
+    val seenNotifications: MutableSet<Notification> = mutableSetOf()
 
     @OneToMany(mappedBy = "user")
     private val tokens: List<Token> = mutableListOf()
