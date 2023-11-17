@@ -89,8 +89,7 @@ class EventService(
 //        TODO make it transactional - remove created image on failure
         if (backgroundImage != null) {
             savedBackgroundImage = imageService.createBackgroundImage(backgroundImage)
-        }
-        else {
+        } else {
             throw IncorrectFileUploadException("Uploaded file does not exist")
         }
 

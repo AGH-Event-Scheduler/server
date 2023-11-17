@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.OrganizationDTO
-import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.image.BackgroundImage
@@ -28,7 +27,7 @@ class OrganizationService(
     private val organizationRepository: OrganizationRepository,
     private val modelMapper: ModelMapper,
     private val translationService: TranslationService,
-    private val imageService: ImageService
+    private val imageService: ImageService,
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
 
     @Transactional
@@ -62,11 +61,11 @@ class OrganizationService(
         backgroundImageFile: MultipartFile?,
         nameMap: Map<LanguageOption, String>,
         descriptionMap: Map<LanguageOption, String>,
-    ): Organization{
+    ): Organization {
         val backgroundImage: BackgroundImage
         val logoImage: LogoImage
 
-        if (backgroundImageFile != null){
+        if (backgroundImageFile != null) {
             backgroundImage = imageService.createBackgroundImage(backgroundImageFile)
         } else {
             throw IncorrectFileUploadException("Uploaded file does not exist")
@@ -82,7 +81,7 @@ class OrganizationService(
             name = translationService.createTranslation(nameMap),
             description = translationService.createTranslation(descriptionMap),
             backgroundImage = backgroundImage,
-            logoImage = logoImage
+            logoImage = logoImage,
         )
         return organizationRepository.save(newOrganization)
     }

@@ -15,7 +15,7 @@ class ImageService(private val imageStorage: ImageStorage) {
         return bufferedImage.getScaledInstance(newWidth, newHeight, SCALE_REPLICATE)
     }
 
-    fun createBackgroundImage(backgroundImage: MultipartFile) : BackgroundImage{
+    fun createBackgroundImage(backgroundImage: MultipartFile): BackgroundImage {
         if (!imageStorage.checkIfImageWithProperExtensions(backgroundImage)) {
             throw IncorrectFileUploadException("Uploaded file type is not supported")
         }
@@ -50,7 +50,7 @@ class ImageService(private val imageStorage: ImageStorage) {
         )
     }
 
-    fun createLogoImage(logoImage: MultipartFile) : LogoImage{
+    fun createLogoImage(logoImage: MultipartFile): LogoImage {
         if (!imageStorage.checkIfImageWithProperExtensions(logoImage)) {
             throw IncorrectFileUploadException("Uploaded file type is not supported")
         }
