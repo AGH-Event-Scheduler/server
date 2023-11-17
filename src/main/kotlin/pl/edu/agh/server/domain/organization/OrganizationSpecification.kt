@@ -22,7 +22,7 @@ class OrganizationSpecification {
             return Specification { root: Root<Organization>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
                 val join = root.join<Organization, Translation>("name", JoinType.INNER)
                 join.on(criteriaBuilder.equal(join.get<LanguageOption>("language"), languageOption))
-                criteriaBuilder.like(criteriaBuilder.lower(root.get<String>("content")), "%$nameLowerCase%")
+                criteriaBuilder.like(criteriaBuilder.lower(join.get<String>("content")), "%$nameLowerCase%")
             }
         }
     }
