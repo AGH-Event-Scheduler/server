@@ -1,23 +1,32 @@
 package pl.edu.agh.server.infrastructure
 
+import org.apache.commons.lang3.math.NumberUtils.toLong
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Configuration
+import org.springframework.mock.web.MockMultipartFile
+import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.authentication.RegisterRequest
 import pl.edu.agh.server.domain.authentication.AuthenticationService
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventRepository
+import pl.edu.agh.server.domain.event.EventService
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.image.LogoImage
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
+import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
-import pl.edu.agh.server.domain.translation.TranslationRepository
+import pl.edu.agh.server.domain.translation.LanguageOption
 import java.awt.image.BufferedImage
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.sql.Timestamp
+import java.time.LocalDateTime
 import java.util.*
 import javax.imageio.ImageIO
 import kotlin.random.Random.Default.nextInt
@@ -30,7 +39,8 @@ class DataLoader(
     private val eventRepository: EventRepository,
     private val imageStorage: ImageStorage,
     private val imageService: ImageService,
-    private val translationRepository: TranslationRepository,
+    private val eventService: EventService,
+    private val organizationService: OrganizationService,
     @Value("\${file.ddl-auto}") private val fileDDLAuto: String,
     @Value("\${configuration.mock-data}") private val mockData: Boolean,
 ) : CommandLineRunner {
@@ -53,63 +63,66 @@ class DataLoader(
     }
 
     private fun createOrganizations() {
-        organizationRepository.saveAll(
-            listOf(
-                Organization(
-                    name = "KN BIT",
-                    logoImage = createLogoImage("logo-1.jpg"),
-                    backgroundImage = createBackgroundImage("bg-1.jpg"),
-                    description = longLoremIpsum(),
-                ),
-                Organization(
-                    name = "KN Osób Studiujących Socjologię",
-                    logoImage = createLogoImage("logo-2.png"),
-                    backgroundImage = createBackgroundImage("bg-2.png"),
-                    description = mediumLoremIpsum(),
-                ),
-                Organization(
-                    name = "BioMedical Innovations",
-                    logoImage = createLogoImage("logo-3.jpeg"),
-                    backgroundImage = createBackgroundImage("bg-3.png"),
-                    description = shortLoremIpsum(),
-                ),
-                Organization(
-                    name = "Koło Naukowe Creative",
-                    logoImage = createLogoImage("logo-4.png"),
-                    backgroundImage = createBackgroundImage("bg-4.png"),
-                    description = longLoremIpsum(),
-                ),
-                Organization(
-                    name = "AGH Eko-Energia",
-                    logoImage = createLogoImage("logo-5.jpg"),
-                    backgroundImage = createBackgroundImage("bg-5.png"),
-                    description = mediumLoremIpsum(),
-                ),
-                Organization(
-                    name = "Koło Naukowe Data Team",
-                    logoImage = createLogoImage("logo-6.jpg"),
-                    backgroundImage = createBackgroundImage("bg-6.png"),
-                    description = shortLoremIpsum(),
-                ),
-                Organization(
-                    name = "KN 4 Society",
-                    logoImage = createLogoImage("logo-7.jpeg"),
-                    backgroundImage = createBackgroundImage("bg-7.jpg"),
-                    description = longLoremIpsum(),
-                ),
-                Organization(
-                    name = "KN Energon",
-                    logoImage = createLogoImage("logo-8.png"),
-                    backgroundImage = createBackgroundImage("bg-8.jpg"),
-                    description = mediumLoremIpsum(),
-                ),
-                Organization(
-                    name = "KN Larp AGH",
-                    logoImage = createLogoImage("logo-9.png"),
-                    backgroundImage = createBackgroundImage("bg-9.jpg"),
-                    description = shortLoremIpsum(),
-                ),
-            ),
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "KN BIT", LanguageOption.EN to "KN BIT"),
+            logoImageFile = getFile("logo-1.jpg"),
+            backgroundImageFile = getFile("bg-1.jpg"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "KN Osób Studiujących Socjologię", LanguageOption.EN to "Osób Studiujących Socjologię"),
+            logoImageFile = getFile("logo-2.png"),
+            backgroundImageFile = getFile("bg-2.png"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "BioMedical Innovations", LanguageOption.EN to "BioMedical Innovations"),
+            logoImageFile = getFile("logo-3.jpeg"),
+            backgroundImageFile = getFile("bg-3.png"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Creative", LanguageOption.EN to "Koło Naukowe Creative"),
+            logoImageFile = getFile("logo-4.png"),
+            backgroundImageFile = getFile("bg-4.png"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "AGH Eko-Energia", LanguageOption.EN to "AGH Eko-Energia"),
+            logoImageFile = getFile("logo-5.jpg"),
+            backgroundImageFile = getFile("bg-5.png"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Data Team", LanguageOption.EN to "Naukowe Data Team"),
+            logoImageFile = getFile("logo-6.jpg"),
+            backgroundImageFile = getFile("bg-6.png"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "KN 4 Society", LanguageOption.EN to "KN 4 Society"),
+            logoImageFile = getFile("logo-7.jpeg"),
+            backgroundImageFile = getFile("bg-7.jpg"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "KN Energon", LanguageOption.EN to "KN Energon"),
+            logoImageFile = getFile("logo-8.png"),
+            backgroundImageFile = getFile("bg-8.jpg"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+        )
+        organizationService.createOrganization(
+            nameMap = mapOf(LanguageOption.PL to "KN Larp AGH", LanguageOption.EN to "KN Larp AGH"),
+            logoImageFile = getFile("logo-9.png"),
+            backgroundImageFile = getFile("bg-9.jpg"),
+            descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
         )
     }
 
@@ -126,87 +139,103 @@ class DataLoader(
 
     private fun createEvents() {
         val organizations = organizationRepository.findAll()
+        val events = mutableListOf<Event>()
+
         for (org: Organization in organizations) {
             val offset = nextInt(0, 30)
-            val events = mutableListOf<Event>(
-//                Event(
-//                    name = translationId1,
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = translationId2,
-//                    location = translationId3,
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusMinutes(45).minusMinutes(toLong(offset.toString()))),
-//                ),
-//                Event(
-//                    name = translationId4,
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = translationId5,
-//                    location = translationId6,
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 2",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = longLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().plusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 3",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = mediumLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().minusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 4",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = longLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(
-//                        LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString())),
-//                    ),
-//                ),
-//                Event(
-//                    name = "Test Event 5",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = shortLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
-//                ),
-//                Event(
-//                    name = "Test Event 6",
-//                    backgroundImage = org.backgroundImage,
-//                    organization = org,
-//                    description = shortLoremIpsum(),
-//                    location = "AGH D17 4.26",
-//                    startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).minusMinutes(toLong(offset.toString()))),
-//                    endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
-//                ),
+            events.addAll(
+                listOf(
+                    eventService.createEvent(
+                        organizationId = org.id!!,
+                        backgroundImage = getFile("bg-1.jpg"),
+                        nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 1", LanguageOption.EN to "Test event 1"),
+                        locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                        descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                        endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).minusMinutes(toLong(offset.toString()))),
+                        startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusMinutes(45).minusMinutes(toLong(offset.toString()))),
+                    ),
+                    eventService.createEvent(
+                        organizationId = org.id!!,
+                        backgroundImage = getFile("bg-1.jpg"),
+                        nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 2", LanguageOption.EN to "Test event 2"),
+                        locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                        descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                        startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
+                        endDate = Timestamp.valueOf(
+                            LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                        ),
+                    ),
+                    eventService.createEvent(
+                        organizationId = org.id!!,
+                        backgroundImage = getFile("bg-1.jpg"),
+                        nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 3", LanguageOption.EN to "Test event 3"),
+                        locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                        descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                        startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).minusMinutes(toLong(offset.toString()))),
+                        endDate = Timestamp.valueOf(
+                            LocalDateTime.now().plusDays(2).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                        ),
+                    ),
+                    eventService.createEvent(
+                        organizationId = org.id!!,
+                        backgroundImage = getFile("bg-1.jpg"),
+                        nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 4", LanguageOption.EN to "Test event 4"),
+                        locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                        descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                        startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).minusMinutes(toLong(offset.toString()))),
+                        endDate = Timestamp.valueOf(
+                            LocalDateTime.now().plusDays(1).plusMinutes(90).minusMinutes(toLong(offset.toString())),
+                        ),
+                    ),
+                    eventService.createEvent(
+                        organizationId = org.id!!,
+                        backgroundImage = getFile("bg-1.jpg"),
+                        nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 5", LanguageOption.EN to "Test event 5"),
+                        locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                        descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                        startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(3).minusMinutes(toLong(offset.toString()))),
+                        endDate = Timestamp.valueOf(
+                            LocalDateTime.now().minusDays(3).plusMinutes(120).minusMinutes(toLong(offset.toString())),
+                        ),
+                    ),
+                    eventService.createEvent(
+                        organizationId = org.id!!,
+                        backgroundImage = getFile("bg-1.jpg"),
+                        nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 6", LanguageOption.EN to "Test event 6"),
+                        locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                        descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                        startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).minusMinutes(toLong(offset.toString()))),
+                        endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(4).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
+                    ),
+                    eventService.createEvent(
+                        organizationId = org.id!!,
+                        backgroundImage = getFile("bg-1.jpg"),
+                        nameMap = mapOf(LanguageOption.PL to "Testowe wydarzenie 7", LanguageOption.EN to "Test event 7"),
+                        locationMap = mapOf(LanguageOption.PL to "AGH D17 4.27", LanguageOption.EN to "AGH D17 4.27"),
+                        descriptionMap = mapOf(LanguageOption.PL to shortLoremIpsumPl(), LanguageOption.EN to shortLoremIpsumEn()),
+                        startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).minusMinutes(toLong(offset.toString()))),
+                        endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).plusMinutes(60).minusMinutes(toLong(offset.toString()))),
+                    ),
+                ),
             )
 
             org.events = events
-//            eventRepository.saveAll(events)
+            eventRepository.saveAll(events)
             organizationRepository.save(org)
-//            translationRepository.saveAll(translations)
         }
+    }
+
+    private fun getFile(name: String): MultipartFile {
+        val imagePath = "./mock-images/"
+        val extension = name.substring(name.lastIndexOf('.') + 1)
+        val contentType = when (extension) {
+            "jpg" -> "image/jpg"
+            "jpeg" -> "image/jpeg"
+            "png" -> "image/png"
+            else -> "text/plain"
+        }
+        val content = Files.readAllBytes(Paths.get(imagePath + name))
+        return MockMultipartFile(name, name, contentType, content)
     }
 
     private fun createBackgroundImage(filename: String): BackgroundImage {
@@ -249,5 +278,13 @@ class DataLoader(
 
     private fun shortLoremIpsum(): String {
         return "Mauris sed pulvinar justo, vel rutrum est. Donec sem justo, rhoncus quis posuere ut, finibus sed turpis. Aliquam pharetra venenatis sem vitae pretium. Cras semper eleifend tortor et imperdiet. Maecenas dictum consectetur nisi eu luctus. Suspendisse eu rutrum magna. Vivamus placerat blandit sem, a aliquet nisi lobortis sed. "
+    }
+
+    private fun shortLoremIpsumEn(): String {
+        return "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself."
+    }
+
+    private fun shortLoremIpsumPl(): String {
+        return "Ale muszę wam wytłumaczyć, jak narodziła się ta błędna koncepcja denuncjacji przyjemności i chwalebnego bólu, a ja dam wam kompletną relację z systemu i objaśnię prawdziwe nauki wielkiego odkrywcy prawdy, mistrza-budowniczego ludzkiego szczęścia. Nikt nie odrzuca, nie lubi lub unika przyjemności samej w sobie."
     }
 }
