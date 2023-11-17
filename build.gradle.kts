@@ -39,6 +39,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("org.modelmapper:modelmapper:2.4.3")
+    implementation("org.springframework:spring-test:6.0.9")
 
     compileOnly("org.projectlombok:lombok")
 

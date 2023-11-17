@@ -59,7 +59,7 @@ class OrganizationController(
                 ),
                 createPageRequest(page, size, sort),
             ),
-            LanguageOption.PL,
+            language,
             getUserName(request),
         )
         return ResponseEntity.ok(organizations)
@@ -75,7 +75,7 @@ class OrganizationController(
         return ResponseEntity.ok(
             organizationService.transformToOrganizationDTO(
                 organization,
-                LanguageOption.PL,
+                language,
                 getUserName(request),
             ),
         )

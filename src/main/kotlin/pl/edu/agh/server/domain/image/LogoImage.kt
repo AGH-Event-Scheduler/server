@@ -9,7 +9,7 @@ import java.util.*
 @Embeddable
 @Data
 @ToString
-class LogoImage(
+class LogoImage (
     @Column(name = "logoImageId")
     var imageId: UUID,
     @Column(name = "logoSmallFilename")

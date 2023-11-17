@@ -14,6 +14,7 @@ import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
+import pl.edu.agh.server.domain.image.ImageService.IncorrectFileUploadException
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
@@ -81,17 +82,16 @@ class EventService(
         locationMap: Map<LanguageOption, String>,
         startDate: Date,
         endDate: Date,
-        backgroundImageSkip: Boolean = false
     ): Event {
         val savedBackgroundImage: BackgroundImage
         val organization = organizationRepository.findById(organizationId).orElseThrow { OrganizationNotFoundException(organizationId) }
 
 //        TODO make it transactional - remove created image on failure
-        if (!backgroundImageSkip && backgroundImage != null) {
+        if (backgroundImage != null) {
             savedBackgroundImage = imageService.createBackgroundImage(backgroundImage)
         }
         else {
-            savedBackgroundImage = organization.backgroundImage
+            throw IncorrectFileUploadException("Uploaded file does not exist")
         }
 
         val newEvent = Event(

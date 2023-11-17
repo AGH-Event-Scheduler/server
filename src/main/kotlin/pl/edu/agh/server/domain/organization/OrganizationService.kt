@@ -5,15 +5,20 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.OrganizationDTO
+import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
+import pl.edu.agh.server.domain.image.BackgroundImage
+import pl.edu.agh.server.domain.image.ImageService
+import pl.edu.agh.server.domain.image.ImageService.IncorrectFileUploadException
+import pl.edu.agh.server.domain.image.LogoImage
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.translation.TranslationService
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
-import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.foundation.application.BaseServiceUtilities
 import java.util.*
 
@@ -22,6 +27,8 @@ class OrganizationService(
     private val userRepository: UserRepository,
     private val organizationRepository: OrganizationRepository,
     private val modelMapper: ModelMapper,
+    private val translationService: TranslationService,
+    private val imageService: ImageService
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
 
     @Transactional
@@ -47,6 +54,37 @@ class OrganizationService(
     fun getOrganization(organizationId: Long, userName: String?): Organization {
         return organizationRepository.findById(organizationId)
             .orElseThrow { throw OrganizationNotFoundException(organizationId) }
+    }
+
+    @Transactional
+    fun createOrganization(
+        logoImageFile: MultipartFile?,
+        backgroundImageFile: MultipartFile?,
+        nameMap: Map<LanguageOption, String>,
+        descriptionMap: Map<LanguageOption, String>,
+    ): Organization{
+        val backgroundImage: BackgroundImage
+        val logoImage: LogoImage
+
+        if (backgroundImageFile != null){
+            backgroundImage = imageService.createBackgroundImage(backgroundImageFile)
+        } else {
+            throw IncorrectFileUploadException("Uploaded file does not exist")
+        }
+
+        if (logoImageFile != null) {
+            logoImage = imageService.createLogoImage(logoImageFile)
+        } else {
+            throw IncorrectFileUploadException("Uploaded file does not exist")
+        }
+
+        val newOrganization = Organization(
+            name = translationService.createTranslation(nameMap),
+            description = translationService.createTranslation(descriptionMap),
+            backgroundImage = backgroundImage,
+            logoImage = logoImage
+        )
+        return organizationRepository.save(newOrganization)
     }
 
 //    FIXME use function from base service once NullPointerException is fixed
