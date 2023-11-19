@@ -6,15 +6,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import pl.edu.agh.server.domain.dto.UserDTO
-import pl.edu.agh.server.domain.user.User
-import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.domain.user.UserService
 
 @RestController
 @RequestMapping("/api/users/")
 class UserController(
     private val userService: UserService,
-    private val modelMapper: ModelMapper
+    private val modelMapper: ModelMapper,
 ) {
     @GetMapping
     fun getUser(
