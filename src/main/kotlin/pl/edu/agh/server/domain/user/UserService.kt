@@ -10,4 +10,8 @@ class UserService(
     fun getUserByEmail(userName: String): User {
         return userRepository.findByEmail(userName).orElseThrow { UserNotFoundException(userName) }
     }
+
+    fun getUserIdByEmail(userName: String): Long {
+        return userRepository.findIdByEmail(userName).orElseThrow { UserNotFoundException(userName) }
+    }
 }

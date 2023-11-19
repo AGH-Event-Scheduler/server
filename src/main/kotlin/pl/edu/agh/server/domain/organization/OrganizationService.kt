@@ -12,8 +12,8 @@ import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
-import pl.edu.agh.server.domain.user.organizationroles.UserOrganizationRole
-import pl.edu.agh.server.domain.user.organizationroles.UserOrganizationRoleRepository
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRole
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRoleRepository
 import pl.edu.agh.server.foundation.application.BaseServiceUtilities
 import java.util.*
 
@@ -22,7 +22,7 @@ class OrganizationService(
     private val userRepository: UserRepository,
     private val organizationRepository: OrganizationRepository,
     private val modelMapper: ModelMapper,
-    private val userOrganizationRoleRepository: UserOrganizationRoleRepository,
+    private val userOrganizationRoleRepository: OrganizationUserRoleRepository,
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
 
     @Transactional
@@ -86,7 +86,7 @@ class OrganizationService(
             val organization = organizationRepository.findById(organizationId).orElseThrow()
             val user = userRepository.findById(userId).orElseThrow()
 
-            val newAssignment = UserOrganizationRole(
+            val newAssignment = OrganizationUserRole(
                 user = user,
                 organization = organization,
                 role = role,
@@ -94,7 +94,7 @@ class OrganizationService(
 
             userOrganizationRoleRepository.save(newAssignment)
 
-            user.userOrganizationRoles.add(newAssignment)
+            user.organizationUserRoles.add(newAssignment)
             userRepository.save(user)
         }
     }

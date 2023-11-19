@@ -11,7 +11,7 @@ import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 @Table(name = "USER_ORGANIZATION_ROLE")
 @ToString
 @EqualsAndHashCode(callSuper = true)
-class UserOrganizationRole(
+class OrganizationUserRole(
     @ManyToOne
     @JoinColumn(name = "user_id")
     val user: User,
