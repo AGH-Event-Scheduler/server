@@ -5,7 +5,7 @@ import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.springframework.stereotype.Component
-import pl.edu.agh.server.config.JwtService
+import pl.edu.agh.server.domain.event.EventRepository
 import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRoleRepository
 
@@ -13,28 +13,35 @@ import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRoleRepos
 @Component
 class AuthorizationAspect(
     private val userService: UserService,
-    private val jwtService: JwtService,
     private val organizationUserRoleRepository: OrganizationUserRoleRepository,
+    private val eventRepository: EventRepository,
 ) {
 
     @Before("@annotation(authorizeAccess) && args(request, organizationId, ..)")
-    fun beforeMethodExecution(
+    fun beforeOrganizationMethodExecution(
         joinPoint: JoinPoint,
         authorizeAccess: AuthorizeAccess,
         request: HttpServletRequest,
         organizationId: Long,
     ) {
-        val userId = userService.getUserIdByEmail(getUserName(request))
-        val userAuthorities = organizationUserRoleRepository.findByOrganizationIdAndUserId(organizationId, userId)
-        val hasAuthority = userAuthorities.stream().anyMatch { it.role.name in authorizeAccess.allowedRoles }
-        hasAuthority || throw AuthorizationException("User does not have required authority")
+        val userAuthorities =
+            organizationUserRoleRepository.findByOrganizationIdAndUserId(organizationId, userService.getUserId(request))
+        userAuthorities.stream()
+            .anyMatch { it.role.name in authorizeAccess.allowedRoles } || throw AuthorizationException("User does not have required authority")
     }
 
-    fun getUserName(request: HttpServletRequest): String {
-        try {
-            return jwtService.extractUsername(request.getHeader("Authorization")!!.substring(7))
-        } catch (e: Exception) {
-            throw AuthorizationException("JWT Authorization Problem")
-        }
+    @Before("@annotation(authorizeAccess) && args(request, eventId, ..)")
+    fun beforeEventMethodExecution(
+        joinPoint: JoinPoint,
+        authorizeAccess: AuthorizeAccess,
+        request: HttpServletRequest,
+        eventId: Long,
+    ) {
+        val organizationId = eventRepository.findOrganizationIdById(eventId)
+            .orElseThrow { throw AuthorizationException("Event does not exist") }
+        val userAuthorities =
+            organizationUserRoleRepository.findByOrganizationIdAndUserId(organizationId, userService.getUserId(request))
+        userAuthorities.stream()
+            .anyMatch { it.role.name in authorizeAccess.allowedRoles } || throw AuthorizationException("User does not have required authority")
     }
 }

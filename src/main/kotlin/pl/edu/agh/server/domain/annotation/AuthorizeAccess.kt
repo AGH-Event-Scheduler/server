@@ -5,7 +5,7 @@ package pl.edu.agh.server.domain.annotation
  *
  * @param allowedRoles The roles allowed to access the method. (passed as array of strings)
  *
- * annotation requires request: HttpServletRequest, @PathVariable organizationId: Long to be passed as first to arguments
+ * annotation requires request: HttpServletRequest, @PathVariable organizationId/eventId: Long to be passed as first two arguments
  *
  */
 @Retention(AnnotationRetention.RUNTIME)
