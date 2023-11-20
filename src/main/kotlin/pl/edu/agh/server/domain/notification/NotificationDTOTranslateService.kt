@@ -4,7 +4,7 @@ import org.modelmapper.ModelMapper
 import org.springframework.stereotype.Service
 import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.dto.NotificationDTO
-import pl.edu.agh.server.domain.dto.OrganizationDto
+import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.event.EventService
 import pl.edu.agh.server.domain.organization.Organization
@@ -27,7 +27,7 @@ class NotificationDTOTranslateService(
 
         return notifications.map {
             modelMapper.map(it, NotificationDTO::class.java).apply {
-                regardingOrganizationDto = if (it.regardingOrganization != null) organizationDtoMap[it.regardingOrganization!!.id] else null
+                regardingOrganizationDto = if (it.regardingOrganization != null) organizationDtoMap[it.regardingOrganization!!.id!!] else null
                 regardingEventDTO = if (it.regardingEvent != null) eventDtoMap[it.regardingEvent!!.id] else null
                 seen = user.seenNotifications.contains(it)
             }
@@ -38,7 +38,7 @@ class NotificationDTOTranslateService(
         return transformToNotificationDTO(listOf(notification), language, user).first()
     }
 
-    private fun getOrganizationDtoMap(notifications: List<Notification>, language: LanguageOption, userName: String?): Map<Long, OrganizationDto> {
+    private fun getOrganizationDtoMap(notifications: List<Notification>, language: LanguageOption, userName: String?): Map<Long, OrganizationDTO> {
         val organizations = mutableSetOf<Organization>()
         notifications.forEach {
             if (it.regardingOrganization != null) {
