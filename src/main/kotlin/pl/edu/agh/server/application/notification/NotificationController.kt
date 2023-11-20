@@ -2,7 +2,10 @@ package pl.edu.agh.server.application.notification
 
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -37,7 +40,7 @@ class NotificationController(
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         @RequestParam(name = "showNotSeenOnly", defaultValue = false.toString()) showNotSeenOnly: Boolean,
         request: HttpServletRequest,
-    ): List<NotificationDTO> {
+    ): ResponseEntity<List<NotificationDTO>> {
         val user = userService.getUserByEmail(getUserName(request))
         val notifications = notificationService.getAllWithSpecificationPageable(
             Specification.anyOf(
@@ -49,7 +52,16 @@ class NotificationController(
             ),
             createPageRequest(page, size, sort),
         )
-        return notificationDTOTranslateService.transformToNotificationDTO(notifications, language, user)
+        return ResponseEntity.ok(notificationDTOTranslateService.transformToNotificationDTO(notifications, language, user))
+    }
+
+    @PostMapping("/{notificationId}")
+    fun markNotificationAsSeen(
+        @PathVariable notificationId: Long,
+        request: HttpServletRequest,
+    ): ResponseEntity<Void> {
+        notificationService.markNotificationAsSeen(getUserName(request), notificationId)
+        return ResponseEntity.ok(null)
     }
 
 //    FIXME use function from base controller once NullPointerException is fixed

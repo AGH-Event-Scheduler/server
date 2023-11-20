@@ -5,13 +5,27 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import pl.edu.agh.server.domain.event.Event
+import pl.edu.agh.server.domain.exception.NotificationNotFoundException
+import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.organization.Organization
+import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.foundation.application.BaseServiceUtilities
 
 @Service
 class NotificationService(
     private val notificationRepository: NotificationRepository,
+    private val userRepository: UserRepository,
 ) : BaseServiceUtilities<Notification>(notificationRepository) {
+
+    @Transactional
+    fun markNotificationAsSeen(userName: String, notificationId: Long) {
+        val user = userRepository.findByEmail(userName).orElseThrow { throw UserNotFoundException(userName) }
+        val notification = notificationRepository.findById(notificationId)
+            .orElseThrow { throw NotificationNotFoundException(notificationId) }
+
+        notification.seenByUsers.add(user)
+        notificationRepository.save(notification)
+    }
 
 //    FIXME use function from base service once NullPointerException is fixed
     override fun getAllWithSpecificationPageable(

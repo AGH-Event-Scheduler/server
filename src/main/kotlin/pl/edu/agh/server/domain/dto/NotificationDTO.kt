@@ -8,6 +8,7 @@ import java.util.*
 @AllArgsConstructor
 @NoArgsConstructor
 data class NotificationDTO(
+    var id: Long? = null,
     var type: NotificationType? = null,
     var regardingOrganizationDto: OrganizationDTO? = null,
     var regardingEventDTO: EventDTO? = null,
