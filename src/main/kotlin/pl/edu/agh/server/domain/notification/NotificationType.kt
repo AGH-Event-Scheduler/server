@@ -1,0 +1,10 @@
+package pl.edu.agh.server.domain.notification
+
+enum class NotificationType(value: String) {
+    EVENT_CREATE("EVENT_CREATE"),
+    EVENT_UPDATE("EVENT_UPDATE"),
+    EVENT_CANCEL("EVENT_CANCEL"),
+    EVENT_REENABLE("EVENT_REENABLE"),
+    ORGANIZATION_CREATE("ORGANIZATION_CREATE"),
+    ORGANIZATION_UPDATE("ORGANIZATION_UPDATE"),
+}

@@ -5,6 +5,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
 import lombok.EqualsAndHashCode
+import org.springframework.data.annotation.LastModifiedDate
 import java.time.Instant
 import java.util.Date
 import kotlin.reflect.KMutableProperty
@@ -20,6 +21,7 @@ open class BaseIdentifiableEntity(
 
     val creationDate: Date = Date.from(Instant.now()),
 
+    @LastModifiedDate
     var lastUpdatedDate: Date = Date.from(Instant.now()),
 ) {
 
