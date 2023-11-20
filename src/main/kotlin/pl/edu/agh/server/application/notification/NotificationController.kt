@@ -43,12 +43,14 @@ class NotificationController(
     ): ResponseEntity<List<NotificationDTO>> {
         val user = userService.getUserByEmail(getUserName(request))
         val notifications = notificationService.getAllWithSpecificationPageable(
-            Specification.anyOf(
-                notificationForAllUsers(),
-                notificationForAdmins(user),
+            Specification.allOf(
                 if (showNotSeenOnly) notificationNotSeenByUser(user) else null,
-                notificationForUserWithSavedEvents(user),
-                notificationForUserFollowingOrganization(user),
+                Specification.anyOf(
+                    notificationForAllUsers(),
+                    notificationForAdmins(user),
+                    notificationForUserWithSavedEvents(user),
+                    notificationForUserFollowingOrganization(user),
+                ),
             ),
             createPageRequest(page, size, sort),
         )
