@@ -9,7 +9,7 @@ import pl.edu.agh.server.domain.dto.UserDTO
 import pl.edu.agh.server.domain.user.UserService
 
 @RestController
-@RequestMapping("/api/users/")
+@RequestMapping("/api/users")
 class UserController(
     private val userService: UserService,
     private val modelMapper: ModelMapper,
