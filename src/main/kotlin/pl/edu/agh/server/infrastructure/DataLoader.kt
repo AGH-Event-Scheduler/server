@@ -71,7 +71,7 @@ class DataLoader(
     private fun mockKnBit() {
         val knBit = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN BIT", LanguageOption.EN to "KN BIT"),
-            logoImageFile = getFile("logo-kn-bit.jpg"),
+            logoImageFile = getFile("logo-kn-bit.png"),
             backgroundImageFile = getFile("bg-kn-bit.jpg"),
             descriptionMap = mapOf(
                 LanguageOption.PL to "Koło naukowe BIT to przede wszystkim miejsce, gdzie studenci AGH mogą rozwijać swoje zainteresowania i się nimi dzielić. Znajdziemy tutaj ludzi zainteresowanych nowoczesnymi metodami tworzenia oprogramowania, aktualnymi technologiami webowymi, a także algorytmami czy sztuczną inteligencją.\n" +
