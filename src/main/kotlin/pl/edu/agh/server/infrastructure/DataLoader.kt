@@ -416,6 +416,59 @@ class DataLoader(
                 LanguageOption.EN to "AGH Eko-Energia is one of the largest scientific groups operating at the AGH University of Science and Technology in Krakow. The projects we develop focus on the renewable energy industry and modern technologies.",
             ),
         )
+        eventService.createEvent(
+            organizationId = ecoEnergy.id!!,
+            backgroundImage = getFile("bg-eco-energy-work.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Targi Pracy Przedsiębiorczości", LanguageOption.EN to "Entrepreneurship Job Fair"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "⏱Trwają zapisy na szkolenia oraz konsultacje biznesowe w ramach Targów Pracy Przedsiębiorczości “Majówka z Pracą”! \n" +
+                    "\n" +
+                    "Będziecie mogli tam spotkać i nas ;))\n" +
+                    "\n" +
+                    "Już 10 maja na Tauron Arenie Kraków Miastem Startupów przeprowadzą dla Was szkolenia z następujących tematyk:\n" +
+                    "✅marketing,\n" +
+                    "✅ pozyskiwanie funduszy dla organizacji studenckich oraz przedsiębiorstw,\n" +
+                    "✅ wystąpienia publiczne,\n" +
+                    "✅ zarządzanie projektami,\n" +
+                    "✅zarządzanie zespołem,\n" +
+                    "✅ innowacje społeczne,\n" +
+                    "✅ wartości społeczne w strategiach biznesowych.\n" +
+                    "\n" +
+                    "Odbędą się również konsultacje biznesowe z ekspertem Pawłem Zdańkowskim, który pomoże rozwiązać wszelkie wątpliwości w prowadzeniu działalności biznesowych!\n" +
+                    "\n" +
+                    "Zapiszcie się korzystając z linku poniżej \n" +
+                    "\n" +
+                    "https://forms.gle/8TiYmDyTHG4dS13w6\n" +
+                    "\n" +
+                    "Do zobaczenia!",
+                LanguageOption.EN to "⏱Registration for training and business consultations as part of the Entrepreneurship Job Fair \"Majówka z Pracy\" is underway!\n" +
+                    "\n" +
+                    "You will be able to meet us there too ;))\n" +
+                    "\n" +
+                    "On May 10, at the Tauron Arena Kraków City of Startups, they will conduct training for you on the following topics:\n" +
+                    "✅marketing,\n" +
+                    "✅ raising funds for student organizations and enterprises,\n" +
+                    "✅ public speaking,\n" +
+                    "✅ project management,\n" +
+                    "✅team management,\n" +
+                    "✅ social innovations,\n" +
+                    "✅ social values \u200B\u200Bin business strategies.\n" +
+                    "\n" +
+                    "There will also be business consultations with expert Paweł Zdańkowski, who will help solve any doubts in running a business!\n" +
+                    "\n" +
+                    "Sign up using the link below\n" +
+                    "\n" +
+                    "https://forms.gle/8TiYmDyTHG4dS13w6\n" +
+                    "\n" +
+                    "See you!",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "Tauron Arena Kraków",
+                LanguageOption.EN to "Tauron Arena Kraków",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusHours(1).plusMinutes(30)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusHours(9).plusMinutes(30)),
+        )
 
         val dataTeam = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Data Team", LanguageOption.EN to "Data Team Scientific Club"),
