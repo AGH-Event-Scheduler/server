@@ -164,6 +164,69 @@ class DataLoader(
                     "Together, we work to popularize science, especially sociology. Through implemented projects, we learn research methods and techniques - useful not only in the academic world, but also on the labor market.",
             ),
         )
+        eventService.createEvent(
+            organizationId = knSociology.id!!,
+            backgroundImage = getFile("bg-kn-sociology-rekru.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Rekrutacja", LanguageOption.EN to "Recruitment"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "❗\uFE0FRuszamy z rekrutacją❗\uFE0F\n" +
+                    "\n" +
+                    "Czy zastanawialiście się nad dołączeniem do KNOSS AGH? \uD83E\uDD14 \n" +
+                    "\n" +
+                    "Jeśli tak, to nie zastanawiajcie się dłużej tylko spróbujcie swoich sił w naszym zespole! \uD83E\uDD29\n" +
+                    "\n" +
+                    "Już niebawem ruszamy z rekrutacją, w której każdy znajdzie coś dla siebie. \n" +
+                    "\n" +
+                    "Nagrywanie TikToków? \uD83C\uDFA5\n" +
+                    "\n" +
+                    "Prowadzenie wywiadów w ramach podcastu?\uD83C\uDF99\uFE0F\n" +
+                    "\n" +
+                    "Udział w projektach badawczych? \uD83D\uDC69\uD83C\uDFFC\u200D\uD83D\uDD2C\n" +
+                    "\n" +
+                    "Zdobywanie wiedzy socjologicznej? \uD83E\uDD1D\uD83C\uDFFC\n" +
+                    "\n" +
+                    "U nas znajdziesz to wszystko i wiele więcej! Poza rozwojem osobistym i zwiększaniem swoich kompetencji nawiążesz również wspaniałe znajomości! \uD83D\uDC65\n" +
+                    "\n" +
+                    "Co, jeśli nie studiujesz socjologii, ale chcesz dołączyć do KNOSSu? \n" +
+                    "\n" +
+                    "Zapraszamy! Z pewnością znajdziesz tu coś dla siebie.\n" +
+                    "\n" +
+                    "Rekrutacja odbędzie się już w drugiej połowie listopada, a zgłoszenia można dokonać poprzez formularz, który pojawi się na naszych profilach lub w siedzibie koła. \uD83D\uDC40\n" +
+                    "\n" +
+                    "Bądź na bieżąco i nie przegap dalszych szczegółów rekrutacji! \uD83E\uDD73",
+                LanguageOption.EN to "❗\uFE0FWe are starting recruitment❗\uFE0F\n" +
+                    "\n" +
+                    "Have you considered joining KNOSS AGH? \uD83E\uDD14\n" +
+                    "\n" +
+                    "If so, don't hesitate any longer and try your hand at our team! \uD83E\uDD29\n" +
+                    "\n" +
+                    "We will soon start recruiting, where everyone will find something for themselves.\n" +
+                    "\n" +
+                    "Recording TikToks? \uD83C\uDFA5\n" +
+                    "\n" +
+                    "Conducting podcast interviews?\uD83C\uDF99\uFE0F\n" +
+                    "\n" +
+                    "Participation in research projects? \uD83D\uDC69\uD83C\uDFFC\u200D\uD83D\uDD2C\n" +
+                    "\n" +
+                    "Acquiring sociological knowledge? \uD83E\uDD1D\uD83C\uDFFC\n" +
+                    "\n" +
+                    "Here you will find all this and much more! In addition to personal development and increasing your competences, you will also make great friends! \uD83D\uDC65\n" +
+                    "\n" +
+                    "What if you don't study sociology but want to join KNOSS?\n" +
+                    "\n" +
+                    "We invite you! You will certainly find something for yourself here.\n" +
+                    "\n" +
+                    "Recruitment will take place in the second half of November, and applications can be submitted via the form that will appear on our profiles or in the Club office. \uD83D\uDC40\n" +
+                    "\n" +
+                    "Stay up to date and don't miss further recruitment details!   ",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "AGH D17 2.21",
+                LanguageOption.EN to "AGH D17 2.21",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(9)),
+        )
 
         val biomedical = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "BioMedical Innovations", LanguageOption.EN to "BioMedical Innovations"),
