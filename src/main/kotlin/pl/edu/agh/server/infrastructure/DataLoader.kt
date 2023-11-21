@@ -22,6 +22,8 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.sql.Timestamp
+import java.time.LocalDateTime
 import javax.imageio.ImageIO
 
 @Configuration
@@ -67,6 +69,86 @@ class DataLoader(
                     "\n" +
                     "In addition to developing our passions, we also share our knowledge in the field of studies by conducting introductory classes in the fields of mathematics and computer science for people who have not had contact with these issues before. All this to exchange experience and prepare faster and better for classes at the university.",
             ),
+        )
+        eventService.createEvent(
+            organizationId = knBit.id!!,
+            backgroundImage = getFile("bg-kn-bit-react.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Warsztaty React - Schibsted Dla Studentów", LanguageOption.EN to "React Workshop - Schibsted For Students"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "Hejka\uD83D\uDC4B\n" +
+                    "\nkolejne warsztaty od Schibsted już niedługo! Tym razem tematyką będzie REACT.\n" +
+                    "\nSerdecznie zapraszamy do zapisów na warsztaty z React'a organizowane w ramach inicjatywy Schibsted for Students prowadzonej przez firmę - Schibsted Tech Polska \uD83D\uDE80\n" +
+                    "\nCzas trwania samych warsztatów to około 3-4h. Przewidziana jest przerwa na luźny networking, lepsze poznanie się i zadanie dodatkowych pytań developerom \uD83E\uDD1D Podczas networkingu będziecie mogli zjeść smaczną pizze i się czegoś napić \uD83C\uDF55 \uD83C\uDF7B\n" +
+                    "\n\uD83D\uDC68\u200D\uD83D\uDCBB Tematyka: React\n" +
+                    "\nCzego potrzebujesz?\n" +
+                    "-własnego sprzętu (laptop + ładowarka) \uD83D\uDC69\u200D\uD83D\uDCBB\uD83D\uDC68\u200D\uD83D\uDCBB\n" +
+                    "-dobrego nastawienia i chęci nauki \uD83D\uDCAA\n" +
+                    "\nLiczba miejsc OGRANICZONA. Obowiązują zapisy do 17.11.2023 godzina 23:59 - obowiązują zapisy! \uD83C\uDFAB\n" +
+                    "\nZapraszamy i do zobaczenia wkrótce! \uD83D\uDE80\n" +
+                    "\nLink do zapisów: https://forms.office.com/e/5UHNq3sLjF\n" +
+                    "\n(Po zamknięciu zapisów, do 20.11.2023 dostaniecie szczegółowe informacje na podanego maila)",
+                LanguageOption.EN to "Hey\uD83D\uDC4B\n" +
+                    "\nnext workshops from Schibsted coming soon! This time the topic will be REACT.\n" +
+                    "\nWe cordially invite you to sign up for React workshops organized as part of the Schibsted for Students initiative run by the company - Schibsted Tech Polska \uD83D\uDE80\n" +
+                    "\nThe duration of the workshops itself is approximately 3-4 hours. There will be a break for casual networking, getting to know each other better and asking additional questions to developers \uD83E\uDD1D During the networking you will be able to eat tasty pizza and drink something \uD83C\uDF55 \uD83C\uDF7B\n" +
+                    "\n\uD83D\uDC68\u200D\uD83D\uDCBB Subject: React\n" +
+                    "\nWhat you need?\n" +
+                    "-your own equipment (laptop + charger) \uD83D\uDC69\u200D\uD83D\uDCBB\uD83D\uDC68\u200D\uD83D\uDCBB\n" +
+                    "-good attitude and willingness to learn \uD83D\uDCAA\n" +
+                    "\nThe number of places is LIMITED. Registration required until November 17, 2023 at 11:59 p.m. - registration required! \uD83C\uDFAB\n" +
+                    "\nWelcome and see you soon! \uD83D\uDE80\n" +
+                    "\nLink to registration: https://forms.office.com/e/5UHNq3sLjF\n" +
+                    "\n(After registration closes, you will receive detailed information by November 20, 2023 by e-mail)",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "Biuro Schibsted Tech Polska - ul. Pawia 23, 31-154 Kraków",
+                LanguageOption.EN to "Kraków office - Schibsted Tech Polska - St. Pawia 23, 31-154 Kraków",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(5).plusHours(4)),
+        )
+        eventService.createEvent(
+            organizationId = knBit.id!!,
+            backgroundImage = getFile("bg-kn-bit-algo.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Akademickie Mistrzostwa Polski w Programowaniu Zespołowym", LanguageOption.EN to "Polish Academic Championship in Team Programming"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "Hej!\n" +
+                    "\n" +
+                    "Jeżeli interesują was algorytmy i/lub programowanie zespołowe, to właśnie dla was mamy coś specjalnego!\n" +
+                    "\n" +
+                    "Jeżeli chcecie sprawdzić swoje umiejętności i zobaczyć, czy jesteście w stanie rozwiązać zadania na poziomie AMPPZ, to jest to idealna okazja!\n" +
+                    "\n" +
+                    "Drużyny jadące na CERC jadą na AMPy automatycznie, tymi eliminacjami chcemy wyłonić jeszcze dwie dodatkowe drużyny reprezentujące AGH.\n" +
+                    "\n" +
+                    "Same AMPPZy są w tym roku w Warszawie, 3-5 listopada.\n" +
+                    "\n" +
+                    "Serdecznie zapraszam wszystkich zainteresowanych ze swoimi laptopami na eliminacje \uD83D\uDE09\n" +
+                    "\n" +
+                    "PS: Zapraszam także oczywiście osoby z CERCa w ramach treningu.\n" +
+                    "\n" +
+                    "PSS: wiecej szczegolow na Discordzie BITu -> https://discord.gg/JEhGe9psu6",
+                LanguageOption.EN to "Hi!\n" +
+                    "\n" +
+                    "If you were curious about algorithms and/or team programming, this was something special for us!\n" +
+                    "\n" +
+                    "Once you check if you can find them, if you are capable of AMPPZ level tasks, this is perfect!\n" +
+                    "\n" +
+                    "Teams going to CERC go to AMPs automatically; these qualifying rounds will reveal two additional characteristics of AGH.\n" +
+                    "\n" +
+                    "The AMPPZs themselves are this year in Warsaw, November 3-5.\n" +
+                    "\n" +
+                    "We cordially encourage everyone interested with their laptops to eliminate it \uD83D\uDE09\n" +
+                    "\n" +
+                    "PS: Of course, also access to people from CERC as part of the training.\n" +
+                    "\n" +
+                    "PSS: more details on BIT's Discord -> https://discord.gg/JEhGe9psu6",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "AGH D17 3.27c",
+                LanguageOption.EN to "AGH D17 3.27c",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(5)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(5).plusHours(2).plusMinutes(30)),
         )
 
         val knSociology = organizationService.createOrganization(
