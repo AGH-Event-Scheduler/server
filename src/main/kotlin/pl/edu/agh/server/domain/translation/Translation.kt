@@ -24,7 +24,7 @@ import java.util.*
 @Data
 @EqualsAndHashCode(callSuper = true)
 class Translation(
-    @Column(length = 1000)
+    @Column(length = 2000)
     var content: String,
     var language: LanguageOption,
 ) : BaseIdentifiableEntity()
