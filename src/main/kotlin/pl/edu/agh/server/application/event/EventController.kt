@@ -174,12 +174,12 @@ class EventController(
         return ResponseEntity.ok().build()
     }
 
-    @PostMapping("/reenable")
-    fun reenableEvent(
+    @PostMapping("/reactivate")
+    fun reactivateEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
     ): ResponseEntity<Void> {
-        eventService.reenableEvent(eventId)
+        eventService.reactivateEvent(eventId)
         return ResponseEntity.ok().build()
     }
 
