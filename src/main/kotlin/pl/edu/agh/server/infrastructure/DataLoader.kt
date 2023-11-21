@@ -581,6 +581,56 @@ class DataLoader(
                 LanguageOption.EN to "KN Larp is a student organization bringing together LARP (live-action role playing) enthusiasts. LARP is an event on the border between a game and a theatrical performance, during which participants act out and experience various types of stories set in various plot conventions. The mission of the club is: to organize and popularize LARPs, research this social phenomenon and create methods and technologies supporting the design of LARPs and enriching the gameplay. We invite both creators, experienced players and people who have not had any contact with this form of activity to cooperate with us. We also encourage you to participate in the events we have prepared. Do you want to get to know us better, take part in our events or join the team? Contact us!",
             ),
         )
+        eventService.createEvent(
+            organizationId = larp.id!!,
+            backgroundImage = getFile("bg-kn-larp-cursed.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Zaklęci", LanguageOption.EN to "Enchanted"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "Serdecznie zapraszamy na larpa \"Zaklęci\", który będziemy mieli przyjemność prowadzić już 30.11 na AGH! ⭐\uFE0F\n" +
+                    "\n" +
+                    "Jest to remix gry \"Zaczarowani\" Jeppe i Maria Bergmann Hamming, w opracowaniu Rafała Matraszka. Pozwala on na kilka godzin przenieść się w ciało mitycznej istoty lub średniowiecznego człowieka i opowiedzieć swoją własną historię \uD83E\uDD0D\uD83D\uDDA4\n",
+                LanguageOption.EN to "We cordially invite you to the \"Enchanted\" larp, \u200B\u200Bwhich we will have the pleasure of conducting on November 30 at AGH! ⭐\uFE0F\n" +
+                    "\n" +
+                    "This is a remix of the game \"Zaczarowani\" by Jeppe and Maria Bergmann Hamming, developed by Rafał Matraszek. It allows you to move into the body of a mythical creature or a medieval man for a few hours and tell your own story   \uD83D\uDDA4",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "AGH A1 322",
+                LanguageOption.EN to "AGH A1 322",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(1)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(1).plusHours(3)),
+        )
+        eventService.createEvent(
+            organizationId = larp.id!!,
+            backgroundImage = getFile("bg-kn-larp-eldores.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Eldores", LanguageOption.EN to "Eldores"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "Pojawiły się sygnały, że nasz larp jest trochę zbyt tajemniczy - zatem odpowiadamy!\n" +
+                    "\n" +
+                    "Oto dokument projektowy nakreślający, o czym właściwie będzie Eldoesz. \n" +
+                    "\n" +
+                    "Mamy nadzieję, że rozwieje to wszelkie wątpliwości i pomoże tym z Was, którzy jeszcze nie zdecydowali się zapisać \uD83D\uDDA4\n" +
+                    "\n" +
+                    "Design doc: https://drive.google.com/.../15ynNsq1Bs.../view...\n" +
+                    "\n" +
+                    "Zapisy otwarte będą do 15 sierpnia!",
+                LanguageOption.EN to "There have been signals that our LARP is a bit too mysterious - so we are responding!\n" +
+                    "\n" +
+                    "Here's a design document outlining what Eldoesz will actually be about.\n" +
+                    "\n" +
+                    "We hope that this will dispel any doubts and help those of you who have not yet decided to sign up \uD83D\uDDA4\n" +
+                    "\n" +
+                    "Design doc: https://drive.google.com/.../15ynNsq1Bs.../view...\n" +
+                    "\n" +
+                    "Registration will be open until August 15!",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "AGH B1 122",
+                LanguageOption.EN to "AGH B1 122",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().minusDays(2).plusHours(5)),
+        )
     }
 
     private fun createUsers() {
