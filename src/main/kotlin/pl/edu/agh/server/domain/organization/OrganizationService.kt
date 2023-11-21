@@ -92,7 +92,6 @@ class OrganizationService(
     }
 
     fun transformToOrganizationDTO(organizations: List<Organization>, language: LanguageOption, userName: String? = null): List<OrganizationDTO> {
-//        TODO: implement once translations are done
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
         return organizations.map {
             modelMapper.map(it, OrganizationDTO::class.java).apply {

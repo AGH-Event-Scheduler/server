@@ -1,5 +1,7 @@
 package pl.edu.agh.server.application.organization
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
@@ -13,6 +15,7 @@ import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion
 import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationWithNameLike
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.foundation.application.BaseControllerUtilities
+import java.util.*
 
 @RestController
 @RequestMapping("/api/organizations")
@@ -81,8 +84,22 @@ class OrganizationController(
         )
     }
 
-//    FIXME use function from base controller once NullPointerException is fixed
-    override fun getUserName(request: HttpServletRequest): String {
-        return jwtService.extractUsername(request.getHeader("Authorization")!!.substring(7))
+    @PostMapping
+    fun createOrganization(
+        @RequestBody createOrganizationRequest: CreateOrganizationRequest,
+        request: HttpServletRequest
+    ): ResponseEntity<OrganizationDTO> {
+        val objectMapper = jacksonObjectMapper()
+        val nameMap: Map<LanguageOption, String> = objectMapper.readValue(createOrganizationRequest.name)
+        val descriptionMap: Map<LanguageOption, String> = objectMapper.readValue(createOrganizationRequest.description)
+
+        val organization = organizationService.createOrganization(
+            logoImageFile = createOrganizationRequest.logoImage,
+            backgroundImageFile = createOrganizationRequest.backgroundImage,
+            nameMap = nameMap,
+            descriptionMap = descriptionMap,
+        )
+
+        return ResponseEntity.ok(organizationService.transformToOrganizationDTO(organization, LanguageOption.PL, getUserName(request)))
     }
 }
