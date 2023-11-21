@@ -499,6 +499,78 @@ class DataLoader(
                 LanguageOption.EN to "KN Energon is a club of students fascinated by engineering, technology and biomimetics. In our organization, we create projects based on mechanical and material engineering. In projects, we often focus on the way energy is distributed and reacted in mechanisms. In the main project we are working on, the \"Hurricane\" trebuchet, we use biomimetism to create a modern trebuchet with the highest possible efficiency!",
             ),
         )
+        eventService.createEvent(
+            organizationId = energon.id!!,
+            backgroundImage = getFile("bg-energon-show.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Pokaz Strzelania z Trebusza", LanguageOption.EN to "Trebuchet Shooting Demonstration"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "TO JUŻ W TEN WEEKEND!\n" +
+                    "\n" +
+                    "Serdecznie zapraszamy Państwa na pokaz strzelania z trebusza #Huragan, który  wyrzuci 20 litrowy keg na rekordową odległość! \uD83D\uDE31\n" +
+                    "\n" +
+                    "Zapraszamy!",
+                LanguageOption.EN to "IT'S THIS WEEKEND!\n" +
+                    "\n" +
+                    "We cordially invite you to the #Huragan trebuchet shooting show, which will throw a 20 liter keg to a record distance! \uD83D\uDE31\n" +
+                    "\n" +
+                    "We invite you!",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "Miasto i Gmina Dubiecko - serwis samorządowy  w Powiecie Przemyskim",
+                LanguageOption.EN to "City and Commune of Dubiecko - local government service in Przemyśl County",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusHours(5)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusHours(6).plusMinutes(30)),
+        )
+        eventService.createEvent(
+            organizationId = energon.id!!,
+            backgroundImage = getFile("bg-energon-open-days.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Dzień Otwarty AGH", LanguageOption.EN to "AGH Open Day"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "DZIEJE SIĘ! na PLENEROWY Dzień Otwarty AGH 2023 \n" +
+                    "\n" +
+                    "Strasznie nam miło, że koło ENERGON \uD83D\uDC09oraz nasza ✨ Kaśka ✨ cieszy się tak dużym zainteresowaniem! \uD83E\uDD70\n" +
+                    "\n" +
+                    "A kto jeszcze Nas nie znalazł \n" +
+                    "Zapraszamy pod  Centrum Dydaktyki AGH Pawilon U2 !\n" +
+                    "\n" +
+                    "Przy naszym stoisku:\n" +
+                    "✅Trebusz ✨ Kaśka ✨gotowy do wystrzału \uD83D\uDE0F\n" +
+                    "✅możecie sprawdzić swoja wiedzę na temat starożytnych maszyn oblężniczych \uD83D\uDE03\n" +
+                    "✅dowiecie się więcej na tematy trebuszy i biomimetyki ☘\uFE0F\n" +
+                    "✅Porozmawiajcie z Nami ❤\uFE0F a nawet umówmy się na MS AGH  na dyskusje \uD83D\uDE07\n" +
+                    "✅upominek \uD83E\uDD2B\n" +
+                    "\n" +
+                    "Czekamy na Was o 15! \n" +
+                    "\n" +
+                    "Do zobaczenia \uD83D\uDE42\n" +
+                    "✌",
+                LanguageOption.EN to "HAPPENS! for the AGH OUTDOOR Open Day 2023\n" +
+                    "\n" +
+                    "We are very pleased that the ENERGON \uD83D\uDC09 group and our ✨ Kaśka ✨ enjoy so much interest!   \n" +
+                    "\n" +
+                    "And who hasn't found us yet?\n" +
+                    "We invite you to the AGH Didactics Center, Pavilion U2!\n" +
+                    "\n" +
+                    "At our stand:\n" +
+                    "✅Trebuchet ✨ Kaśka ✨ready to fire \uD83D\uDE0F\n" +
+                    "✅ you can test your knowledge about ancient siege machines \uD83D\uDE03\n" +
+                    "✅ you will learn more about trebuchets and biomimetics ☘\uFE0F\n" +
+                    "✅Talk to us ❤\uFE0F and let's even make an appointment at MS AGH for discussions \uD83D\uDE07\n" +
+                    "✅gift \uD83E\uDD2B\n" +
+                    "\n" +
+                    "We are waiting for you at 3 p.m.!\n" +
+                    "\n" +
+                    "See you \uD83D\uDE42\n" +
+                    "✌",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "Centrum Dydaktyczne AGH, Pawilon U2",
+                LanguageOption.EN to "AGH Didactics Center, Pavilion U2",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).plusHours(5)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).plusHours(6).plusMinutes(30)),
+        )
 
         val larp = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN Larp AGH", LanguageOption.EN to "KN Larp AGH"),
