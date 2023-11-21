@@ -57,6 +57,18 @@ class DataLoader(
     }
 
     private fun createOrganizationsAndEvents() {
+        mockKnBit()
+        mockKnSociety()
+        mockBiomedical()
+        mockCreative()
+        mockEcoEnergy()
+        mockDataTeam()
+        mockForSociety()
+        mockEnergon()
+        mockLarp()
+    }
+
+    private fun mockKnBit() {
         val knBit = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN BIT", LanguageOption.EN to "KN BIT"),
             logoImageFile = getFile("logo-kn-bit.jpg"),
@@ -150,7 +162,8 @@ class DataLoader(
             startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(5)),
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(5).plusHours(2).plusMinutes(30)),
         )
-
+    }
+    private fun mockKnSociety() {
         val knSociology = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN Osób Studiujących Socjologię", LanguageOption.EN to "SC of People Studying Sociology"),
             logoImageFile = getFile("logo-kn-sociology.png"),
@@ -227,7 +240,8 @@ class DataLoader(
             startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2)),
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(9)),
         )
-
+    }
+    private fun mockBiomedical() {
         val biomedical = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "BioMedical Innovations", LanguageOption.EN to "BioMedical Innovations"),
             logoImageFile = getFile("logo-biomedical.jpeg"),
@@ -276,7 +290,8 @@ class DataLoader(
             startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1)),
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).plusHours(3)),
         )
-
+    }
+    private fun mockCreative() {
         val creative = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Creative", LanguageOption.EN to "Creative Scientific Club"),
             logoImageFile = getFile("logo-creative.png"),
@@ -406,7 +421,8 @@ class DataLoader(
             startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusHours(4).plusMinutes(30)),
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(6).plusHours(4).plusMinutes(30)),
         )
-
+    }
+    private fun mockEcoEnergy() {
         val ecoEnergy = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "AGH Eko-Energia", LanguageOption.EN to "AGH Eco-Energy"),
             logoImageFile = getFile("logo-eco-energy.jpg"),
@@ -469,7 +485,8 @@ class DataLoader(
             startDate = Timestamp.valueOf(LocalDateTime.now().plusHours(1).plusMinutes(30)),
             endDate = Timestamp.valueOf(LocalDateTime.now().plusHours(9).plusMinutes(30)),
         )
-
+    }
+    private fun mockDataTeam() {
         val dataTeam = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Data Team", LanguageOption.EN to "Data Team Scientific Club"),
             logoImageFile = getFile("logo-data-team.jpg"),
@@ -479,7 +496,8 @@ class DataLoader(
                 LanguageOption.EN to "Geos Informatica Scientific Club",
             ),
         )
-
+    }
+    private fun mockForSociety() {
         val forSociety = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN 4 Society", LanguageOption.EN to "SC 4 Society"),
             logoImageFile = getFile("logo-4-society.jpeg"),
@@ -489,7 +507,8 @@ class DataLoader(
                 LanguageOption.EN to "The 4Society scientific club is engaged in scientific activities at the intersection of social sciences and technology. The group's goals are to expand students' knowledge, conduct scientific research in the context of the changing information society, organize meetings and debates with people from the world of science, and create valuable content containing reliable and transparent social knowledge.",
             ),
         )
-
+    }
+    private fun mockEnergon() {
         val energon = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN Energon", LanguageOption.EN to "KN Energon"),
             logoImageFile = getFile("logo-energon.png"),
@@ -571,7 +590,8 @@ class DataLoader(
             startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).plusHours(5)),
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).plusHours(6).plusMinutes(30)),
         )
-
+    }
+    private fun mockLarp() {
         val larp = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN Larp AGH", LanguageOption.EN to "KN Larp AGH"),
             logoImageFile = getFile("logo-larp.png"),
