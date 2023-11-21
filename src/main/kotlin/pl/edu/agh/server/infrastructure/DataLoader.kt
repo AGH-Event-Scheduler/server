@@ -237,6 +237,45 @@ class DataLoader(
                 LanguageOption.EN to "The aim of the BioMedical Innovations Scientific Club is to stimulate interest in scientific and research work in the field of processing and analysis of digital images used in modern biology and medicine. We present our achievements and share experiences, thoughts, conclusions and analysis with the rest of the members, creating an atmosphere conducive to development in the interesting field of medical imaging.",
             ),
         )
+        eventService.createEvent(
+            organizationId = biomedical.id!!,
+            backgroundImage = getFile("bg-kn-biomedical-rekru.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Spotkanie rekrutacyjne", LanguageOption.EN to "Recruitment meeting"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "Czy interesuje Cię przetwarzanie i analiza obrazów?  \n" +
+                    "\n" +
+                    "Czy słowa \"medycyna\" i \"biologia\" wywołują u \n" +
+                    "\n" +
+                    "Ciebie przyspieszony puls?  A może masz za dużo czasu i chcesz wykorzystać go na pozytywny rozwój?\n" +
+                    "\n" +
+                    "Jeśli na którekolwiek pytanie Twoja odpowiedź brzmi twierdząco, to w takim razie zapraszamy na spotkanie rekrutacyjne naszego Koła Naukowego BioMedical Imaging! \n" +
+                    "\n" +
+                    "Koło Naukowe BioMedical Imaging zostało założone w listopadzie 2020 roku na Wydziale Elektrotechniki, Automatyki, Informatyki i Inżynierii Biomedycznej z inicjatywy studentów i pracowników AGH, których wspólnym celem jest rozbudzanie zainteresowań pracą naukową oraz badawczą w zakresie przetwarzania i analizy obrazów cyfrowych, stosowanych we współczesnej biologii i medycynie.\n" +
+                    "\n" +
+                    "Nie czekaj i zostań członkiem naszego Koła już teraz! \n" +
+                    "\n" +
+                    "Do zobaczenia!",
+                LanguageOption.EN to "Are you interested in image processing and analysis?\n" +
+                    "\n" +
+                    "Do the words \"medicine\" and \"biology\" trigger u?\n" +
+                    "\n" +
+                    "Is your pulse racing? Or maybe you have too much time and want to use it for positive development?\n" +
+                    "\n" +
+                    "If your answer to any of these questions is yes, then we invite you to the recruitment meeting of our BioMedical Imaging Scientific Club!\n" +
+                    "\n" +
+                    "The BioMedical Imaging Scientific Club was founded in November 2020 at the Faculty of Electrical Engineering, Automation, Computer Science and Biomedical Engineering on the initiative of students and employees of AGH, whose common goal is to arouse interest in scientific and research work in the field of processing and analysis of digital images used in modern biology and medicine.\n" +
+                    "\n" +
+                    "Don't wait and become a member of our Club now!\n" +
+                    "\n" +
+                    "See you!",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "AGH B1 sala 121",
+                LanguageOption.EN to "AGH B1 room 121",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).plusHours(3)),
+        )
 
         val creative = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Creative", LanguageOption.EN to "Creative Scientific Club"),
