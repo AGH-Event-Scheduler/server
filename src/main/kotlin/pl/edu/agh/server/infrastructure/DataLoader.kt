@@ -308,6 +308,104 @@ class DataLoader(
                     "We work with companies and research teams in the city of Krakow and beyond. As a result of cooperation, Creative members have the opportunity to participate in trips to research centers, engineering offices and production plants, where they can learn more about the company’s profile. What’s more, often mentioned companies send us information about the possibility of taking up an internship or work in their company because they value the activity of our circle.",
             ),
         )
+        eventService.createEvent(
+            organizationId = creative.id!!,
+            backgroundImage = getFile("bg-kn-creative-science-night.jpg"),
+            nameMap = mapOf(LanguageOption.PL to "Małopolska noc naukowców", LanguageOption.EN to "Recruitment meeting"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "Zapraszamy od 18:00 na pokaz \"Z metalem można prawie wszystko\" \uD83E\uDDD0 \n" +
+                    "\n" +
+                    "Do zobaczenia ! \uD83D\uDC9A\uD83D\uDDA4❤\uFE0F\n" +
+                    "\n" +
+                    "https://lnkd.in/ddsbA8nW",
+                LanguageOption.EN to "We invite you from 18:00 to the show \"You can almost do anything with metal\" \uD83E\uDDD0\n" +
+                    "\n" +
+                    "See you ! \uD83D\uDC9A\uD83D\uDDA4❤\uFE0F\n" +
+                    "\n" +
+                    "https://lnkd.in/ddsbA8nW",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "Zdalnie",
+                LanguageOption.EN to "Online",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).plusHours(4)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).plusHours(7)),
+        )
+        eventService.createEvent(
+            organizationId = creative.id!!,
+            backgroundImage = getFile("bg-kn-creative-rekru.png"),
+            nameMap = mapOf(LanguageOption.PL to "Rekrutujemy!", LanguageOption.EN to "We are recruiting!"),
+            descriptionMap = mapOf(
+                LanguageOption.PL to "\uD83D\uDD25Zaczynamy rekrutację!\uD83D\uDD25\n" +
+                    "Szukasz sposobu na rozwinięcie swoich umiejętności? \n" +
+                    "\n" +
+                    "Jesteś otwarty na nowe doświadczenia?\n" +
+                    "\n" +
+                    "Chcesz na studiach robić coś wyjątkowego, albo masz pomysł na własny projekt?\n" +
+                    "\n" +
+                    "Jeśli tak, CREATIVE może być miejscem w ktorym powyzsze rzeczy zaczną się spełniać \uD83E\uDD16\n" +
+                    "\n" +
+                    "Kogo szukamy? \n" +
+                    "\uD83D\uDC49 Elektroników i Robotyków,\n" +
+                    "\uD83D\uDC49 Programistów,\n" +
+                    "\uD83D\uDC49 Entuzjastów Sztucznej Inteligencji,\n" +
+                    "\uD83D\uDC49 Mistrzów CADa, oraz Modelowania numerycznego (CFD/FEM/CA)\n" +
+                    "\n" +
+                    "Jeżeli jesteś, albo przynajmniej aspirujesz do bycia kimś z powyższej listy (ale nie tylko!) zachęcamy do uzupełnienia formularza poniżej:\n" +
+                    "\n" +
+                    "http://bit.ly/2Z3nAjH\n" +
+                    "\n" +
+                    "Pamiętajcie, że nie są to wszystkie z projektów Creative.\n" +
+                    "\n" +
+                    "Jesteśmy też otwarci na nowe pomysły \uD83C\uDF88\n" +
+                    "\n" +
+                    "Jednak przede wszystkim chcemy wam rozwijać swoje pasje i poznawac nowe ciekawe zagadnienia \uD83C\uDF1F\n" +
+                    "\n" +
+                    "Zapisy trwają do 6 Stycznia, do godziny 23.59 \uD83D\uDC49 ⏰\n" +
+                    "\n" +
+                    "Osoby ktore sie zapiszą poinformujemy o spotkaniu organizacyjnym, które odbędzie się:\n" +
+                    "\uD83D\uDD25 9 Stycznia 2020 \uD83D\uDD25\n" +
+                    "\n" +
+                    "Nie czekajcie!",
+                LanguageOption.EN to "\uD83D\uDD25We are starting recruitment!\uD83D\uDD25\n" +
+                    "Are you looking for a way to develop your skills?\n" +
+                    "\n" +
+                    "Are you open to new experiences?\n" +
+                    "\n" +
+                    "Do you want to do something unique during your studies or do you have an idea for your own project?\n" +
+                    "\n" +
+                    "If so, CREATIVE may be the place where the above things will come true \uD83E\uDD16\n" +
+                    "\n" +
+                    "Who are we looking for?\n" +
+                    "\uD83D\uDC49 Electronics and Robotics,\n" +
+                    "\uD83D\uDC49 Programmers,\n" +
+                    "\uD83D\uDC49 Artificial Intelligence enthusiasts,\n" +
+                    "\uD83D\uDC49 Masters of CAD and Numerical Modeling (CFD/FEM/CA)\n" +
+                    "\n" +
+                    "If you are, or at least aspire to be, someone from the above list (but not only!), we encourage you to complete the form below:\n" +
+                    "\n" +
+                    "http://bit.ly/2Z3nAjH\n" +
+                    "\n" +
+                    "Please note that these are not all Creative designs.\n" +
+                    "\n" +
+                    "We are also open to new ideas \uD83C\uDF88\n" +
+                    "\n" +
+                    "However, above all, we want you to develop your passions and learn new interesting issues \uD83C\uDF1F\n" +
+                    "\n" +
+                    "Registration lasts until January 6, 11.59 p.m. \uD83D\uDC49 ⏰\n" +
+                    "\n" +
+                    "We will inform those who register about the organizational meeting that will take place:\n" +
+                    "\uD83D\uDD25 January 9, 2020 \uD83D\uDD25\n" +
+                    "\n" +
+                    "Don't wait!",
+            ),
+            locationMap = mapOf(
+                LanguageOption.PL to "Zdalnie",
+                LanguageOption.EN to "Online",
+            ),
+            startDate = Timestamp.valueOf(LocalDateTime.now().plusDays(3).plusHours(4).plusMinutes(30)),
+            endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(6).plusHours(4).plusMinutes(30)),
+        )
 
         val ecoEnergy = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "AGH Eko-Energia", LanguageOption.EN to "AGH Eco-Energy"),
