@@ -77,9 +77,9 @@ class NotificationService(
     }
 
     @Transactional
-    fun notifyAboutEventReenable(event: Event): Notification {
+    fun notifyAboutEventReactivate(event: Event): Notification {
         val newNotification = Notification(
-            type = NotificationType.EVENT_REENABLE,
+            type = NotificationType.EVENT_REACTIVATE,
             regardingEvent = event,
             forUsersWithSavedEvents = mutableSetOf(event),
             forFollowersOfOrganizations = mutableSetOf(event.organization),
