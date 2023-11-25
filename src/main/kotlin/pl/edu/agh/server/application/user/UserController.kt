@@ -3,6 +3,7 @@ package pl.edu.agh.server.application.user
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import pl.edu.agh.server.domain.annotation.AuthorizeAccess
 import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
@@ -33,6 +34,7 @@ class UserController(
     }
 
     @PostMapping("/organization-roles/{organizationId}/grant")
+    @AuthorizeAccess(allowedRoles = ["HEAD"])
     fun grantOrganizationRole(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,

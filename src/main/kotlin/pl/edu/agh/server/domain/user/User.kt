@@ -57,8 +57,8 @@ class User(
     @OneToMany(mappedBy = "user")
     private val tokens: List<Token> = mutableListOf()
 
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val organizationUserRoles: MutableList<OrganizationUserRole> = mutableListOf()
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    var organizationUserRoles: MutableList<OrganizationUserRole> = mutableListOf()
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(role.name))

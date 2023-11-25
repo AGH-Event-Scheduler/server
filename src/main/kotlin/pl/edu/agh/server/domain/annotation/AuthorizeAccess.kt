@@ -11,5 +11,5 @@ package pl.edu.agh.server.domain.annotation
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class AuthorizeAccess(
-    val allowedRoles: Array<String> = [], // TODO  to be mapped to enum
+    val allowedRoles: Array<String> = [],
 )

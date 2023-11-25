@@ -93,9 +93,6 @@ class OrganizationService(
             )
 
             userOrganizationRoleRepository.save(newAssignment)
-
-            user.organizationUserRoles.add(newAssignment)
-            userRepository.save(user)
         }
     }
 }

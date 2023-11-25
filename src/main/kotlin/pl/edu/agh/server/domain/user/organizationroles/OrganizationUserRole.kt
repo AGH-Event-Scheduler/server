@@ -18,7 +18,7 @@ class OrganizationUserRole(
 
     @ManyToOne
     @JoinColumn(name = "organization_id")
-    val organization: Organization,
+    var organization: Organization,
 
     @Enumerated(EnumType.STRING)
     val role: OrganizationRole,

@@ -283,6 +283,9 @@ class DataLoader(
 
     private fun assignRoles() {
         val admin = userRepository.findByEmail("admin@agh.edu.pl").get()
-        organizationService.assignUserRole(1, admin.id!!, OrganizationRole.ADMIN)
+        organizationRepository.findAll().forEach { organization ->
+            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.CONTENT_CREATOR)
+            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.HEAD)
+        }
     }
 }

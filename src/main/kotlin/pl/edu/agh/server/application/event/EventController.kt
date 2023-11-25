@@ -153,7 +153,7 @@ class EventController(
     }
 
     @PutMapping("/{eventId}")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR", "ADMIN"])
+    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun updateEventForOrganization(
         request: HttpServletRequest,
         @PathVariable eventId: Long,
@@ -203,7 +203,7 @@ class EventController(
     }
 
     @PostMapping("/cancel")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR", "ADMIN"])
+    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun cancelEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
@@ -213,7 +213,7 @@ class EventController(
     }
 
     @PostMapping("/reenable")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR", "ADMIN"])
+    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun reenableEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
