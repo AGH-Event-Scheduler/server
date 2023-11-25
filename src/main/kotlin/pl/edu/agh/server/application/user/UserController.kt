@@ -32,18 +32,18 @@ class UserController(
     fun getLoggedUserOrganizationRoles(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,
-        @RequestParam("email", required = false) email: String?,
     ): ResponseEntity<List<OrganizationRole>> {
-        val organizationUserRoles: List<OrganizationRole> = when {
-            !email.isNullOrBlank() -> {
-                userService.getOrganizationRoles(organizationId, email)
-            }
+        return ResponseEntity.ok(userService.getOrganizationRoles(organizationId, userService.getUserId(request)))
+    }
 
-            else -> {
-                userService.getOrganizationRoles(organizationId, userService.getUserId(request))
-            }
-        }
-        return ResponseEntity.ok(organizationUserRoles)
+    @GetMapping("/organization-roles/{organizationId}/{email}")
+    @AuthorizeAccess(allowedRoles = ["ADMIN", "HEAD"])
+    fun getUserOrganizationRoles(
+        request: HttpServletRequest,
+        @PathVariable organizationId: Long,
+        @PathVariable email: String,
+    ): ResponseEntity<List<OrganizationRole>> {
+        return ResponseEntity.ok(userService.getOrganizationRoles(organizationId, email))
     }
 
     @PostMapping("/organization-roles/{organizationId}/grant")
