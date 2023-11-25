@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.dto.FullEventDTO
-import pl.edu.agh.server.domain.dto.OrganizationDto
+import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.exception.EventNotFoundException
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
+import pl.edu.agh.server.domain.image.ImageService.IncorrectFileUploadException
+import pl.edu.agh.server.domain.notification.NotificationService
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
@@ -34,6 +36,7 @@ class EventService(
     private val organizationRepository: OrganizationRepository,
     private val imageService: ImageService,
     private val organizationService: OrganizationService,
+    private val notificationService: NotificationService,
 ) : BaseServiceUtilities<Event>(eventRepository) {
 
     @Transactional
@@ -61,31 +64,38 @@ class EventService(
         val event = eventRepository.findById(eventId)
             .orElseThrow { throw EventNotFoundException(eventId) }
         event.canceled = true
-        eventRepository.save(event)
+        val updatedEvent = eventRepository.save(event)
+        notificationService.notifyAboutEventCancel(updatedEvent)
     }
 
     @Transactional
-    fun reenableEvent(eventId: Long) {
+    fun reactivateEvent(eventId: Long) {
         val event = eventRepository.findById(eventId)
             .orElseThrow { throw EventNotFoundException(eventId) }
         event.canceled = false
-        eventRepository.save(event)
+        val updatedEvent = eventRepository.save(event)
+        notificationService.notifyAboutEventReactivate(updatedEvent)
     }
 
     @Transactional
     fun createEvent(
         organizationId: Long,
-        backgroundImage: MultipartFile,
+        backgroundImage: MultipartFile?,
         nameMap: Map<LanguageOption, String>,
         descriptionMap: Map<LanguageOption, String>,
         locationMap: Map<LanguageOption, String>,
         startDate: Date,
         endDate: Date,
     ): Event {
+        val savedBackgroundImage: BackgroundImage
         val organization = organizationRepository.findById(organizationId).orElseThrow { OrganizationNotFoundException(organizationId) }
 
 //        TODO make it transactional - remove created image on failure
-        val savedBackgroundImage: BackgroundImage = imageService.createBackgroundImage(backgroundImage)
+        if (backgroundImage != null) {
+            savedBackgroundImage = imageService.createBackgroundImage(backgroundImage)
+        } else {
+            throw IncorrectFileUploadException("Uploaded file does not exist")
+        }
 
         val newEvent = Event(
             name = translationService.createTranslation(nameMap),
@@ -97,11 +107,13 @@ class EventService(
             backgroundImage = savedBackgroundImage,
         )
 
-        organization.events.add(newEvent)
-        eventRepository.save(newEvent)
+        val savedEvent = eventRepository.save(newEvent)
+        organization.events.add(savedEvent)
         organizationRepository.save(organization)
 
-        return newEvent
+        notificationService.notifyAboutEventCreation(savedEvent)
+
+        return savedEvent
     }
 
     @Transactional
@@ -128,9 +140,11 @@ class EventService(
         event.startDate = startDate
         event.endDate = endDate
 
-        eventRepository.save(event)
+        val savedEvent = eventRepository.save(event)
 
-        return event
+        notificationService.notifyAboutEventUpdate(savedEvent)
+
+        return savedEvent
     }
 
     fun getEvent(eventId: Long): Event {
@@ -164,7 +178,7 @@ class EventService(
     }
 
     fun transformToEventDTO(events: List<Event>, language: LanguageOption, userName: String? = null): List<EventDTO> {
-        val organizationMap = getOrganizationDtoMap(events, language, userName)
+        val organizationMap = getOrganizationDTOMap(events, language, userName)
 
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
 
@@ -194,7 +208,7 @@ class EventService(
         return translations.associateBy({ it.language }, { it.content })
     }
 
-    private fun getOrganizationDtoMap(events: List<Event>, language: LanguageOption, userName: String?): Map<Long, OrganizationDto> {
+    private fun getOrganizationDTOMap(events: List<Event>, language: LanguageOption, userName: String?): Map<Long, OrganizationDTO> {
         val organizations = mutableSetOf<Organization>()
         events.forEach { organizations.add(it.organization) }
 

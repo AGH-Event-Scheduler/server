@@ -2,7 +2,6 @@ package pl.edu.agh.server.domain.translation
 
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class TranslationService(private val translationRepository: TranslationRepository) {
@@ -10,7 +9,7 @@ class TranslationService(private val translationRepository: TranslationRepositor
     fun createTranslation(
         contentLanguageMap: Map<LanguageOption, String>,
     ): MutableSet<Translation> {
-        return LanguageOption.values().map {
+        return LanguageOption.entries.map {
             translationRepository.save(Translation(contentLanguageMap[it].toString(), it))
         }.toMutableSet()
     }

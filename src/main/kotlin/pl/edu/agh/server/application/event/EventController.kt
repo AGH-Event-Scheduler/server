@@ -212,13 +212,13 @@ class EventController(
         return ResponseEntity.ok().build()
     }
 
-    @PostMapping("/reenable")
+    @PostMapping("/reactivate")
     @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
-    fun reenableEvent(
+    fun reactivateEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
     ): ResponseEntity<Void> {
-        eventService.reenableEvent(eventId)
+        eventService.reactivateEvent(eventId)
         return ResponseEntity.ok().build()
     }
 

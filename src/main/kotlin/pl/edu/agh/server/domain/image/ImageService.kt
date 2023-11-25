@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.awt.Image
 import java.awt.Image.SCALE_REPLICATE
 import java.awt.image.BufferedImage
-import java.util.UUID
+import java.util.*
 import javax.imageio.ImageIO
 
 @Service
@@ -43,6 +43,41 @@ class ImageService(private val imageStorage: ImageStorage) {
         imageStorage.saveFile(bigBackgroundImage, imageId, bigName)
 
         return BackgroundImage(
+            imageId = imageId,
+            smallFilename = smallName,
+            mediumFilename = mediumName,
+            bigFilename = bigName,
+        )
+    }
+
+    fun createLogoImage(logoImage: MultipartFile): LogoImage {
+        if (!imageStorage.checkIfImageWithProperExtensions(logoImage)) {
+            throw IncorrectFileUploadException("Uploaded file type is not supported")
+        }
+
+        val imageId = imageStorage.generateImageId()
+        val extension = logoImage.originalFilename?.let { imageStorage.getFileExtension(it) }
+        if (extension === "") {
+            throw IncorrectFileUploadException("Could not resolve file extension")
+        }
+        val smallName = "small.$extension"
+        val mediumName = "medium.$extension"
+        val bigName = "big.$extension"
+
+        imageStorage.createImageDirectory(imageId)
+
+        val originalBufferedImage: BufferedImage = ImageIO.read(logoImage.inputStream)
+
+        val smallLogoImage: Image = resize(originalBufferedImage, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1])
+        imageStorage.saveFile(smallLogoImage, imageId, smallName)
+
+        val mediumLogoImage: Image = resize(originalBufferedImage, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1])
+        imageStorage.saveFile(mediumLogoImage, imageId, mediumName)
+
+        val bigLogoImage: Image = resize(originalBufferedImage, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1])
+        imageStorage.saveFile(bigLogoImage, imageId, bigName)
+
+        return LogoImage(
             imageId = imageId,
             smallFilename = smallName,
             mediumFilename = mediumName,

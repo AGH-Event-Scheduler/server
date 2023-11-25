@@ -5,7 +5,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
-import pl.edu.agh.server.domain.dto.OrganizationDto
+import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationFollowedByUser
@@ -48,18 +48,19 @@ class OrganizationController(
         @RequestParam(name = "subscribedOnly", defaultValue = false.toString()) subscribedOnly: Boolean,
         @RequestParam(name = "yourOrganizationsOnly", defaultValue = false.toString()) yourOrganizationsOnly: Boolean,
         @RequestParam(name = "name", required = false) name: String?,
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         request: HttpServletRequest,
-    ): ResponseEntity<List<OrganizationDto>> {
+    ): ResponseEntity<List<OrganizationDTO>> {
         val organizations = organizationService.transformToOrganizationDTO(
             organizationService.getAllWithSpecificationPageable(
                 Specification.allOf(
                     if (yourOrganizationsOnly) organizationsWithAuthority(getUserName(request)) else null,
                     if (subscribedOnly) organizationFollowedByUser(getUserName(request)) else null,
-                    if (name != null) organizationWithNameLike(name) else null,
+                    if (name != null) organizationWithNameLike(name, language) else null,
                 ),
                 createPageRequest(page, size, sort),
             ),
-            LanguageOption.PL,
+            language,
             getUserName(request),
         )
         return ResponseEntity.ok(organizations)
@@ -68,13 +69,14 @@ class OrganizationController(
     @GetMapping("/{organizationId}")
     fun getOrganizationById(
         request: HttpServletRequest,
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         @PathVariable organizationId: Long,
-    ): ResponseEntity<OrganizationDto> {
+    ): ResponseEntity<OrganizationDTO> {
         val organization = organizationService.getOrganization(organizationId, getUserName(request))
         return ResponseEntity.ok(
             organizationService.transformToOrganizationDTO(
                 organization,
-                LanguageOption.PL,
+                language,
                 getUserName(request),
             ),
         )
