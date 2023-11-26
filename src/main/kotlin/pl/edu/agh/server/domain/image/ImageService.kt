@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.awt.Image
 import java.awt.Image.SCALE_REPLICATE
 import java.awt.image.BufferedImage
-import java.util.UUID
+import java.util.*
 import javax.imageio.ImageIO
 
 @Service

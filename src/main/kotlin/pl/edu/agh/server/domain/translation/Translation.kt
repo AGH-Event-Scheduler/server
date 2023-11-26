@@ -8,7 +8,6 @@ import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
-import java.util.*
 
 @Entity
 @Table(

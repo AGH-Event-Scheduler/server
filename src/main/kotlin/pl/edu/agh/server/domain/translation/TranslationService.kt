@@ -2,7 +2,6 @@ package pl.edu.agh.server.domain.translation
 
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class TranslationService(private val translationRepository: TranslationRepository) {

@@ -1,6 +1,9 @@
 package pl.edu.agh.server.domain.notification
 
-import jakarta.persistence.criteria.*
+import jakarta.persistence.criteria.CriteriaBuilder
+import jakarta.persistence.criteria.CriteriaQuery
+import jakarta.persistence.criteria.JoinType
+import jakarta.persistence.criteria.Root
 import org.springframework.data.jpa.domain.Specification
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.organization.Organization

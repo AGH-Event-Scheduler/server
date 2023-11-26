@@ -7,7 +7,7 @@ import jakarta.persistence.MappedSuperclass
 import lombok.EqualsAndHashCode
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.Instant
-import java.util.Date
+import java.util.*
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.memberProperties

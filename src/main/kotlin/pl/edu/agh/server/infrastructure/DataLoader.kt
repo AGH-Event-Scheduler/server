@@ -18,6 +18,8 @@ import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.student.Student
 import pl.edu.agh.server.domain.student.StudentRepository
 import pl.edu.agh.server.domain.translation.LanguageOption
+import pl.edu.agh.server.domain.user.UserRepository
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Files
@@ -36,6 +38,7 @@ class DataLoader(
     private val imageService: ImageService,
     private val eventService: EventService,
     private val organizationService: OrganizationService,
+    private val userRepository: UserRepository,
     @Value("\${file.ddl-auto}") private val fileDDLAuto: String,
     @Value("\${configuration.mock-data}") private val mockData: Boolean,
 ) : CommandLineRunner {
@@ -49,6 +52,7 @@ class DataLoader(
 
             createOrganizationsAndEvents()
             createUsers()
+            assignRoles()
         }
     }
 
@@ -85,7 +89,10 @@ class DataLoader(
         eventService.createEvent(
             organizationId = knBit.id!!,
             backgroundImage = getFile("bg-kn-bit-react.jpg"),
-            nameMap = mapOf(LanguageOption.PL to "Warsztaty React - Schibsted Dla Studentów", LanguageOption.EN to "React Workshop - Schibsted For Students"),
+            nameMap = mapOf(
+                LanguageOption.PL to "Warsztaty React - Schibsted Dla Studentów",
+                LanguageOption.EN to "React Workshop - Schibsted For Students",
+            ),
             descriptionMap = mapOf(
                 LanguageOption.PL to "Hejka\uD83D\uDC4B\n" +
                     "\nkolejne warsztaty od Schibsted już niedługo! Tym razem tematyką będzie REACT.\n" +
@@ -122,7 +129,10 @@ class DataLoader(
         eventService.createEvent(
             organizationId = knBit.id!!,
             backgroundImage = getFile("bg-kn-bit-algo.jpg"),
-            nameMap = mapOf(LanguageOption.PL to "Akademickie Mistrzostwa Polski w Programowaniu Zespołowym", LanguageOption.EN to "Polish Academic Championship in Team Programming"),
+            nameMap = mapOf(
+                LanguageOption.PL to "Akademickie Mistrzostwa Polski w Programowaniu Zespołowym",
+                LanguageOption.EN to "Polish Academic Championship in Team Programming",
+            ),
             descriptionMap = mapOf(
                 LanguageOption.PL to "Hej!\n" +
                     "\n" +
@@ -163,9 +173,13 @@ class DataLoader(
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(5).plusHours(2).plusMinutes(30)),
         )
     }
+
     private fun mockKnSociety() {
         val knSociology = organizationService.createOrganization(
-            nameMap = mapOf(LanguageOption.PL to "KN Osób Studiujących Socjologię", LanguageOption.EN to "SC of People Studying Sociology"),
+            nameMap = mapOf(
+                LanguageOption.PL to "KN Osób Studiujących Socjologię",
+                LanguageOption.EN to "SC of People Studying Sociology",
+            ),
             logoImageFile = getFile("logo-kn-sociology.png"),
             backgroundImageFile = getFile("bg-kn-sociology.png"),
             descriptionMap = mapOf(
@@ -241,9 +255,13 @@ class DataLoader(
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(9)),
         )
     }
+
     private fun mockBiomedical() {
         val biomedical = organizationService.createOrganization(
-            nameMap = mapOf(LanguageOption.PL to "BioMedical Innovations", LanguageOption.EN to "BioMedical Innovations"),
+            nameMap = mapOf(
+                LanguageOption.PL to "BioMedical Innovations",
+                LanguageOption.EN to "BioMedical Innovations",
+            ),
             logoImageFile = getFile("logo-biomedical.jpeg"),
             backgroundImageFile = getFile("bg-biomedical.png"),
             descriptionMap = mapOf(
@@ -291,9 +309,13 @@ class DataLoader(
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(1).plusHours(3)),
         )
     }
+
     private fun mockCreative() {
         val creative = organizationService.createOrganization(
-            nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Creative", LanguageOption.EN to "Creative Scientific Club"),
+            nameMap = mapOf(
+                LanguageOption.PL to "Koło Naukowe Creative",
+                LanguageOption.EN to "Creative Scientific Club",
+            ),
             logoImageFile = getFile("logo-creative.png"),
             backgroundImageFile = getFile("bg-creative.png"),
             descriptionMap = mapOf(
@@ -326,7 +348,10 @@ class DataLoader(
         eventService.createEvent(
             organizationId = creative.id!!,
             backgroundImage = getFile("bg-kn-creative-science-night.jpg"),
-            nameMap = mapOf(LanguageOption.PL to "Małopolska noc naukowców", LanguageOption.EN to "Recruitment meeting"),
+            nameMap = mapOf(
+                LanguageOption.PL to "Małopolska noc naukowców",
+                LanguageOption.EN to "Recruitment meeting",
+            ),
             descriptionMap = mapOf(
                 LanguageOption.PL to "Zapraszamy od 18:00 na pokaz \"Z metalem można prawie wszystko\" \uD83E\uDDD0 \n" +
                     "\n" +
@@ -422,6 +447,7 @@ class DataLoader(
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(6).plusHours(4).plusMinutes(30)),
         )
     }
+
     private fun mockEcoEnergy() {
         val ecoEnergy = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "AGH Eko-Energia", LanguageOption.EN to "AGH Eco-Energy"),
@@ -435,7 +461,10 @@ class DataLoader(
         eventService.createEvent(
             organizationId = ecoEnergy.id!!,
             backgroundImage = getFile("bg-eco-energy-work.jpg"),
-            nameMap = mapOf(LanguageOption.PL to "Targi Pracy Przedsiębiorczości", LanguageOption.EN to "Entrepreneurship Job Fair"),
+            nameMap = mapOf(
+                LanguageOption.PL to "Targi Pracy Przedsiębiorczości",
+                LanguageOption.EN to "Entrepreneurship Job Fair",
+            ),
             descriptionMap = mapOf(
                 LanguageOption.PL to "⏱Trwają zapisy na szkolenia oraz konsultacje biznesowe w ramach Targów Pracy Przedsiębiorczości “Majówka z Pracą”! \n" +
                     "\n" +
@@ -486,9 +515,13 @@ class DataLoader(
             endDate = Timestamp.valueOf(LocalDateTime.now().plusHours(9).plusMinutes(30)),
         )
     }
+
     private fun mockDataTeam() {
         val dataTeam = organizationService.createOrganization(
-            nameMap = mapOf(LanguageOption.PL to "Koło Naukowe Data Team", LanguageOption.EN to "Data Team Scientific Club"),
+            nameMap = mapOf(
+                LanguageOption.PL to "Koło Naukowe Data Team",
+                LanguageOption.EN to "Data Team Scientific Club",
+            ),
             logoImageFile = getFile("logo-data-team.jpg"),
             backgroundImageFile = getFile("bg-data-team.png"),
             descriptionMap = mapOf(
@@ -497,6 +530,7 @@ class DataLoader(
             ),
         )
     }
+
     private fun mockForSociety() {
         val forSociety = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN 4 Society", LanguageOption.EN to "SC 4 Society"),
@@ -508,6 +542,7 @@ class DataLoader(
             ),
         )
     }
+
     private fun mockEnergon() {
         val energon = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN Energon", LanguageOption.EN to "KN Energon"),
@@ -521,7 +556,10 @@ class DataLoader(
         eventService.createEvent(
             organizationId = energon.id!!,
             backgroundImage = getFile("bg-energon-show.jpg"),
-            nameMap = mapOf(LanguageOption.PL to "Pokaz Strzelania z Trebusza", LanguageOption.EN to "Trebuchet Shooting Demonstration"),
+            nameMap = mapOf(
+                LanguageOption.PL to "Pokaz Strzelania z Trebusza",
+                LanguageOption.EN to "Trebuchet Shooting Demonstration",
+            ),
             descriptionMap = mapOf(
                 LanguageOption.PL to "TO JUŻ W TEN WEEKEND!\n" +
                     "\n" +
@@ -591,6 +629,7 @@ class DataLoader(
             endDate = Timestamp.valueOf(LocalDateTime.now().plusDays(2).plusHours(6).plusMinutes(30)),
         )
     }
+
     private fun mockLarp() {
         val larp = organizationService.createOrganization(
             nameMap = mapOf(LanguageOption.PL to "KN Larp AGH", LanguageOption.EN to "KN Larp AGH"),
@@ -682,9 +721,21 @@ class DataLoader(
         val imageId = imageStorage.generateImageId()
         val extension = imageStorage.getFileExtension(filename)
         imageStorage.createImageDirectory(imageId)
-        imageStorage.saveFile(imageService.resize(image, BackgroundImage.BIG_SIZE[0], BackgroundImage.BIG_SIZE[1]), imageId, "big.$extension")
-        imageStorage.saveFile(imageService.resize(image, BackgroundImage.MEDIUM_SIZE[0], BackgroundImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
-        imageStorage.saveFile(imageService.resize(image, BackgroundImage.SMALL_SIZE[0], BackgroundImage.SMALL_SIZE[1]), imageId, "small.$extension")
+        imageStorage.saveFile(
+            imageService.resize(image, BackgroundImage.BIG_SIZE[0], BackgroundImage.BIG_SIZE[1]),
+            imageId,
+            "big.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, BackgroundImage.MEDIUM_SIZE[0], BackgroundImage.MEDIUM_SIZE[1]),
+            imageId,
+            "medium.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, BackgroundImage.SMALL_SIZE[0], BackgroundImage.SMALL_SIZE[1]),
+            imageId,
+            "small.$extension",
+        )
 
         return BackgroundImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }
@@ -694,9 +745,21 @@ class DataLoader(
         val imageId = imageStorage.generateImageId()
         val extension = imageStorage.getFileExtension(filename)
         imageStorage.createImageDirectory(imageId)
-        imageStorage.saveFile(imageService.resize(image, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1]), imageId, "big.$extension")
-        imageStorage.saveFile(imageService.resize(image, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1]), imageId, "medium.$extension")
-        imageStorage.saveFile(imageService.resize(image, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1]), imageId, "small.$extension")
+        imageStorage.saveFile(
+            imageService.resize(image, LogoImage.BIG_SIZE[0], LogoImage.BIG_SIZE[1]),
+            imageId,
+            "big.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, LogoImage.MEDIUM_SIZE[0], LogoImage.MEDIUM_SIZE[1]),
+            imageId,
+            "medium.$extension",
+        )
+        imageStorage.saveFile(
+            imageService.resize(image, LogoImage.SMALL_SIZE[0], LogoImage.SMALL_SIZE[1]),
+            imageId,
+            "small.$extension",
+        )
 
         return LogoImage(imageId, "small.$extension", "medium.$extension", "big.$extension")
     }
@@ -725,5 +788,13 @@ class DataLoader(
 
     private fun shortLoremIpsumPl(): String {
         return "Ale muszę wam wytłumaczyć, jak narodziła się ta błędna koncepcja denuncjacji przyjemności i chwalebnego bólu, a ja dam wam kompletną relację z systemu i objaśnię prawdziwe nauki wielkiego odkrywcy prawdy, mistrza-budowniczego ludzkiego szczęścia. Nikt nie odrzuca, nie lubi lub unika przyjemności samej w sobie."
+    }
+
+    private fun assignRoles() {
+        val admin = userRepository.findByEmail("admin@agh.edu.pl").get()
+        organizationRepository.findAll().forEach { organization ->
+            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.CONTENT_CREATOR)
+            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.HEAD)
+        }
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
+import pl.edu.agh.server.domain.annotation.AuthorizeAccess
 import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.dto.FullEventDTO
 import pl.edu.agh.server.domain.event.Event
@@ -36,7 +37,7 @@ class EventController(
 ) : BaseControllerUtilities<Event>(jwtService) {
 
     @PostMapping("/save")
-    fun subscribeUserToOrganization(
+    fun saveEventForUser(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
     ): ResponseEntity<Void> {
@@ -45,7 +46,7 @@ class EventController(
     }
 
     @PostMapping("/remove")
-    fun unsubscribeUserFromOrganization(
+    fun removeEventForUser(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
     ): ResponseEntity<Void> {
@@ -69,7 +70,21 @@ class EventController(
         @RequestParam(name = "name", required = false) name: String?,
         request: HttpServletRequest,
     ): ResponseEntity<List<EventDTO>> {
-        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, showCanceled, request)
+        val entities = getAllFilteredEventDTOs(
+            page,
+            size,
+            sort,
+            language,
+            savedOnly,
+            fromFollowedOnly,
+            type,
+            organizationId,
+            startDate,
+            endDate,
+            name,
+            showCanceled,
+            request,
+        )
         return ResponseEntity.ok(
             entities,
         )
@@ -92,15 +107,30 @@ class EventController(
         request: HttpServletRequest,
     ): ResponseEntity<SortedMap<String, List<EventDTO>>> {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
-        val entities = getAllFilteredEventDTOs(page, size, sort, language, savedOnly, fromFollowedOnly, type, organizationId, startDate, endDate, name, showCanceled, request)
+        val entities = getAllFilteredEventDTOs(
+            page,
+            size,
+            sort,
+            language,
+            savedOnly,
+            fromFollowedOnly,
+            type,
+            organizationId,
+            startDate,
+            endDate,
+            name,
+            showCanceled,
+            request,
+        )
         return ResponseEntity.ok(entities.groupBy { dateFormat.format(it.startDate) }.toSortedMap())
     }
 
     @PostMapping("/organization/{organizationId}")
+    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun createEventForOrganization(
+        request: HttpServletRequest,
         @PathVariable organizationId: Long,
         @RequestBody eventCreationRequest: EventCreationRequest,
-        request: HttpServletRequest,
     ): ResponseEntity<EventDTO> {
         val objectMapper = jacksonObjectMapper()
         val nameMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.name)
@@ -123,10 +153,11 @@ class EventController(
     }
 
     @PutMapping("/{eventId}")
+    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun updateEventForOrganization(
+        request: HttpServletRequest,
         @PathVariable eventId: Long,
         @RequestBody eventUpdateRequest: EventUpdateRequest,
-        request: HttpServletRequest,
     ): ResponseEntity<EventDTO> {
         val objectMapper = jacksonObjectMapper()
         val nameMap: Map<LanguageOption, String> = objectMapper.readValue(eventUpdateRequest.name)
@@ -154,7 +185,13 @@ class EventController(
         @PathVariable id: Long,
         request: HttpServletRequest,
     ): ResponseEntity<EventDTO> {
-        return ResponseEntity.ok(eventService.transformToEventDTO(eventService.getEvent(id), language, getUserName(request)))
+        return ResponseEntity.ok(
+            eventService.transformToEventDTO(
+                eventService.getEvent(id),
+                language,
+                getUserName(request),
+            ),
+        )
     }
 
     @GetMapping("/{id}/full")
@@ -166,6 +203,7 @@ class EventController(
     }
 
     @PostMapping("/cancel")
+    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun cancelEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
@@ -175,6 +213,7 @@ class EventController(
     }
 
     @PostMapping("/reactivate")
+    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun reactivateEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
@@ -207,7 +246,14 @@ class EventController(
                     if (!showCanceled) eventNotCanceled() else null,
                     if (savedOnly) eventSavedByUser(userName) else null,
                     if (fromFollowedOnly) eventFromFollowedByUser(user) else null,
-                    if (type != null) eventInDateRangeType(Date.from(Instant.now()), type) else null, // TODO replace this with simple eventInDateRange
+                    if (type != null) {
+                        eventInDateRangeType(
+                            Date.from(Instant.now()),
+                            type,
+                        )
+                    } else {
+                        null
+                    }, // TODO replace this with simple eventInDateRange
                     if (organizationId != null) eventBelongToOrganization(organizationId) else null,
                     if (startDate != null && endDate != null) eventInDateRange(startDate, endDate) else null,
                     if (name != null) eventWithNameLike(name, language) else null,
@@ -218,7 +264,7 @@ class EventController(
         )
     }
 
-//    FIXME use function from base controller once NullPointerException is fixed
+    //    FIXME use function from base controller once NullPointerException is fixed
     override fun getUserName(request: HttpServletRequest): String {
         return jwtService.extractUsername(request.getHeader("Authorization")!!.substring(7))
     }
