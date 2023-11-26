@@ -701,6 +701,21 @@ class DataLoader(
                 lastName = "admin",
             ),
         )
+        val domainOptions = arrayOf("agh.edu.pl", "student.agh.edu.pl")
+
+        for (i in 500..530) {
+            val emailDomain = domainOptions[i % domainOptions.size]
+            val email = "user$i@$emailDomain"
+
+            authenticationService.register(
+                RegisterRequest(
+                    email = email,
+                    password = "password$i",
+                    firstName = "User",
+                    lastName = "Surname$i",
+                ),
+            )
+        }
     }
 
     private fun getFile(name: String): MultipartFile {
@@ -793,8 +808,10 @@ class DataLoader(
     private fun assignRoles() {
         val admin = userRepository.findByEmail("admin@agh.edu.pl").get()
         organizationRepository.findAll().forEach { organization ->
-            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.CONTENT_CREATOR)
             organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.HEAD)
+        }
+        userRepository.findAll().forEach { user ->
+            organizationService.assignUserRole(1, user.id!!, OrganizationRole.HEAD)
         }
     }
 }
