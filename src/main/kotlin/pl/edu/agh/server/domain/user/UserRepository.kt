@@ -24,9 +24,9 @@ interface UserRepository : BaseRepository<User> {
             " u.lastName," +
             " our.role," +
             " our.organization.id) " +
-            "FROM User u INNER JOIN OrganizationUserRole our on" +
-            " our.user.id = u.id" +
-            " where our.organization.id = :organizationId",
+            "FROM User u LEFT JOIN OrganizationUserRole our on  our.organization.id = :organizationId" +
+            " AND our.user.id = u.id " +
+            " where our.organization.id = :organizationId OR our.organization.id IS NULL",
     )
     fun findAllUsersWithRoleForOrganization(
         pageable: Pageable,
