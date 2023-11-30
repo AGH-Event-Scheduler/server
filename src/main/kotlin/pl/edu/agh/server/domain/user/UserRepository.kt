@@ -46,7 +46,6 @@ interface UserRepository : BaseRepository<User> {
             "WHERE (our.organization.id = :organizationId OR our.organization.id IS NULL) " +
             "AND (u.name LIKE %:search% OR u.lastName LIKE %:search% OR u.email LIKE %:search% " +
             "OR CONCAT(u.name, ' ', u.lastName) LIKE %:search%) " +
-            "AND NOT LOWER(u.name) LIKE '%admin%' AND NOT LOWER(u.lastName) LIKE '%admin%' AND NOT LOWER(u.email) LIKE '%admin%' " +
             "ORDER BY u.name ASC",
     )
     fun findAllUsersWithRoleForOrganizationFiltered(
