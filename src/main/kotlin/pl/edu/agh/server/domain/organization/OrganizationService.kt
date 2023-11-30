@@ -127,7 +127,7 @@ class OrganizationService(
 
     @Transactional
     fun assignUserRole(organizationId: Long, userId: Long, role: OrganizationRole) {
-        if (!userOrganizationRoleRepository.existsByOrganizationIdAndUserIdAndRole(organizationId, userId, role)) {
+        if (userOrganizationRoleRepository.existsByOrganizationIdAndUserIdAndRole(organizationId, userId, role).not()) {
             val organization = organizationRepository.findById(organizationId).orElseThrow()
             val user = userRepository.findById(userId).orElseThrow()
 
@@ -138,6 +138,14 @@ class OrganizationService(
             )
 
             userOrganizationRoleRepository.save(newAssignment)
+        }
+    }
+
+    @Transactional
+    fun removeUserRoles(organizationId: Long, userId: Long) {
+        val userOrganizationRoles = userOrganizationRoleRepository.findByOrganizationIdAndUserId(organizationId, userId)
+        if (userOrganizationRoles.isNotEmpty()) {
+            userOrganizationRoleRepository.deleteAll(userOrganizationRoles)
         }
     }
 }

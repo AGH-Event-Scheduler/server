@@ -75,10 +75,16 @@ class UserController(
     fun grantOrganizationRole(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,
-        @RequestParam("role") role: OrganizationRole,
+        @RequestParam("role", required = false) role: OrganizationRole?,
         @RequestParam("email") email: String,
     ): ResponseEntity<Void> {
-        organizationService.assignUserRole(organizationId, userService.getUserIdByEmail(email), role)
+        val userId = userService.getUserIdByEmail(email)
+
+        when (role) {
+            null -> organizationService.removeUserRoles(organizationId, userId)
+            else -> organizationService.assignUserRole(organizationId, userId, role)
+        }
+
         return ResponseEntity.ok().build()
     }
 }
