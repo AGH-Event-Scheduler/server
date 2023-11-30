@@ -8,7 +8,6 @@ import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
-import java.util.*
 
 @Entity
 @Table(
@@ -24,7 +23,7 @@ import java.util.*
 @Data
 @EqualsAndHashCode(callSuper = true)
 class Translation(
-    @Column(length = 1000)
+    @Column(length = 2000)
     var content: String,
     var language: LanguageOption,
 ) : BaseIdentifiableEntity()

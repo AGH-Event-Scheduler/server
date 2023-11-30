@@ -1,10 +1,6 @@
 package pl.edu.agh.server.domain.notification
 
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.ManyToMany
-import jakarta.persistence.OneToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import lombok.Data
 import lombok.EqualsAndHashCode
 import lombok.ToString

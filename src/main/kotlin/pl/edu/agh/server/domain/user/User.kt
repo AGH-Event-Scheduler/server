@@ -13,6 +13,7 @@ import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.event.Event
 import pl.edu.agh.server.domain.notification.Notification
 import pl.edu.agh.server.domain.organization.Organization
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRole
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
 
 @Entity
@@ -59,6 +60,9 @@ class User(
 
     @OneToMany(mappedBy = "user")
     private val tokens: List<Token> = mutableListOf()
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    var organizationUserRoles: MutableList<OrganizationUserRole> = mutableListOf()
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(role.name))

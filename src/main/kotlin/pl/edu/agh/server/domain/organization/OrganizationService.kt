@@ -18,6 +18,9 @@ import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.translation.TranslationService
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRole
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRoleRepository
 import pl.edu.agh.server.foundation.application.BaseServiceUtilities
 import java.util.*
 
@@ -26,6 +29,7 @@ class OrganizationService(
     private val userRepository: UserRepository,
     private val organizationRepository: OrganizationRepository,
     private val modelMapper: ModelMapper,
+    private val userOrganizationRoleRepository: OrganizationUserRoleRepository,
     private val translationService: TranslationService,
     private val imageService: ImageService,
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
@@ -84,14 +88,20 @@ class OrganizationService(
             logoImage = logoImage,
         )
         return organizationRepository.save(newOrganization)
-    }
+    } //    FIXME use function from base service once NullPointerException is fixed
 
-//    FIXME use function from base service once NullPointerException is fixed
-    override fun getAllWithSpecificationPageable(specification: Specification<Organization>, pageable: PageRequest): List<Organization> {
+    override fun getAllWithSpecificationPageable(
+        specification: Specification<Organization>,
+        pageable: PageRequest,
+    ): List<Organization> {
         return organizationRepository.findAll(specification, pageable).content
     }
 
-    fun transformToOrganizationDTO(organizations: List<Organization>, language: LanguageOption, userName: String? = null): List<OrganizationDTO> {
+    fun transformToOrganizationDTO(
+        organizations: List<Organization>,
+        language: LanguageOption,
+        userName: String? = null,
+    ): List<OrganizationDTO> {
         val user: Optional<User> = userName?.let { userRepository.findByEmail(it) } ?: Optional.empty()
         return organizations.map {
             modelMapper.map(it, OrganizationDTO::class.java).apply {
@@ -101,11 +111,32 @@ class OrganizationService(
             }
         }
     }
+
     private fun getTranslatedContent(translations: Set<Translation>, language: LanguageOption): String {
         return translations.firstOrNull { translation -> translation.language === language }?.content ?: ""
     }
 
-    fun transformToOrganizationDTO(organization: Organization, language: LanguageOption, userName: String? = null): OrganizationDTO {
+    fun transformToOrganizationDTO(
+        organization: Organization,
+        language: LanguageOption,
+        userName: String? = null,
+    ): OrganizationDTO {
         return transformToOrganizationDTO(listOf(organization), language, userName).first()
+    }
+
+    @Transactional
+    fun assignUserRole(organizationId: Long, userId: Long, role: OrganizationRole) {
+        if (!userOrganizationRoleRepository.existsByOrganizationIdAndUserIdAndRole(organizationId, userId, role)) {
+            val organization = organizationRepository.findById(organizationId).orElseThrow()
+            val user = userRepository.findById(userId).orElseThrow()
+
+            val newAssignment = OrganizationUserRole(
+                user = user,
+                organization = organization,
+                role = role,
+            )
+
+            userOrganizationRoleRepository.save(newAssignment)
+        }
     }
 }

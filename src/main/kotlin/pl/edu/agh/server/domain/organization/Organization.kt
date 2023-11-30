@@ -10,8 +10,8 @@ import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.LogoImage
 import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.user.User
+import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRole
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
-import java.util.*
 
 @Entity
 @Table(name = "Organization")
@@ -37,5 +37,8 @@ class Organization(
 
     @ManyToMany(mappedBy = "followedOrganizations")
     var followedByUsers: MutableSet<User> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    var organizationUserRoles: MutableList<OrganizationUserRole> = mutableListOf(),
 
 ) : BaseIdentifiableEntity()

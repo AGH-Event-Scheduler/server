@@ -69,12 +69,12 @@ class EventService(
     }
 
     @Transactional
-    fun reenableEvent(eventId: Long) {
+    fun reactivateEvent(eventId: Long) {
         val event = eventRepository.findById(eventId)
             .orElseThrow { throw EventNotFoundException(eventId) }
         event.canceled = false
         val updatedEvent = eventRepository.save(event)
-        notificationService.notifyAboutEventReenable(updatedEvent)
+        notificationService.notifyAboutEventReactivate(updatedEvent)
     }
 
     @Transactional
