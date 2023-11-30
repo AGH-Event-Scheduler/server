@@ -40,6 +40,9 @@ class UserController(
         @PathVariable organizationId: Long,
         pageable: Pageable,
     ): Page<UserWithRoleDTO> {
+        if (search != null) {
+            return userRepository.findAllUsersWithRoleForOrganizationFiltered(pageable, organizationId, search) // TODO to be changed to specifications later
+        }
         return userRepository.findAllUsersWithRoleForOrganization(pageable, organizationId)
     }
 

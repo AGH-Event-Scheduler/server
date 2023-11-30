@@ -24,13 +24,35 @@ interface UserRepository : BaseRepository<User> {
             " u.lastName," +
             " our.role," +
             " our.organization.id) " +
-            "FROM User u LEFT JOIN OrganizationUserRole our on  our.organization.id = :organizationId" +
-            " AND our.user.id = u.id " +
-            " where our.organization.id = :organizationId OR our.organization.id IS NULL",
+            "FROM User u LEFT JOIN OrganizationUserRole our ON  our.organization.id = :organizationId " +
+            "AND our.user.id = u.id " +
+            "WHERE our.organization.id = :organizationId OR our.organization.id IS NULL " +
+            "ORDER BY u.name ASC",
     )
     fun findAllUsersWithRoleForOrganization(
         pageable: Pageable,
         @Param("organizationId") organizationId: Long,
+    ): Page<UserWithRoleDTO>
+
+    @Query(
+        "SELECT new pl.edu.agh.server.domain.dto.UserWithRoleDTO(" +
+            "u.email," +
+            " u.name," +
+            " u.lastName," +
+            " our.role," +
+            " our.organization.id) " +
+            "FROM User u " +
+            "LEFT JOIN OrganizationUserRole our ON our.organization.id = :organizationId AND our.user.id = u.id " +
+            "WHERE (our.organization.id = :organizationId OR our.organization.id IS NULL) " +
+            "AND (u.name LIKE %:search% OR u.lastName LIKE %:search% OR u.email LIKE %:search% " +
+            "OR CONCAT(u.name, ' ', u.lastName) LIKE %:search%) " +
+            "AND NOT LOWER(u.name) LIKE '%admin%' AND NOT LOWER(u.lastName) LIKE '%admin%' AND NOT LOWER(u.email) LIKE '%admin%' " +
+            "ORDER BY u.name ASC",
+    )
+    fun findAllUsersWithRoleForOrganizationFiltered(
+        pageable: Pageable,
+        @Param("organizationId") organizationId: Long,
+        @Param("search") search: String,
     ): Page<UserWithRoleDTO>
 
     @Query(
