@@ -15,9 +15,8 @@ import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.image.LogoImage
 import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
-import pl.edu.agh.server.domain.student.Student
-import pl.edu.agh.server.domain.student.StudentRepository
 import pl.edu.agh.server.domain.translation.LanguageOption
+import pl.edu.agh.server.domain.user.Role
 import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
 import java.awt.image.BufferedImage
@@ -30,7 +29,6 @@ import javax.imageio.ImageIO
 
 @Configuration
 class DataLoader(
-    private val studentRepository: StudentRepository,
     private val organizationRepository: OrganizationRepository,
     private val authenticationService: AuthenticationService,
     private val eventRepository: EventRepository,
@@ -47,9 +45,6 @@ class DataLoader(
             removeImages()
         }
         if (mockData) {
-            val student = Student("472924", "Kamil", "Błażewicz")
-            studentRepository.save(student)
-
             createOrganizationsAndEvents()
             createUsers()
             assignRoles()
@@ -807,11 +802,10 @@ class DataLoader(
 
     private fun assignRoles() {
         val admin = userRepository.findByEmail("admin@agh.edu.pl").get()
-        organizationRepository.findAll().forEach { organization ->
-            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.HEAD)
-        }
         userRepository.findAll().forEach { user ->
             organizationService.assignUserRole(1, user.id!!, OrganizationRole.HEAD)
         }
+        admin.role = Role.ADMIN
+        userRepository.save(admin)
     }
 }

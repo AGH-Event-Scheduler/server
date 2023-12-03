@@ -90,4 +90,14 @@ class UserController(
 
         return ResponseEntity.ok().build()
     }
+
+    @GetMapping("/admin")
+    fun isAdmin(request: HttpServletRequest): ResponseEntity<Boolean> {
+        return ResponseEntity.ok(userService.isAdmin(request))
+    }
+
+    @GetMapping("/any-organization-roles")
+    fun hasAnyRoleAssigned(request: HttpServletRequest): ResponseEntity<Boolean> {
+        return ResponseEntity.ok(userService.hasAnyRoleAssigned(request))
+    }
 }

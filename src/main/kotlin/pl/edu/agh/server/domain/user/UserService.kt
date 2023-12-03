@@ -40,4 +40,14 @@ class UserService(
             throw AuthorizationException("JWT Authorization Problem")
         }
     }
+
+    fun isAdmin(request: HttpServletRequest): Boolean {
+        val username = jwtService.extractUsername(request.getHeader("Authorization")!!.substring(7))
+        val user = userRepository.findByEmail(username).orElseThrow { UserNotFoundException(username) }
+        return user.role == Role.ADMIN
+    }
+
+    fun hasAnyRoleAssigned(request: HttpServletRequest): Boolean? {
+        return isAdmin(request) || organizationUserRoleRepository.existsByUserId(getUserId(request))
+    }
 }

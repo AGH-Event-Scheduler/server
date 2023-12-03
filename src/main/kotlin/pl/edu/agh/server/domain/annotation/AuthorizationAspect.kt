@@ -24,6 +24,7 @@ class AuthorizationAspect(
         request: HttpServletRequest,
         organizationId: Long,
     ) {
+        if (userService.isAdmin(request)) return
         val userAuthorities =
             organizationUserRoleRepository.findByOrganizationIdAndUserId(organizationId, userService.getUserId(request))
         userAuthorities.stream()
@@ -37,6 +38,7 @@ class AuthorizationAspect(
         request: HttpServletRequest,
         eventId: Long,
     ) {
+        if (userService.isAdmin(request)) return
         val organizationId = eventRepository.findOrganizationIdById(eventId)
             .orElseThrow { throw AuthorizationException("Event does not exist") }
         val userAuthorities =
