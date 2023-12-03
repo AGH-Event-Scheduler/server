@@ -7,5 +7,5 @@ data class CreateOrganizationRequest(
     val logoImage: MultipartFile,
     val name: String,
     val description: String,
-    val leaderEmail: String
+    val leaderEmail: String,
 )

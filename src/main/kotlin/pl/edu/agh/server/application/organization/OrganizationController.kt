@@ -69,6 +69,27 @@ class OrganizationController(
         return ResponseEntity.ok(organizations)
     }
 
+    //    @AuthorizeAccess(allowedRoles = ["ADMIN"])
+    @PostMapping
+    fun createOrganization(
+        request: HttpServletRequest,
+        @ModelAttribute createOrganizationRequest: CreateOrganizationRequest,
+    ): ResponseEntity<OrganizationDTO> {
+        val objectMapper = jacksonObjectMapper()
+        val nameMap: Map<LanguageOption, String> = objectMapper.readValue(createOrganizationRequest.name)
+        val descriptionMap: Map<LanguageOption, String> = objectMapper.readValue(createOrganizationRequest.description)
+
+        val organization = organizationService.createOrganization(
+            logoImageFile = createOrganizationRequest.logoImage,
+            backgroundImageFile = createOrganizationRequest.backgroundImage,
+            nameMap = nameMap,
+            descriptionMap = descriptionMap,
+            leaderEmail = createOrganizationRequest.leaderEmail,
+        )
+
+        return ResponseEntity.ok(organizationService.transformToOrganizationDTO(organization, LanguageOption.PL, getUserName(request)))
+    }
+
     @GetMapping("/{organizationId}")
     fun getOrganizationById(
         request: HttpServletRequest,
@@ -83,24 +104,5 @@ class OrganizationController(
                 getUserName(request),
             ),
         )
-    }
-
-    @PostMapping
-    fun createOrganization(
-        @RequestBody createOrganizationRequest: CreateOrganizationRequest,
-        request: HttpServletRequest
-    ): ResponseEntity<OrganizationDTO> {
-        val objectMapper = jacksonObjectMapper()
-        val nameMap: Map<LanguageOption, String> = objectMapper.readValue(createOrganizationRequest.name)
-        val descriptionMap: Map<LanguageOption, String> = objectMapper.readValue(createOrganizationRequest.description)
-
-        val organization = organizationService.createOrganization(
-            logoImageFile = createOrganizationRequest.logoImage,
-            backgroundImageFile = createOrganizationRequest.backgroundImage,
-            nameMap = nameMap,
-            descriptionMap = descriptionMap,
-        )
-
-        return ResponseEntity.ok(organizationService.transformToOrganizationDTO(organization, LanguageOption.PL, getUserName(request)))
     }
 }

@@ -13,11 +13,13 @@ import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.image.ImageService.IncorrectFileUploadException
 import pl.edu.agh.server.domain.image.LogoImage
+import pl.edu.agh.server.domain.notification.NotificationService
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.translation.Translation
 import pl.edu.agh.server.domain.translation.TranslationService
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
+import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRole
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationUserRoleRepository
@@ -32,6 +34,8 @@ class OrganizationService(
     private val userOrganizationRoleRepository: OrganizationUserRoleRepository,
     private val translationService: TranslationService,
     private val imageService: ImageService,
+    private val userService: UserService,
+    private val notificationService: NotificationService,
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
 
     @Transactional
@@ -65,6 +69,7 @@ class OrganizationService(
         backgroundImageFile: MultipartFile?,
         nameMap: Map<LanguageOption, String>,
         descriptionMap: Map<LanguageOption, String>,
+        leaderEmail: String,
     ): Organization {
         val backgroundImage: BackgroundImage
         val logoImage: LogoImage
@@ -87,7 +92,14 @@ class OrganizationService(
             backgroundImage = backgroundImage,
             logoImage = logoImage,
         )
-        return organizationRepository.save(newOrganization)
+        val organization = organizationRepository.save(newOrganization)
+
+        val user = userService.getUserByEmail(leaderEmail)
+        assignUserRole(organization.id!!, user.id!!, OrganizationRole.HEAD)
+
+        notificationService.notifyAboutOrganizationCreation(organization)
+
+        return organization
     } //    FIXME use function from base service once NullPointerException is fixed
 
     override fun getAllWithSpecificationPageable(
