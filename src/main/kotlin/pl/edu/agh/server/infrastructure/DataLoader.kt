@@ -50,8 +50,8 @@ class DataLoader(
             val student = Student("472924", "Kamil", "Błażewicz")
             studentRepository.save(student)
 
-            createOrganizationsAndEvents()
             createUsers()
+            createOrganizationsAndEvents()
             assignRoles()
         }
     }
@@ -85,6 +85,7 @@ class DataLoader(
                     "\n" +
                     "In addition to developing our passions, we also share our knowledge in the field of studies by conducting introductory classes in the fields of mathematics and computer science for people who have not had contact with these issues before. All this to exchange experience and prepare faster and better for classes at the university.",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
         eventService.createEvent(
             organizationId = knBit.id!!,
@@ -190,6 +191,7 @@ class DataLoader(
                     "\n" +
                     "Together, we work to popularize science, especially sociology. Through implemented projects, we learn research methods and techniques - useful not only in the academic world, but also on the labor market.",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
         eventService.createEvent(
             organizationId = knSociology.id!!,
@@ -268,6 +270,7 @@ class DataLoader(
                 LanguageOption.PL to "Celem Koło Naukowe BioMedical Innovations jest rozbudzanie zainteresowań pracą naukową oraz badawczą w zakresie przetwarzania i analizy obrazów cyfrowych, stosowanych we współczesnej biologii i medycynie. Prezentujemy swoje osiągnięcia i dzielą się doświadczeniami, przemyśleniami, wnioskami oraz analizą z resztą członków, tworząc atmosferę sprzyjającą rozwojowi w jakże interesującej dziedzinie obrazowania medycznego.",
                 LanguageOption.EN to "The aim of the BioMedical Innovations Scientific Club is to stimulate interest in scientific and research work in the field of processing and analysis of digital images used in modern biology and medicine. We present our achievements and share experiences, thoughts, conclusions and analysis with the rest of the members, creating an atmosphere conducive to development in the interesting field of medical imaging.",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
         eventService.createEvent(
             organizationId = biomedical.id!!,
@@ -344,6 +347,7 @@ class DataLoader(
                     "\n" +
                     "We work with companies and research teams in the city of Krakow and beyond. As a result of cooperation, Creative members have the opportunity to participate in trips to research centers, engineering offices and production plants, where they can learn more about the company’s profile. What’s more, often mentioned companies send us information about the possibility of taking up an internship or work in their company because they value the activity of our circle.",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
         eventService.createEvent(
             organizationId = creative.id!!,
@@ -457,6 +461,7 @@ class DataLoader(
                 LanguageOption.PL to "AGH Eko-Energia jest jednym z największych kół naukowych działających na Akademii Górniczo-Hutniczej w Krakowie. Rozwijane przez nas projektu koncentrują się na branży odnawialnych źródeł energii i nowoczesnych technologii.",
                 LanguageOption.EN to "AGH Eko-Energia is one of the largest scientific groups operating at the AGH University of Science and Technology in Krakow. The projects we develop focus on the renewable energy industry and modern technologies.",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
         eventService.createEvent(
             organizationId = ecoEnergy.id!!,
@@ -528,6 +533,7 @@ class DataLoader(
                 LanguageOption.PL to "Koło Naukowe Geos Informatica",
                 LanguageOption.EN to "Geos Informatica Scientific Club",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
     }
 
@@ -540,6 +546,7 @@ class DataLoader(
                 LanguageOption.PL to "Koło naukowe 4Society zajmuje się działalnością naukową z pogranicza nauk społecznych i technologii. Koło stawia sobie za cel poszerzanie wiedzy studentów, prowadzenie badań naukowych w kontekście zmieniającego się społeczeństwa informacyjnego, organizowanie spotkań i debat z ludźmi ze świata nauki oraz tworzenie wartościowych treści, zawierających rzetelną i przejrzystą wiedzę społeczną.",
                 LanguageOption.EN to "The 4Society scientific club is engaged in scientific activities at the intersection of social sciences and technology. The group's goals are to expand students' knowledge, conduct scientific research in the context of the changing information society, organize meetings and debates with people from the world of science, and create valuable content containing reliable and transparent social knowledge.",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
     }
 
@@ -552,6 +559,7 @@ class DataLoader(
                 LanguageOption.PL to "KN Energon jest kołem zrzeszającym studentów zafascynowanych inżynierią, technologią i biomimetyką. W naszej organizacji tworzymy projekty oparte o inżynierię mechanicnzą i materiałową. W projektach koncentrujemy się często na sposobie rozprowadzenia i reakcji energii w mechanizmach. W głównym projekcie, nad którym pracujemy, czyli trebuszu \"Huragan\" wykorzystujemy biomimetyzm, aby stworzyć nowoczesny trebusz o jak największej sprawności!",
                 LanguageOption.EN to "KN Energon is a club of students fascinated by engineering, technology and biomimetics. In our organization, we create projects based on mechanical and material engineering. In projects, we often focus on the way energy is distributed and reacted in mechanisms. In the main project we are working on, the \"Hurricane\" trebuchet, we use biomimetism to create a modern trebuchet with the highest possible efficiency!",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
         eventService.createEvent(
             organizationId = energon.id!!,
@@ -639,6 +647,7 @@ class DataLoader(
                 LanguageOption.PL to "KN Larp to organizacja studencka zrzeszająca miłośników LARPów (live-action role playing). LARP to wydarzenie z pogranicza gry i przedstawienia teatralnego, podczas którego uczestnicy odgrywają i przeżywają różnego rodzaju historie, osadzone w rozmaitych konwencjach fabularnych. Misją koła jest: organizacja i popularyzacja LARPów, badanie tego zjawiska społecznego oraz tworzenie metod i technologii wspomagających projektowanie LARPów i wzbogacających rozgrywkę. Do współpracy zapraszamy zarówno twórców, doświadczonych graczy, jak i osoby, które nie miały dotychczas styczności z tą formą aktywności. Zachęcamy też do udziału w przygotowanych przez nas wydarzeniach. Chcesz poznać nas lepiej, wziąć udział w naszych wydarzeniach lub dołączyć do zespołu? Skontaktuj się z nami! ",
                 LanguageOption.EN to "KN Larp is a student organization bringing together LARP (live-action role playing) enthusiasts. LARP is an event on the border between a game and a theatrical performance, during which participants act out and experience various types of stories set in various plot conventions. The mission of the club is: to organize and popularize LARPs, research this social phenomenon and create methods and technologies supporting the design of LARPs and enriching the gameplay. We invite both creators, experienced players and people who have not had any contact with this form of activity to cooperate with us. We also encourage you to participate in the events we have prepared. Do you want to get to know us better, take part in our events or join the team? Contact us!",
             ),
+            leaderEmail = "admin@agh.edu.pl",
         )
         eventService.createEvent(
             organizationId = larp.id!!,
@@ -794,7 +803,6 @@ class DataLoader(
         val admin = userRepository.findByEmail("admin@agh.edu.pl").get()
         organizationRepository.findAll().forEach { organization ->
             organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.CONTENT_CREATOR)
-            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.HEAD)
         }
     }
 }

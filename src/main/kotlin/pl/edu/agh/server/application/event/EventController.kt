@@ -130,7 +130,7 @@ class EventController(
     fun createEventForOrganization(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,
-        @RequestBody eventCreationRequest: EventCreationRequest,
+        @ModelAttribute eventCreationRequest: EventCreationRequest,
     ): ResponseEntity<EventDTO> {
         val objectMapper = jacksonObjectMapper()
         val nameMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.name)

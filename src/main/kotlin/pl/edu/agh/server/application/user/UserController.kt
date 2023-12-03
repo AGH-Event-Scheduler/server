@@ -57,4 +57,12 @@ class UserController(
         organizationService.assignUserRole(organizationId, userService.getUserIdByEmail(email), role)
         return ResponseEntity.ok().build()
     }
+
+    @GetMapping("/exist")
+    @AuthorizeAccess(allowedRoles = ["ADMIN"])
+    fun checkUserExist(
+        @RequestParam("email") email: String,
+    ): ResponseEntity<Boolean> {
+        return ResponseEntity.ok(userService.checkUserExist(email))
+    }
 }
