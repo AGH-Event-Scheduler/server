@@ -17,6 +17,8 @@ interface UserRepository : BaseRepository<User> {
     @Query("SELECT u.id FROM User u WHERE u.email = :email")
     fun findIdByEmail(email: String): Optional<Long>
 
+    fun existsByEmail(email: String): Boolean
+
     @Query(
         "SELECT new pl.edu.agh.server.domain.dto.UserWithRoleDTO(" +
             "u.email," +

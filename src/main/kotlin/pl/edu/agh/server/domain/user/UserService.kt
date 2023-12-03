@@ -14,6 +14,10 @@ class UserService(
     private val jwtService: JwtService,
     private val organizationUserRoleRepository: OrganizationUserRoleRepository,
 ) {
+    fun checkUserExist(userName: String): Boolean {
+        return userRepository.existsByEmail(userName)
+    }
+
     fun getUserByEmail(userName: String): User {
         return userRepository.findByEmail(userName).orElseThrow { UserNotFoundException(userName) }
     }

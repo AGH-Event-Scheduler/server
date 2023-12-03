@@ -91,6 +91,14 @@ class UserController(
         return ResponseEntity.ok().build()
     }
 
+    @GetMapping("/exist")
+    @AuthorizeAccess(allowedRoles = ["ADMIN"])
+    fun checkUserExist(
+        @RequestParam("email") email: String,
+    ): ResponseEntity<Boolean> {
+        return ResponseEntity.ok(userService.checkUserExist(email))
+    }
+
     @GetMapping("/admin")
     fun isAdmin(request: HttpServletRequest): ResponseEntity<Boolean> {
         return ResponseEntity.ok(userService.isAdmin(request))
