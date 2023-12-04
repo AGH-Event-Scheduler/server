@@ -85,7 +85,7 @@ class ImageService(private val imageStorage: ImageStorage) {
         )
     }
 
-    fun removeBackgroundImage(imageId: UUID) {
+    fun removeImage(imageId: UUID) {
         imageStorage.deleteImage(imageId)
     }
 

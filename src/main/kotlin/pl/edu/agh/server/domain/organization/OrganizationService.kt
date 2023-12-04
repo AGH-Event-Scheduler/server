@@ -71,37 +71,47 @@ class OrganizationService(
         descriptionMap: Map<LanguageOption, String>,
         leaderEmail: String,
     ): Organization {
-        val backgroundImage: BackgroundImage
-        val logoImage: LogoImage
+        var backgroundImage: BackgroundImage? = null
+        var logoImage: LogoImage? = null
+        try {
+            if (backgroundImageFile != null) {
+                backgroundImage = imageService.createBackgroundImage(backgroundImageFile)
+            } else {
+                throw IncorrectFileUploadException("Uploaded file does not exist")
+            }
 
-        if (backgroundImageFile != null) {
-            backgroundImage = imageService.createBackgroundImage(backgroundImageFile)
-        } else {
-            throw IncorrectFileUploadException("Uploaded file does not exist")
+            if (logoImageFile != null) {
+                logoImage = imageService.createLogoImage(logoImageFile)
+            } else {
+                throw IncorrectFileUploadException("Uploaded file does not exist")
+            }
+
+            val newOrganization = Organization(
+                name = translationService.createTranslation(nameMap),
+                description = translationService.createTranslation(descriptionMap),
+                backgroundImage = backgroundImage,
+                logoImage = logoImage,
+            )
+            val organization = organizationRepository.save(newOrganization)
+
+            val user = userService.getUserByEmail(leaderEmail)
+            assignUserRole(organization.id!!, user.id!!, OrganizationRole.HEAD)
+
+            notificationService.notifyAboutOrganizationCreation(organization)
+
+            return organization
+        } catch (e: RuntimeException) {
+            if (backgroundImage != null) {
+                imageService.removeImage(backgroundImage.imageId)
+            }
+            if (logoImage != null) {
+                imageService.removeImage(logoImage.imageId)
+            }
+            throw e
         }
+    }
 
-        if (logoImageFile != null) {
-            logoImage = imageService.createLogoImage(logoImageFile)
-        } else {
-            throw IncorrectFileUploadException("Uploaded file does not exist")
-        }
-
-        val newOrganization = Organization(
-            name = translationService.createTranslation(nameMap),
-            description = translationService.createTranslation(descriptionMap),
-            backgroundImage = backgroundImage,
-            logoImage = logoImage,
-        )
-        val organization = organizationRepository.save(newOrganization)
-
-        val user = userService.getUserByEmail(leaderEmail)
-        assignUserRole(organization.id!!, user.id!!, OrganizationRole.HEAD)
-
-        notificationService.notifyAboutOrganizationCreation(organization)
-
-        return organization
-    } //    FIXME use function from base service once NullPointerException is fixed
-
+//    FIXME use function from base service once NullPointerException is fixed
     override fun getAllWithSpecificationPageable(
         specification: Specification<Organization>,
         pageable: PageRequest,
