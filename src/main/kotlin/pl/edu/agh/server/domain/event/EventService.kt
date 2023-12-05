@@ -87,33 +87,39 @@ class EventService(
         startDate: Date,
         endDate: Date,
     ): Event {
-        val savedBackgroundImage: BackgroundImage
-        val organization = organizationRepository.findById(organizationId).orElseThrow { OrganizationNotFoundException(organizationId) }
+        var newSavedBackgroundImage: BackgroundImage? = null
+        try {
+            val organization = organizationRepository.findById(organizationId).orElseThrow { OrganizationNotFoundException(organizationId) }
 
-//        TODO make it transactional - remove created image on failure
-        if (backgroundImage != null) {
-            savedBackgroundImage = imageService.createBackgroundImage(backgroundImage)
-        } else {
-            throw IncorrectFileUploadException("Uploaded file does not exist")
+            if (backgroundImage != null) {
+                newSavedBackgroundImage = imageService.createBackgroundImage(backgroundImage)
+            } else {
+                throw IncorrectFileUploadException("Uploaded file does not exist")
+            }
+
+            val newEvent = Event(
+                name = translationService.createTranslation(nameMap),
+                description = translationService.createTranslation(descriptionMap),
+                location = translationService.createTranslation(locationMap),
+                startDate = startDate,
+                endDate = endDate,
+                organization = organization,
+                backgroundImage = newSavedBackgroundImage,
+            )
+
+            val savedEvent = eventRepository.save(newEvent)
+            organization.events.add(savedEvent)
+            organizationRepository.save(organization)
+
+            notificationService.notifyAboutEventCreation(savedEvent)
+
+            return savedEvent
+        } catch (e: RuntimeException) {
+            if (newSavedBackgroundImage != null) {
+                imageService.removeImage(newSavedBackgroundImage.imageId)
+            }
+            throw e
         }
-
-        val newEvent = Event(
-            name = translationService.createTranslation(nameMap),
-            description = translationService.createTranslation(descriptionMap),
-            location = translationService.createTranslation(locationMap),
-            startDate = startDate,
-            endDate = endDate,
-            organization = organization,
-            backgroundImage = savedBackgroundImage,
-        )
-
-        val savedEvent = eventRepository.save(newEvent)
-        organization.events.add(savedEvent)
-        organizationRepository.save(organization)
-
-        notificationService.notifyAboutEventCreation(savedEvent)
-
-        return savedEvent
     }
 
     @Transactional
@@ -126,25 +132,34 @@ class EventService(
         startDate: Date,
         endDate: Date,
     ): Event {
-        val event = eventRepository.findById(eventId).orElseThrow { throw EventNotFoundException(eventId) }
+        var newSavedBackgroundImage: BackgroundImage? = null
+        try {
+            val event = eventRepository.findById(eventId).orElseThrow { throw EventNotFoundException(eventId) }
 
-//        TODO make it transactional - remove previous image and current on failure
-        if (backgroundImage != null) {
-            val savedBackgroundImage: BackgroundImage = imageService.createBackgroundImage(backgroundImage)
-            event.backgroundImage = savedBackgroundImage
+            val previouslySavedBackgroundImage = event.backgroundImage
+            if (backgroundImage != null) {
+                newSavedBackgroundImage = imageService.createBackgroundImage(backgroundImage)
+                event.backgroundImage = newSavedBackgroundImage
+            }
+
+            event.name = translationService.createTranslation(nameMap)
+            event.description = translationService.createTranslation(descriptionMap)
+            event.location = translationService.createTranslation(locationMap)
+            event.startDate = startDate
+            event.endDate = endDate
+
+            val savedEvent = eventRepository.save(event)
+            imageService.removeImage(previouslySavedBackgroundImage.imageId)
+
+            notificationService.notifyAboutEventUpdate(savedEvent)
+
+            return savedEvent
+        } catch (e: RuntimeException) {
+            if (newSavedBackgroundImage != null) {
+                imageService.removeImage(newSavedBackgroundImage.imageId)
+            }
+            throw e
         }
-
-        event.name = translationService.createTranslation(nameMap)
-        event.description = translationService.createTranslation(descriptionMap)
-        event.location = translationService.createTranslation(locationMap)
-        event.startDate = startDate
-        event.endDate = endDate
-
-        val savedEvent = eventRepository.save(event)
-
-        notificationService.notifyAboutEventUpdate(savedEvent)
-
-        return savedEvent
     }
 
     fun getEvent(eventId: Long): Event {
