@@ -64,6 +64,10 @@ class User(
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var organizationUserRoles: MutableList<OrganizationUserRole> = mutableListOf()
 
+    var verificationToken: String? = null
+
+    var enabled: Boolean = false
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(role.name))
     }
@@ -89,6 +93,6 @@ class User(
     }
 
     override fun isEnabled(): Boolean {
-        return true
+        return enabled
     }
 }

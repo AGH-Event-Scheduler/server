@@ -15,6 +15,7 @@ import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.authentication.token.TokenCategory
 import pl.edu.agh.server.domain.authentication.token.TokenRepository
+import pl.edu.agh.server.domain.mail.EmailService
 import pl.edu.agh.server.domain.user.Role
 import pl.edu.agh.server.domain.user.User
 import pl.edu.agh.server.domain.user.UserRepository
@@ -28,6 +29,7 @@ class AuthenticationService(
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
     private val tokenRepository: TokenRepository,
+    private val emailService: EmailService,
 ) {
     fun register(request: RegisterRequest) {
         val user = User(
@@ -37,12 +39,16 @@ class AuthenticationService(
             lastName = request.lastName,
             role = Role.USER,
         )
+        user.verificationToken = generateVerificationToken()
         userRepository.save(user)
+
+        emailService.sendVerificationEmail(user.email, user.verificationToken!!)
     }
 
     fun authenticate(request: AuthenticationRequest): AuthenticationResponse {
         authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.email, request.password))
         val user = userRepository.findByEmail(request.email).orElseThrow { throw Exception("User not found") }
+        if (!user.enabled) throw Exception("User not verified")
         revokeAllUserAccessTokens(user.id!!)
         val accessToken = jwtService.generateToken(user)
         val refreshToken = jwtService.generateRefreshToken(user)
@@ -102,5 +108,20 @@ class AuthenticationService(
             .orElseThrow { throw Exception("User not found") }
         revokeAllUserAccessTokens(user.id!!)
         revokeRefreshToken(refreshToken)
+    }
+
+    fun generateVerificationToken(): String {
+        return UUID.randomUUID().toString()
+    }
+
+    fun verifyEmail(verificationToken: String) {
+        val user = userRepository.findByVerificationToken(verificationToken)
+            .orElseThrow { throw IllegalArgumentException("Invalid verification token") }
+
+        // TODO tokenExpirationTime
+
+        user.enabled = true
+        user.verificationToken = null
+        userRepository.save(user)
     }
 }

@@ -13,6 +13,12 @@ class EmailService(
 
     @Value("\${application.email.password}")
     private val emailPassword: String,
+
+    @Value("\${application.ip}")
+    private val ip: String,
+
+    @Value("\${application.port}")
+    private val port: String,
 ) {
 
     fun sendEmail(to: String, subject: String, message: String) {
@@ -28,5 +34,10 @@ class EmailService(
         }
 
         email.send()
+    }
+
+    fun sendVerificationEmail(to: String, verificationToken: String) {
+        val verificationLink = "http://$ip:$port/api/authentication/verify?token=$verificationToken"
+        sendEmail(to, "Account Verification", "Click link to verify account: $verificationLink")
     }
 }

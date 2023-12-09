@@ -64,4 +64,6 @@ interface UserRepository : BaseRepository<User> {
             "FROM User u",
     )
     fun findAllUsers(pageable: Pageable): Page<UserDTO>
+
+    fun findByVerificationToken(@Param("verificationToken") verificationToken: String): Optional<User>
 }
