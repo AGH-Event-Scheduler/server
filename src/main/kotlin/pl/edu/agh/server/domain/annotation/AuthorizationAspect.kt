@@ -46,4 +46,14 @@ class AuthorizationAspect(
         userAuthorities.stream()
             .anyMatch { it.role.name in authorizeAccess.allowedRoles } || throw AuthorizationException("User does not have required authority")
     }
+
+    @Before("@annotation(adminRestricted) && args(request, ..)")
+    fun beforeAdminAuthorizedMethod(
+        joinPoint: JoinPoint,
+        adminRestricted: AdminRestricted,
+        request: HttpServletRequest,
+    ) {
+        if (userService.isAdmin(request)) return
+        throw AuthorizationException("User does not have required authority")
+    }
 }

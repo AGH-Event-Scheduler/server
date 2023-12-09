@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
+import pl.edu.agh.server.domain.annotation.AdminRestricted
 import pl.edu.agh.server.domain.annotation.AuthorizeAccess
 import pl.edu.agh.server.domain.dto.UserDTO
 import pl.edu.agh.server.domain.dto.UserWithRoleDTO
@@ -92,7 +93,7 @@ class UserController(
     }
 
     @GetMapping("/exist")
-    @AuthorizeAccess(allowedRoles = ["ADMIN"])
+    @AdminRestricted
     fun checkUserExist(
         @RequestParam("email") email: String,
     ): ResponseEntity<Boolean> {

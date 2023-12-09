@@ -7,13 +7,11 @@ import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.authentication.RegisterRequest
 import pl.edu.agh.server.domain.authentication.AuthenticationService
-import pl.edu.agh.server.domain.event.EventRepository
 import pl.edu.agh.server.domain.event.EventService
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.image.LogoImage
-import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.user.Role
@@ -29,9 +27,7 @@ import javax.imageio.ImageIO
 
 @Configuration
 class DataLoader(
-    private val organizationRepository: OrganizationRepository,
     private val authenticationService: AuthenticationService,
-    private val eventRepository: EventRepository,
     private val imageStorage: ImageStorage,
     private val imageService: ImageService,
     private val eventService: EventService,
@@ -45,8 +41,8 @@ class DataLoader(
             removeImages()
         }
         if (mockData) {
-            createOrganizationsAndEvents()
             createUsers()
+            createOrganizationsAndEvents()
             assignRoles()
         }
     }
