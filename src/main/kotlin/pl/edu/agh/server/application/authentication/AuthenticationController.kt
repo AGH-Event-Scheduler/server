@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.domain.authentication.AuthenticationService
+import templates.VerificationView
 
 @RestController
 @RequestMapping("/api/authentication")
@@ -47,45 +48,11 @@ class AuthenticationController(
     fun verify(@RequestParam("token") verificationToken: String, response: HttpServletResponse) {
         try {
             authenticationService.verifyEmail(verificationToken)
-
-            val htmlContent = """
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Email Verification Successful</title>
-                    <style>
-                        body {
-                            font-family: 'Arial', sans-serif;
-                            text-align: center;
-                            margin: 20vh auto;
-                        }
-
-                        h1 {
-                            font-size: 2em;
-                            color: #0066cc; /* Change the color as desired */
-                        }
-
-                        p {
-                            font-size: 1.2em;
-                            color: #333; /* Change the color as desired */
-                        }
-                    </style>
-                </head>
-                <body>
-                    <h1>Email Verification Successful</h1>
-                    <p>You can now login to your application.</p>
-                </body>
-                </html>
-            """.trimIndent()
-
             response.contentType = "text/html"
-            response.writer.write(htmlContent)
+            response.writer.write(VerificationView.verificationSuccessHTML())
         } catch (e: Exception) {
-            response.contentType = "text/plain"
-            response.writer.write("Email Verification token is invalid or has expired.")
+            response.contentType = "text/html"
+            response.writer.write(VerificationView.verificationFailureHTML())
         }
     }
 }

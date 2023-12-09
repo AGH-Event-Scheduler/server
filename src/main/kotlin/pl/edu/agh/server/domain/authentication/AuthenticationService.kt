@@ -3,6 +3,7 @@ package pl.edu.agh.server.domain.authentication
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -30,6 +31,7 @@ class AuthenticationService(
     private val authenticationManager: AuthenticationManager,
     private val tokenRepository: TokenRepository,
     private val emailService: EmailService,
+    @Value("\${configuration.email.verification}") val verificationEnabled: Boolean,
 ) {
     fun register(request: RegisterRequest) {
         val user = User(
@@ -39,10 +41,13 @@ class AuthenticationService(
             lastName = request.lastName,
             role = Role.USER,
         )
+        if (verificationEnabled.not()) user.enabled = true
         user.verificationToken = generateVerificationToken()
         userRepository.save(user)
 
-        emailService.sendVerificationEmail(user.email, user.verificationToken!!)
+        if (verificationEnabled) {
+            emailService.sendVerificationEmail(user.email, user.verificationToken!!)
+        }
     }
 
     fun authenticate(request: AuthenticationRequest): AuthenticationResponse {
