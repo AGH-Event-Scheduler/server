@@ -68,12 +68,18 @@ class User(
 
     var enabled: Boolean = false
 
+    var newPassword: String? = null
+
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(role.name))
     }
 
     override fun getPassword(): String {
         return password
+    }
+
+    fun setPassword(password: String) {
+        this.password = password
     }
 
     override fun getUsername(): String {

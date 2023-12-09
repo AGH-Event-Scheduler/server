@@ -5,6 +5,7 @@ import org.apache.commons.mail.Email
 import org.apache.commons.mail.SimpleEmail
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.util.logging.Logger
 
 @Service
 class EmailService(
@@ -32,12 +33,17 @@ class EmailService(
             setMsg(message)
             addTo(to)
         }
-
+        Logger.getAnonymousLogger().info("Sending email to $to")
         email.send()
     }
 
-    fun sendVerificationEmail(to: String, verificationToken: String) {
+    fun sendEmailVerificationMail(to: String, verificationToken: String) {
         val verificationLink = "http://$ip:$port/api/authentication/verify?token=$verificationToken"
         sendEmail(to, "Account Verification", "Click link to verify account: $verificationLink")
+    }
+
+    fun sendPasswordChangeVerificationMail(to: String, verificationToken: String) {
+        val verificationLink = "http://$ip:$port/api/authentication/verify-password?token=$verificationToken"
+        sendEmail(to, "Password Change", "Click link to activate new password: $verificationLink")
     }
 }

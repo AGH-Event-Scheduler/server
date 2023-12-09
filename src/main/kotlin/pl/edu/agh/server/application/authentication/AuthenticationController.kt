@@ -5,8 +5,8 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import pl.edu.agh.server.application.authentication.responseview.VerificationView
 import pl.edu.agh.server.domain.authentication.AuthenticationService
-import templates.VerificationView
 
 @RestController
 @RequestMapping("/api/authentication")
@@ -49,10 +49,28 @@ class AuthenticationController(
         try {
             authenticationService.verifyEmail(verificationToken)
             response.contentType = "text/html"
-            response.writer.write(VerificationView.verificationSuccessHTML())
+            response.writer.write(VerificationView.emailVerificationSuccessHTML())
         } catch (e: Exception) {
             response.contentType = "text/html"
-            response.writer.write(VerificationView.verificationFailureHTML())
+            response.writer.write(VerificationView.emailVerificationFailureHTML())
+        }
+    }
+
+    @PostMapping("/reset-password")
+    fun prepareResetPassword(@RequestBody request: ResetPasswordRequest): ResponseEntity<Void> {
+        authenticationService.prepareForPasswordChange(request)
+        return ResponseEntity.ok().build()
+    }
+
+    @GetMapping("/verify-password")
+    fun verifyAndResetPassword(@RequestParam("token") verificationToken: String, response: HttpServletResponse) {
+        try {
+            authenticationService.resetPasswordAfterVerification(verificationToken)
+            response.contentType = "text/html"
+            response.writer.write(VerificationView.passwordChangeVerificationSuccessHTML())
+        } catch (e: Exception) {
+            response.contentType = "text/html"
+            response.writer.write(VerificationView.passwordChangeVerificationFailureTML())
         }
     }
 }

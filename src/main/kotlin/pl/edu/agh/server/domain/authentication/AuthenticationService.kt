@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 import pl.edu.agh.server.application.authentication.AuthenticationRequest
 import pl.edu.agh.server.application.authentication.AuthenticationResponse
 import pl.edu.agh.server.application.authentication.RegisterRequest
+import pl.edu.agh.server.application.authentication.ResetPasswordRequest
 import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.authentication.token.TokenCategory
@@ -46,7 +47,7 @@ class AuthenticationService(
         userRepository.save(user)
 
         if (verificationEnabled) {
-            emailService.sendVerificationEmail(user.email, user.verificationToken!!)
+            emailService.sendEmailVerificationMail(user.email, user.verificationToken!!)
         }
     }
 
@@ -126,6 +127,27 @@ class AuthenticationService(
         // TODO tokenExpirationTime
 
         user.enabled = true
+        user.verificationToken = null
+        userRepository.save(user)
+    }
+
+    fun prepareForPasswordChange(request: ResetPasswordRequest) {
+        val user = userRepository.findByEmail(request.email)
+            .orElseThrow { throw IllegalArgumentException("Invalid email") }
+        user.newPassword = passwordEncoder.encode(request.password)
+        user.verificationToken = generateVerificationToken()
+
+        // TODO tokenExpirationTime
+
+        emailService.sendPasswordChangeVerificationMail(user.email, user.verificationToken!!)
+        userRepository.save(user)
+    }
+
+    fun resetPasswordAfterVerification(verificationToken: String) {
+        val user = userRepository.findByVerificationToken(verificationToken)
+            .orElseThrow { throw IllegalArgumentException("Invalid verification token") }
+        user.password = user.newPassword!!
+        user.newPassword = null
         user.verificationToken = null
         userRepository.save(user)
     }
