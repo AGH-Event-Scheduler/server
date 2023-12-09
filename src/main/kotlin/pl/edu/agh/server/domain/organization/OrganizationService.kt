@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import pl.edu.agh.server.domain.dto.FullOrganizationDTO
 import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
@@ -58,7 +59,7 @@ class OrganizationService(
         return userRepository.save(user)
     }
 
-    fun getOrganization(organizationId: Long, userName: String?): Organization {
+    fun getOrganization(organizationId: Long): Organization {
         return organizationRepository.findById(organizationId)
             .orElseThrow { throw OrganizationNotFoundException(organizationId) }
     }
@@ -71,42 +72,99 @@ class OrganizationService(
         descriptionMap: Map<LanguageOption, String>,
         leaderEmail: String,
     ): Organization {
-        val backgroundImage: BackgroundImage
-        val logoImage: LogoImage
+        var backgroundImage: BackgroundImage? = null
+        var logoImage: LogoImage? = null
+        try {
+            if (backgroundImageFile != null) {
+                backgroundImage = imageService.createBackgroundImage(backgroundImageFile)
+            } else {
+                throw IncorrectFileUploadException("Uploaded file does not exist")
+            }
 
-        if (backgroundImageFile != null) {
-            backgroundImage = imageService.createBackgroundImage(backgroundImageFile)
-        } else {
-            throw IncorrectFileUploadException("Uploaded file does not exist")
+            if (logoImageFile != null) {
+                logoImage = imageService.createLogoImage(logoImageFile)
+            } else {
+                throw IncorrectFileUploadException("Uploaded file does not exist")
+            }
+
+            val newOrganization = Organization(
+                name = translationService.createTranslation(nameMap),
+                description = translationService.createTranslation(descriptionMap),
+                backgroundImage = backgroundImage,
+                logoImage = logoImage,
+            )
+            val organization = organizationRepository.save(newOrganization)
+
+            val user = userService.getUserByEmail(leaderEmail)
+            assignUserRole(organization.id!!, user.id!!, OrganizationRole.HEAD)
+
+            notificationService.notifyAboutOrganizationCreation(organization)
+
+            return organization
+        } catch (e: RuntimeException) {
+            if (backgroundImage != null) {
+                imageService.removeImage(backgroundImage.imageId)
+            }
+            if (logoImage != null) {
+                imageService.removeImage(logoImage.imageId)
+            }
+            throw e
         }
+    }
 
-        if (logoImageFile != null) {
-            logoImage = imageService.createLogoImage(logoImageFile)
-        } else {
-            throw IncorrectFileUploadException("Uploaded file does not exist")
+    fun updateOrganization(
+        organizationId: Long,
+        logoImageFile: MultipartFile?,
+        backgroundImageFile: MultipartFile?,
+        nameMap: Map<LanguageOption, String>,
+        descriptionMap: Map<LanguageOption, String>,
+    ): Organization {
+        var savedBackgroundImage: BackgroundImage? = null
+        var savedLogoImage: LogoImage? = null
+        try {
+            val organization = organizationRepository.findById(organizationId).orElseThrow { throw OrganizationNotFoundException(organizationId) }
+
+            if (backgroundImageFile != null) {
+                savedBackgroundImage = imageService.createBackgroundImage(backgroundImageFile)
+                organization.backgroundImage = savedBackgroundImage
+            }
+
+            if (logoImageFile != null) {
+                savedLogoImage = imageService.createLogoImage(logoImageFile)
+                organization.logoImage = savedLogoImage
+            }
+
+            organization.name = translationService.createTranslation(nameMap)
+            organization.description = translationService.createTranslation(descriptionMap)
+
+            val savedOrganization = organizationRepository.save(organization)
+
+            notificationService.notifyAboutOrganizationUpdate(savedOrganization)
+
+            return savedOrganization
+        } catch (e: RuntimeException) {
+            if (savedBackgroundImage != null) {
+                imageService.removeImage(savedBackgroundImage.imageId)
+            }
+            if (savedLogoImage != null) {
+                imageService.removeImage(savedLogoImage.imageId)
+            }
+            throw e
         }
-
-        val newOrganization = Organization(
-            name = translationService.createTranslation(nameMap),
-            description = translationService.createTranslation(descriptionMap),
-            backgroundImage = backgroundImage,
-            logoImage = logoImage,
-        )
-        val organization = organizationRepository.save(newOrganization)
-
-        val user = userService.getUserByEmail(leaderEmail)
-        assignUserRole(organization.id!!, user.id!!, OrganizationRole.HEAD)
-
-        notificationService.notifyAboutOrganizationCreation(organization)
-
-        return organization
-    } //    FIXME use function from base service once NullPointerException is fixed
-
+    }
     override fun getAllWithSpecificationPageable(
         specification: Specification<Organization>,
         pageable: PageRequest,
     ): List<Organization> {
         return organizationRepository.findAll(specification, pageable).content
+    }
+
+    fun transformToOrganizationDTO(
+        organization: Organization,
+        language: LanguageOption,
+        userName: String? = null,
+    ): OrganizationDTO {
+        return transformToOrganizationDTO(listOf(organization), language, userName).first()
     }
 
     fun transformToOrganizationDTO(
@@ -124,16 +182,28 @@ class OrganizationService(
         }
     }
 
+    fun transformToFullOrganizationDTO(organizations: List<Organization>): List<FullOrganizationDTO> {
+        val fullOrganizationDTOs = organizations.map {
+            modelMapper.map(it, FullOrganizationDTO::class.java)
+                .apply {
+                    nameMap = getTranslationMap(it.name)
+                    descriptionMap = getTranslationMap(it.description)
+                }
+        }
+
+        return fullOrganizationDTOs
+    }
+
+    fun transformToFullOrganizationDTO(organization: Organization): FullOrganizationDTO {
+        return transformToFullOrganizationDTO(listOf(organization)).first()
+    }
+
     private fun getTranslatedContent(translations: Set<Translation>, language: LanguageOption): String {
         return translations.firstOrNull { translation -> translation.language === language }?.content ?: ""
     }
 
-    fun transformToOrganizationDTO(
-        organization: Organization,
-        language: LanguageOption,
-        userName: String? = null,
-    ): OrganizationDTO {
-        return transformToOrganizationDTO(listOf(organization), language, userName).first()
+    private fun getTranslationMap(translations: Set<Translation>): Map<LanguageOption, String> {
+        return translations.associateBy({ it.language }, { it.content })
     }
 
     @Transactional

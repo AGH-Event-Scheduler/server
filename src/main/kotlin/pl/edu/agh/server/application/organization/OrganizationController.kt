@@ -2,11 +2,14 @@ package pl.edu.agh.server.application.organization
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
+import pl.edu.agh.server.domain.annotation.AuthorizeAccess
+import pl.edu.agh.server.domain.dto.FullOrganizationDTO
 import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationService
@@ -96,11 +99,52 @@ class OrganizationController(
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         @PathVariable organizationId: Long,
     ): ResponseEntity<OrganizationDTO> {
-        val organization = organizationService.getOrganization(organizationId, getUserName(request))
+        val organization = organizationService.getOrganization(organizationId)
         return ResponseEntity.ok(
             organizationService.transformToOrganizationDTO(
                 organization,
                 language,
+                getUserName(request),
+            ),
+        )
+    }
+
+    @GetMapping("/{organizationId}/full")
+    @AuthorizeAccess(allowedRoles = ["HEAD", "ADMIN"])
+    fun getFullOrganizationById(
+        @PathVariable organizationId: Long,
+    ): ResponseEntity<FullOrganizationDTO> {
+        val organization = organizationService.getOrganization(organizationId)
+        return ResponseEntity.ok(
+            organizationService.transformToFullOrganizationDTO(
+                organization,
+            ),
+        )
+    }
+
+    @PutMapping("/{organizationId}")
+    @AuthorizeAccess(allowedRoles = ["HEAD", "ADMIN"])
+    fun updateOrganization(
+        request: HttpServletRequest,
+        @PathVariable organizationId: Long,
+        @RequestBody organizationUpdateRequest: UpdateOrganizationRequest,
+    ): ResponseEntity<OrganizationDTO> {
+        val objectMapper = jacksonObjectMapper()
+        val nameMap: Map<LanguageOption, String> = objectMapper.readValue(organizationUpdateRequest.name)
+        val descriptionMap: Map<LanguageOption, String> = objectMapper.readValue(organizationUpdateRequest.description)
+
+        val organization = organizationService.updateOrganization(
+            organizationId = organizationId,
+            backgroundImageFile = organizationUpdateRequest.backgroundImage,
+            logoImageFile = organizationUpdateRequest.logoImage,
+            nameMap = nameMap,
+            descriptionMap = descriptionMap,
+        )
+
+        return ResponseEntity.ok(
+            organizationService.transformToOrganizationDTO(
+                organization,
+                LanguageOption.PL,
                 getUserName(request),
             ),
         )
