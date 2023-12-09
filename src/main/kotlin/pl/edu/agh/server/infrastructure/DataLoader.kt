@@ -7,17 +7,14 @@ import org.springframework.mock.web.MockMultipartFile
 import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.application.authentication.RegisterRequest
 import pl.edu.agh.server.domain.authentication.AuthenticationService
-import pl.edu.agh.server.domain.event.EventRepository
 import pl.edu.agh.server.domain.event.EventService
 import pl.edu.agh.server.domain.image.BackgroundImage
 import pl.edu.agh.server.domain.image.ImageService
 import pl.edu.agh.server.domain.image.ImageStorage
 import pl.edu.agh.server.domain.image.LogoImage
-import pl.edu.agh.server.domain.organization.OrganizationRepository
 import pl.edu.agh.server.domain.organization.OrganizationService
-import pl.edu.agh.server.domain.student.Student
-import pl.edu.agh.server.domain.student.StudentRepository
 import pl.edu.agh.server.domain.translation.LanguageOption
+import pl.edu.agh.server.domain.user.Role
 import pl.edu.agh.server.domain.user.UserRepository
 import pl.edu.agh.server.domain.user.organizationroles.OrganizationRole
 import java.awt.image.BufferedImage
@@ -30,10 +27,7 @@ import javax.imageio.ImageIO
 
 @Configuration
 class DataLoader(
-    private val studentRepository: StudentRepository,
-    private val organizationRepository: OrganizationRepository,
     private val authenticationService: AuthenticationService,
-    private val eventRepository: EventRepository,
     private val imageStorage: ImageStorage,
     private val imageService: ImageService,
     private val eventService: EventService,
@@ -47,9 +41,6 @@ class DataLoader(
             removeImages()
         }
         if (mockData) {
-            val student = Student("472924", "Kamil", "Błażewicz")
-            studentRepository.save(student)
-
             createUsers()
             createOrganizationsAndEvents()
             assignRoles()
@@ -710,6 +701,21 @@ class DataLoader(
                 lastName = "admin",
             ),
         )
+        val domainOptions = arrayOf("agh.edu.pl", "student.agh.edu.pl")
+
+        for (i in 500..530) {
+            val emailDomain = domainOptions[i % domainOptions.size]
+            val email = "user$i@$emailDomain"
+
+            authenticationService.register(
+                RegisterRequest(
+                    email = email,
+                    password = "password$i",
+                    firstName = "User",
+                    lastName = "Surname$i",
+                ),
+            )
+        }
     }
 
     private fun getFile(name: String): MultipartFile {
@@ -801,8 +807,10 @@ class DataLoader(
 
     private fun assignRoles() {
         val admin = userRepository.findByEmail("admin@agh.edu.pl").get()
-        organizationRepository.findAll().forEach { organization ->
-            organizationService.assignUserRole(organization.id!!, admin.id!!, OrganizationRole.CONTENT_CREATOR)
+        userRepository.findAll().forEach { user ->
+            organizationService.assignUserRole(1, user.id!!, OrganizationRole.HEAD)
         }
+        admin.role = Role.ADMIN
+        userRepository.save(admin)
     }
 }

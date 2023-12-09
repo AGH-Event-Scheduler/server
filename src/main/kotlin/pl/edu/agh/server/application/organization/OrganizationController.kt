@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
+import pl.edu.agh.server.domain.annotation.AdminRestricted
 import pl.edu.agh.server.domain.annotation.AuthorizeAccess
 import pl.edu.agh.server.domain.dto.FullOrganizationDTO
 import pl.edu.agh.server.domain.dto.OrganizationDTO
@@ -72,8 +73,8 @@ class OrganizationController(
         return ResponseEntity.ok(organizations)
     }
 
-    //    @AuthorizeAccess(allowedRoles = ["ADMIN"])
     @PostMapping
+    @AdminRestricted
     fun createOrganization(
         request: HttpServletRequest,
         @ModelAttribute createOrganizationRequest: CreateOrganizationRequest,

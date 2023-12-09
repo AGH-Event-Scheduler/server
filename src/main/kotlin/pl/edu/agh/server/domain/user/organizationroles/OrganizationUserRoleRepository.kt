@@ -10,4 +10,6 @@ interface OrganizationUserRoleRepository : BaseRepository<OrganizationUserRole> 
     fun findOrganizationRoleByOrganizationIdAndUserId(organizationId: Long, userId: Long): List<OrganizationRole>
 
     fun existsByOrganizationIdAndUserIdAndRole(organizationId: Long, userId: Long, role: OrganizationRole): Boolean
+
+    fun existsByUserId(userId: Long): Boolean
 }
