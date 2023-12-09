@@ -40,6 +40,7 @@ dependencies {
     implementation("org.modelmapper:modelmapper:2.4.3")
     implementation("org.springframework:spring-test:6.0.9")
     implementation("com.microsoft.sqlserver:mssql-jdbc")
+    implementation("org.apache.commons:commons-email:1.5")
 
     compileOnly("org.projectlombok:lombok")
 
