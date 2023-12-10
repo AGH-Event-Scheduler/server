@@ -25,6 +25,9 @@ class JwtService(val tokenRepository: TokenRepository) {
     @Value("\${application.security.jwt.refresh-token.expirationTimeMs}")
     lateinit var refreshExpirationTime: Number
 
+    @Value("\${application.security.jwt.verification.expirationTimeMs}")
+    lateinit var verificationExpirationTime: Number
+
     fun extractUsername(token: String): String {
         return extractClaims(token, Claims::getSubject)
     }
@@ -83,5 +86,16 @@ class JwtService(val tokenRepository: TokenRepository) {
     private fun getSigningKey(): Key {
         val keyBytes = Decoders.BASE64.decode(secretKey)
         return Keys.hmacShaKeyFor(keyBytes)
+    }
+
+    fun generateVerificationToken(): String {
+        return Jwts.builder()
+            .setIssuedAt(Date(System.currentTimeMillis()))
+            .setExpiration(Date(System.currentTimeMillis() + verificationExpirationTime.toLong()))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact()
+    }
+
+    fun isVerificationTokenValid(token: String): Boolean {
+        return isTokenSignedWithCorrectKey(token) && !isTokenExpired(token)
     }
 }

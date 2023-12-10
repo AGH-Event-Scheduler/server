@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import pl.edu.agh.server.application.authentication.AuthenticationRequest
 import pl.edu.agh.server.application.authentication.AuthenticationResponse
 import pl.edu.agh.server.application.authentication.RegisterRequest
@@ -43,7 +44,7 @@ class AuthenticationService(
             role = Role.USER,
         )
         if (verificationEnabled.not()) user.enabled = true
-        user.verificationToken = generateVerificationToken()
+        user.verificationToken = jwtService.generateVerificationToken()
         userRepository.save(user)
 
         if (verificationEnabled) {
@@ -109,6 +110,7 @@ class AuthenticationService(
         tokenRepository.save(refreshToken.get())
     }
 
+    @Transactional
     fun logout(refreshToken: String) {
         val user = userRepository.findByEmail(jwtService.extractUsername(refreshToken))
             .orElseThrow { throw Exception("User not found") }
@@ -116,36 +118,41 @@ class AuthenticationService(
         revokeRefreshToken(refreshToken)
     }
 
-    fun generateVerificationToken(): String {
-        return UUID.randomUUID().toString()
-    }
-
     fun verifyEmail(verificationToken: String) {
+        if (jwtService.isVerificationTokenValid(verificationToken).not()) {
+            throw IllegalArgumentException("Invalid verification token")
+        }
+
         val user = userRepository.findByVerificationToken(verificationToken)
             .orElseThrow { throw IllegalArgumentException("Invalid verification token") }
-
-        // TODO tokenExpirationTime
 
         user.enabled = true
         user.verificationToken = null
         userRepository.save(user)
     }
 
+    @Transactional
     fun prepareForPasswordChange(request: ResetPasswordRequest) {
-        val user = userRepository.findByEmail(request.email)
-            .orElseThrow { throw IllegalArgumentException("Invalid email") }
-        user.newPassword = passwordEncoder.encode(request.password)
-        user.verificationToken = generateVerificationToken()
+        val user =
+            userRepository.findByEmail(request.email).orElseThrow { throw IllegalArgumentException("Invalid email") }
 
-        // TODO tokenExpirationTime
+        user.newPassword = passwordEncoder.encode(request.password)
+        user.verificationToken = jwtService.generateVerificationToken()
 
         emailService.sendPasswordChangeVerificationMail(user.email, user.verificationToken!!)
+
         userRepository.save(user)
     }
 
+    @Transactional
     fun resetPasswordAfterVerification(verificationToken: String) {
+        if (jwtService.isVerificationTokenValid(verificationToken).not()) {
+            throw IllegalArgumentException("Invalid verification token")
+        }
+
         val user = userRepository.findByVerificationToken(verificationToken)
             .orElseThrow { throw IllegalArgumentException("Invalid verification token") }
+
         user.password = user.newPassword!!
         user.newPassword = null
         user.verificationToken = null
