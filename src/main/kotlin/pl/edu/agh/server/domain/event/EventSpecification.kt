@@ -13,16 +13,13 @@ class EventSpecification {
     companion object {
         fun eventBelongToOrganization(organizationId: Long): Specification<Event> {
             return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
-                val predicate: Predicate =
-                    criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), organizationId)
-                query.where(predicate)
-                null
+                criteriaBuilder.equal(root.get<Organization>("organization").get<Long>("id"), organizationId)
             }
         }
 
         fun eventInDateRange(startDate: Date, endDate: Date): Specification<Event> {
             return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
-                val predicate: Predicate = criteriaBuilder.or(
+                criteriaBuilder.or(
                     criteriaBuilder.and(
                         criteriaBuilder.greaterThanOrEqualTo(root.get<Date>("startDate"), startDate),
                         criteriaBuilder.lessThanOrEqualTo(root.get<Date>("startDate"), endDate),
@@ -32,8 +29,6 @@ class EventSpecification {
                         criteriaBuilder.lessThanOrEqualTo(root.get<Date>("endDate"), endDate),
                     ),
                 )
-                query.where(predicate)
-                null
             }
         }
 
@@ -58,7 +53,7 @@ class EventSpecification {
             type: EventsType,
         ): Specification<Event> {
             return Specification { root, query, criteriaBuilder ->
-                val predicate: Predicate = criteriaBuilder.and(
+                criteriaBuilder.and(
                     when (type) {
                         EventsType.UPCOMING ->
                             criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), date)
@@ -66,9 +61,6 @@ class EventSpecification {
                             criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), date)
                     },
                 )
-
-                query.where(predicate)
-                null
             }
         }
 
