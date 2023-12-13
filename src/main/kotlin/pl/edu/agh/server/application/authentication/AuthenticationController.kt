@@ -62,6 +62,12 @@ class AuthenticationController(
         return ResponseEntity.ok().build()
     }
 
+    @PostMapping("/resend-verification-mail")
+    fun resendVerificationMail(@RequestParam email: String): ResponseEntity<Void> {
+        authenticationService.resendVerificationEmail(email)
+        return ResponseEntity.ok().build()
+    }
+
     @GetMapping("/verify-password")
     fun verifyAndResetPassword(@RequestParam("token") verificationToken: String, response: HttpServletResponse) {
         try {

@@ -18,6 +18,7 @@ import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.authentication.token.TokenCategory
 import pl.edu.agh.server.domain.authentication.token.TokenRepository
+import pl.edu.agh.server.domain.authentication.token.VerificationTokenType
 import pl.edu.agh.server.domain.mail.EmailService
 import pl.edu.agh.server.domain.user.Role
 import pl.edu.agh.server.domain.user.User
@@ -44,11 +45,15 @@ class AuthenticationService(
             role = Role.USER,
         )
         if (verificationEnabled.not()) user.enabled = true
-        user.verificationToken = jwtService.generateVerificationToken()
+        user.verificationToken = jwtService.generateVerificationToken(VerificationTokenType.EMAIL_VERIFICATION)
         userRepository.save(user)
 
         if (verificationEnabled) {
-            emailService.sendEmailVerificationMail(user.email, user.verificationToken!!)
+            emailService.sendVerificationMail(
+                user.email,
+                user.verificationToken!!,
+                VerificationTokenType.EMAIL_VERIFICATION,
+            )
         }
     }
 
@@ -135,11 +140,12 @@ class AuthenticationService(
     fun prepareForPasswordChange(request: ResetPasswordRequest) {
         val user =
             userRepository.findByEmail(request.email).orElseThrow { throw IllegalArgumentException("Invalid email") }
+        if (user.enabled.not()) throw IllegalArgumentException("User not verified")
 
         user.newPassword = passwordEncoder.encode(request.password)
-        user.verificationToken = jwtService.generateVerificationToken()
+        user.verificationToken = jwtService.generateVerificationToken(VerificationTokenType.PASSWORD_RESET)
 
-        emailService.sendPasswordChangeVerificationMail(user.email, user.verificationToken!!)
+        emailService.sendVerificationMail(user.email, user.verificationToken!!, VerificationTokenType.PASSWORD_RESET)
 
         userRepository.save(user)
     }
@@ -157,5 +163,18 @@ class AuthenticationService(
         user.newPassword = null
         user.verificationToken = null
         userRepository.save(user)
+    }
+
+    @Transactional
+    fun resendVerificationEmail(email: String) {
+        val user =
+            userRepository.findByEmail(email).orElseThrow { throw IllegalArgumentException("Invalid email") }
+        if (user.verificationToken == null) throw IllegalArgumentException("User already verified")
+        val verificationTokenType = jwtService.extractVerificationTokenType(user.verificationToken!!)
+
+        user.verificationToken = jwtService.generateVerificationToken(verificationTokenType)
+        userRepository.save(user)
+
+        emailService.sendVerificationMail(user.email, user.verificationToken!!, verificationTokenType)
     }
 }

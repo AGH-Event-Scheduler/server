@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.authentication.token.TokenRepository
+import pl.edu.agh.server.domain.authentication.token.VerificationTokenType
 import java.security.Key
 import java.util.*
 
@@ -93,6 +94,26 @@ class JwtService(val tokenRepository: TokenRepository) {
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(Date(System.currentTimeMillis() + verificationExpirationTime.toLong()))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact()
+    }
+
+    fun generateVerificationToken(verificationType: VerificationTokenType): String {
+        val claims = mutableMapOf<String, Any>()
+        claims["verificationTokenType"] = verificationType.name
+
+        return Jwts.builder()
+            .setIssuedAt(Date(System.currentTimeMillis()))
+            .setExpiration(Date(System.currentTimeMillis() + verificationExpirationTime.toLong()))
+            .addClaims(claims)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact()
+    }
+
+    fun extractVerificationTokenType(verificationToken: String): VerificationTokenType {
+        val verificationTokenType: String = extractClaims(verificationToken) { claims ->
+            claims["verificationTokenType"] as String
+        }
+
+        return VerificationTokenType.valueOf(verificationTokenType)
     }
 
     fun isVerificationTokenValid(token: String): Boolean {
