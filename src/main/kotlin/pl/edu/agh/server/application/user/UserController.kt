@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.annotation.AdminRestricted
-import pl.edu.agh.server.domain.annotation.AuthorizeAccess
+import pl.edu.agh.server.domain.annotation.AuthorizeOrganizationAccess
 import pl.edu.agh.server.domain.dto.UserDTO
 import pl.edu.agh.server.domain.dto.UserWithRoleDTO
 import pl.edu.agh.server.domain.organization.OrganizationService
@@ -65,7 +65,7 @@ class UserController(
     }
 
     @GetMapping("/organization-roles/{organizationId}/{email}")
-    @AuthorizeAccess(allowedRoles = ["ADMIN", "HEAD"])
+    @AuthorizeOrganizationAccess(allowedRoles = ["ADMIN", "HEAD"])
     fun getUserOrganizationRoles(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,
@@ -75,7 +75,7 @@ class UserController(
     }
 
     @PostMapping("/organization-roles/{organizationId}/grant")
-    @AuthorizeAccess(allowedRoles = ["HEAD"])
+    @AuthorizeOrganizationAccess(allowedRoles = ["HEAD"])
     fun grantOrganizationRole(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,

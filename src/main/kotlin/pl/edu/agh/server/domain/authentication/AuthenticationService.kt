@@ -115,6 +115,17 @@ class AuthenticationService(
         tokenRepository.save(refreshToken.get())
     }
 
+    private fun revokeAllUserTokens(userId: Long) {
+        val userTokens: List<Token> = tokenRepository.findAllByUserId(userId)
+        if (userTokens.isEmpty()) return
+        userTokens.forEach {
+            it.apply {
+                revoked = true
+            }
+        }
+        tokenRepository.saveAll(userTokens)
+    }
+
     @Transactional
     fun logout(refreshToken: String) {
         val user = userRepository.findByEmail(jwtService.extractUsername(refreshToken))
@@ -163,6 +174,8 @@ class AuthenticationService(
         user.newPassword = null
         user.verificationToken = null
         userRepository.save(user)
+
+        revokeAllUserTokens(user.id!!)
     }
 
     @Transactional
