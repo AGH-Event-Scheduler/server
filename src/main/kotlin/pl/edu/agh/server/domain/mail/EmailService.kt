@@ -16,8 +16,8 @@ class EmailService(
     @Value("\${application.email.password}")
     private val emailPassword: String,
 
-    @Value("\${application.ip}")
-    private val ip: String,
+    @Value("\${application.address}")
+    private val address: String,
 
     @Value("\${application.port}")
     private val port: String,
@@ -46,7 +46,7 @@ class EmailService(
     }
 
     private fun generateVerificationLink(tokenType: String, port: String): String {
-        val baseUrl = "http://$ip${if (port.isNotBlank()) ":$port" else ""}/api/authentication/"
+        val baseUrl = "$address${if (port.isNotBlank()) ":$port" else ""}/api/authentication/"
 
         return when (tokenType) {
             "verify" -> "${baseUrl}verify?token="
