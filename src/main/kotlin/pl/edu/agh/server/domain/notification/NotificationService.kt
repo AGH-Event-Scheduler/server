@@ -1,6 +1,7 @@
 package pl.edu.agh.server.domain.notification
 
 import jakarta.transaction.Transactional
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -31,8 +32,8 @@ class NotificationService(
     override fun getAllWithSpecificationPageable(
         specification: Specification<Notification>,
         pageable: PageRequest,
-    ): List<Notification> {
-        return notificationRepository.findAll(specification, pageable).content
+    ): Page<Notification> {
+        return notificationRepository.findAll(specification, pageable)
     }
 
     @Transactional

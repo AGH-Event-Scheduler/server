@@ -1,6 +1,8 @@
 package pl.edu.agh.server.application.notification
 
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -35,9 +37,10 @@ class NotificationController(
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         @RequestParam(name = "showNotSeenOnly", defaultValue = false.toString()) showNotSeenOnly: Boolean,
         request: HttpServletRequest,
-    ): ResponseEntity<List<NotificationDTO>> {
+    ): ResponseEntity<Page<NotificationDTO>> {
         val user = userService.getUserByEmail(getUserName(request))
-        val notifications = notificationService.getAllWithSpecificationPageable(
+        val pageRequest = createPageRequest(page, size, sort)
+        val notificationsPage = notificationService.getAllWithSpecificationPageable(
             Specification.allOf(
                 if (showNotSeenOnly) notificationNotSeenByUser(user) else null,
                 Specification.anyOf(
@@ -47,9 +50,15 @@ class NotificationController(
                     notificationForUserFollowingOrganization(user),
                 ),
             ),
-            createPageRequest(page, size, sort),
+            pageRequest,
         )
-        return ResponseEntity.ok(notificationDTOTranslateService.transformToNotificationDTO(notifications, language, user))
+        return ResponseEntity.ok(
+            PageImpl(
+                notificationDTOTranslateService.transformToNotificationDTO(notificationsPage.content, language, user),
+                pageRequest,
+                notificationsPage.totalElements,
+            ),
+        )
     }
 
     @PostMapping("/{notificationId}")

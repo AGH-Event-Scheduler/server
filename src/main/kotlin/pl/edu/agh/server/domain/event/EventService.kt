@@ -2,6 +2,7 @@ package pl.edu.agh.server.domain.event
 
 import jakarta.transaction.Transactional
 import org.modelmapper.ModelMapper
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -171,8 +172,8 @@ class EventService(
     override fun getAllWithSpecificationPageable(
         specification: Specification<Event>,
         pageable: PageRequest,
-    ): List<Event> {
-        return eventRepository.findAll(specification, pageable).content
+    ): Page<Event> {
+        return eventRepository.findAll(specification, pageable)
     }
 
     fun transformToFullEventDTO(events: List<Event>): List<FullEventDTO> {
