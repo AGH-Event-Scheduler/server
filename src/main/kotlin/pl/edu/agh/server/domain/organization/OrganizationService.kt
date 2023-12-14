@@ -1,6 +1,7 @@
 package pl.edu.agh.server.domain.organization
 
 import org.modelmapper.ModelMapper
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -155,8 +156,8 @@ class OrganizationService(
     override fun getAllWithSpecificationPageable(
         specification: Specification<Organization>,
         pageable: PageRequest,
-    ): List<Organization> {
-        return organizationRepository.findAll(specification, pageable).content
+    ): Page<Organization> {
+        return organizationRepository.findAll(specification, pageable)
     }
 
     fun transformToOrganizationDTO(

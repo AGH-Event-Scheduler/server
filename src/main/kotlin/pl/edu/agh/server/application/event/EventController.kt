@@ -4,6 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
@@ -56,7 +58,7 @@ class EventController(
     }
 
     @GetMapping
-    fun getEventsInDateRange(
+    fun getFilteredEvents(
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "startDate,desc") sort: String,
@@ -70,7 +72,7 @@ class EventController(
         @RequestParam(name = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") endDate: Date?,
         @RequestParam(name = "name", required = false) name: String?,
         request: HttpServletRequest,
-    ): ResponseEntity<List<EventDTO>> {
+    ): ResponseEntity<Page<EventDTO>> {
         val entities = getAllFilteredEventDTOs(
             page,
             size,
@@ -92,7 +94,7 @@ class EventController(
     }
 
     @GetMapping("/groupedByDate")
-    fun getEventsInDateRangeGroupedByDate(
+    fun getFilteredEventsGroupedByDate(
         @RequestParam(name = "page", defaultValue = "0") page: Int,
         @RequestParam(name = "size", defaultValue = "${Integer.MAX_VALUE}") size: Int,
         @RequestParam(name = "sort", defaultValue = "startDate,desc") sort: String,
@@ -122,7 +124,7 @@ class EventController(
             name,
             showCanceled,
             request,
-        )
+        ).content
         return ResponseEntity.ok(entities.groupBy { dateFormat.format(it.startDate) }.toSortedMap())
     }
 
@@ -132,6 +134,7 @@ class EventController(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,
         @ModelAttribute eventCreationRequest: EventCreationRequest,
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
     ): ResponseEntity<EventDTO> {
         val objectMapper = jacksonObjectMapper()
         val nameMap: Map<LanguageOption, String> = objectMapper.readValue(eventCreationRequest.name)
@@ -150,7 +153,7 @@ class EventController(
             endDate = endDate,
         )
 
-        return ResponseEntity.ok(eventService.transformToEventDTO(event, LanguageOption.PL, getUserName(request)))
+        return ResponseEntity.ok(eventService.transformToEventDTO(event, language, getUserName(request)))
     }
 
     @PutMapping("/{eventId}")
@@ -159,6 +162,7 @@ class EventController(
         request: HttpServletRequest,
         @PathVariable eventId: Long,
         @RequestBody eventUpdateRequest: EventUpdateRequest,
+        @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
     ): ResponseEntity<EventDTO> {
         val objectMapper = jacksonObjectMapper()
         val nameMap: Map<LanguageOption, String> = objectMapper.readValue(eventUpdateRequest.name)
@@ -177,7 +181,7 @@ class EventController(
             endDate = endDate,
         )
 
-        return ResponseEntity.ok(eventService.transformToEventDTO(event, LanguageOption.PL, getUserName(request)))
+        return ResponseEntity.ok(eventService.transformToEventDTO(event, language, getUserName(request)))
     }
 
     @GetMapping("/{id}")
@@ -237,31 +241,39 @@ class EventController(
         name: String?,
         showCanceled: Boolean,
         request: HttpServletRequest,
-    ): List<EventDTO> {
+    ): Page<EventDTO> {
         val userName = getUserName(request)
         val user = userService.getUserByEmail(userName)
+        val pageRequest = createPageRequest(page, size, sort)
 
-        return eventService.transformToEventDTO(
-            eventService.getAllWithSpecificationPageable(
-                Specification.allOf(
-                    if (!showCanceled) eventNotCanceled() else null,
-                    if (savedOnly) eventSavedByUser(userName) else null,
-                    if (fromFollowedOnly) eventFromFollowedByUser(user) else null,
-                    if (type != null) {
-                        eventInDateRangeType(
-                            Date.from(Instant.now()),
-                            type,
-                        )
-                    } else {
-                        null
-                    }, // TODO replace this with simple eventInDateRange
-                    if (organizationId != null) eventBelongToOrganization(organizationId) else null,
-                    if (startDate != null && endDate != null) eventInDateRange(startDate, endDate) else null,
-                    if (name != null) eventWithNameLike(name, language) else null,
-                ),
-                createPageRequest(page, size, sort),
+        val eventsPage = eventService.getAllWithSpecificationPageable(
+            Specification.allOf(
+                if (!showCanceled) eventNotCanceled() else null,
+                if (savedOnly) eventSavedByUser(userName) else null,
+                if (fromFollowedOnly) eventFromFollowedByUser(user) else null,
+                if (type != null) {
+                    eventInDateRangeType(
+                        Date.from(Instant.now()),
+                        type,
+                    )
+                } else {
+                    null
+                }, // TODO replace this with simple eventInDateRange
+                if (organizationId != null) eventBelongToOrganization(organizationId) else null,
+                if (startDate != null && endDate != null) eventInDateRange(startDate, endDate) else null,
+                if (name != null) eventWithNameLike(name, language) else null,
             ),
-            language,
+            pageRequest,
+        )
+
+        return PageImpl(
+            eventService.transformToEventDTO(
+                eventsPage.content,
+                language,
+                getUserName(request),
+            ),
+            pageRequest,
+            eventsPage.totalElements,
         )
     }
 

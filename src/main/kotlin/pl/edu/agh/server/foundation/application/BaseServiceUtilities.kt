@@ -1,5 +1,6 @@
 package pl.edu.agh.server.foundation.application
 
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import pl.edu.agh.server.foundation.domain.BaseIdentifiableEntity
@@ -11,8 +12,8 @@ abstract class BaseServiceUtilities<T : BaseIdentifiableEntity>(
     open fun getAllWithSpecificationPageable(
         specification: Specification<T>,
         pageable: PageRequest,
-    ): List<T> {
-        return repository.findAll(specification, pageable).content
+    ): Page<T> {
+        return repository.findAll(specification, pageable)
     }
 
     open fun getAllWithSpecification(
@@ -23,8 +24,8 @@ abstract class BaseServiceUtilities<T : BaseIdentifiableEntity>(
 
     open fun getAllWithPageable(
         pageable: PageRequest,
-    ): List<T> {
-        return repository.findAll(pageable).content
+    ): Page<T> {
+        return repository.findAll(pageable)
     }
 
     open fun getAll(): List<T> {

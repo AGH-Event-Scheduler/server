@@ -4,6 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -57,20 +59,26 @@ class OrganizationController(
         @RequestParam(name = "name", required = false) name: String?,
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
         request: HttpServletRequest,
-    ): ResponseEntity<List<OrganizationDTO>> {
-        val organizations = organizationService.transformToOrganizationDTO(
-            organizationService.getAllWithSpecificationPageable(
-                Specification.allOf(
-                    if (yourOrganizationsOnly) organizationsWithAuthority(getUserName(request)) else null,
-                    if (subscribedOnly) organizationFollowedByUser(getUserName(request)) else null,
-                    if (name != null) organizationWithNameLike(name, language) else null,
-                ),
-                createPageRequest(page, size, sort),
+    ): ResponseEntity<Page<OrganizationDTO>> {
+        val pageRequest = createPageRequest(page, size, sort)
+        val organizationsPage: Page<Organization> = organizationService.getAllWithSpecificationPageable(
+            Specification.allOf(
+                if (yourOrganizationsOnly) organizationsWithAuthority(getUserName(request)) else null,
+                if (subscribedOnly) organizationFollowedByUser(getUserName(request)) else null,
+                if (name != null) organizationWithNameLike(name, language) else null,
             ),
-            language,
-            getUserName(request),
+            pageRequest,
         )
-        return ResponseEntity.ok(organizations)
+        val organizationsDTOPage = PageImpl(
+            organizationService.transformToOrganizationDTO(
+                organizationsPage.content,
+                language,
+                getUserName(request),
+            ),
+            pageRequest,
+            organizationsPage.totalElements,
+        )
+        return ResponseEntity.ok(organizationsDTOPage)
     }
 
     @PostMapping
