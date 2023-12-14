@@ -17,9 +17,9 @@ class OrganizationSpecification {
             }
         }
 
-        fun organizationNotArchived(): Specification<Organization> {
+        fun organizationIsArchived(): Specification<Organization> {
             return Specification { root: Root<Organization>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
-                criteriaBuilder.isFalse(root.get<Boolean>("isArchived"))
+                criteriaBuilder.isTrue(root.get<Boolean>("isArchived"))
             }
         }
 
