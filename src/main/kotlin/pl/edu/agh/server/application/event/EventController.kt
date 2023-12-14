@@ -24,6 +24,7 @@ import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventInDateRa
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventNotCanceled
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventSavedByUser
 import pl.edu.agh.server.domain.event.EventSpecification.Companion.eventWithNameLike
+import pl.edu.agh.server.domain.event.EventSpecification.Companion.organizationNotArchived
 import pl.edu.agh.server.domain.translation.LanguageOption
 import pl.edu.agh.server.domain.user.UserService
 import pl.edu.agh.server.foundation.application.BaseControllerUtilities
@@ -66,6 +67,7 @@ class EventController(
         @RequestParam(name = "showCanceled", defaultValue = true.toString()) showCanceled: Boolean,
         @RequestParam(name = "savedOnly", defaultValue = false.toString()) savedOnly: Boolean,
         @RequestParam(name = "fromFollowedOnly", defaultValue = false.toString()) fromFollowedOnly: Boolean,
+        @RequestParam(name = "showFromArchived", defaultValue = false.toString()) showFromArchived: Boolean,
         @RequestParam(name = "type", required = false) type: EventsType?,
         @RequestParam(name = "organizationId", required = false) organizationId: Long?,
         @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") startDate: Date?,
@@ -86,6 +88,7 @@ class EventController(
             endDate,
             name,
             showCanceled,
+            showFromArchived,
             request,
         )
         return ResponseEntity.ok(
@@ -102,6 +105,7 @@ class EventController(
         @RequestParam(name = "showCanceled", defaultValue = true.toString()) showCanceled: Boolean,
         @RequestParam(name = "savedOnly", defaultValue = false.toString()) savedOnly: Boolean,
         @RequestParam(name = "fromFollowedOnly", defaultValue = false.toString()) fromFollowedOnly: Boolean,
+        @RequestParam(name = "showFromArchived", defaultValue = false.toString()) showFromArchived: Boolean,
         @RequestParam(name = "type", required = false) type: EventsType?,
         @RequestParam(name = "organizationId", required = false) organizationId: Long?,
         @RequestParam(name = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") startDate: Date?,
@@ -123,6 +127,7 @@ class EventController(
             endDate,
             name,
             showCanceled,
+            showFromArchived,
             request,
         ).content
         return ResponseEntity.ok(entities.groupBy { dateFormat.format(it.startDate) }.toSortedMap())
@@ -240,6 +245,7 @@ class EventController(
         endDate: Date?,
         name: String?,
         showCanceled: Boolean,
+        showFromArchived: Boolean,
         request: HttpServletRequest,
     ): Page<EventDTO> {
         val userName = getUserName(request)
@@ -248,6 +254,7 @@ class EventController(
 
         val eventsPage = eventService.getAllWithSpecificationPageable(
             Specification.allOf(
+                if (!showFromArchived) organizationNotArchived() else null,
                 if (!showCanceled) eventNotCanceled() else null,
                 if (savedOnly) eventSavedByUser(userName) else null,
                 if (fromFollowedOnly) eventFromFollowedByUser(user) else null,

@@ -41,6 +41,22 @@ class OrganizationService(
 ) : BaseServiceUtilities<Organization>(organizationRepository) {
 
     @Transactional
+    fun archiveOrganization(organizationId: Long) {
+        val organization = organizationRepository.findById(organizationId).orElseThrow { throw OrganizationNotFoundException(organizationId) }
+        organization.isArchived = true
+        val upDatedOrganization = organizationRepository.save(organization)
+        notificationService.notifyAboutOrganizationArchive(upDatedOrganization)
+    }
+
+    @Transactional
+    fun reactivateOrganization(organizationId: Long) {
+        val organization = organizationRepository.findById(organizationId).orElseThrow { throw OrganizationNotFoundException(organizationId) }
+        organization.isArchived = false
+        val upDatedOrganization = organizationRepository.save(organization)
+        notificationService.notifyAboutOrganizationReactivate(upDatedOrganization)
+    }
+
+    @Transactional
     fun subscribeUserToOrganization(userName: String, organizationId: Long): User {
         val user = userRepository.findByEmail(userName).orElseThrow { throw UserNotFoundException(userName) }
         val organization = organizationRepository.findById(organizationId)

@@ -17,4 +17,5 @@ data class OrganizationDTO(
     var id: Long? = null,
     var creationDate: Date? = null,
     var lastUpdatedDate: Date? = null,
+    var isArchived: Boolean? = null,
 )
