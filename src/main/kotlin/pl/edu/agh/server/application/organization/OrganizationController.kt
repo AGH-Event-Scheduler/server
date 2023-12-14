@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
 import pl.edu.agh.server.domain.annotation.AdminRestricted
-import pl.edu.agh.server.domain.annotation.AuthorizeAccess
+import pl.edu.agh.server.domain.annotation.AuthorizeOrganizationAccess
 import pl.edu.agh.server.domain.dto.FullOrganizationDTO
 import pl.edu.agh.server.domain.dto.OrganizationDTO
 import pl.edu.agh.server.domain.organization.Organization
@@ -111,7 +111,7 @@ class OrganizationController(
     }
 
     @GetMapping("/{organizationId}/full")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "ADMIN"])
+    @AuthorizeOrganizationAccess(allowedRoles = ["HEAD", "ADMIN"])
     fun getFullOrganizationById(
         @PathVariable organizationId: Long,
     ): ResponseEntity<FullOrganizationDTO> {
@@ -124,7 +124,7 @@ class OrganizationController(
     }
 
     @PutMapping("/{organizationId}")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "ADMIN"])
+    @AuthorizeOrganizationAccess(allowedRoles = ["HEAD", "ADMIN"])
     fun updateOrganization(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,

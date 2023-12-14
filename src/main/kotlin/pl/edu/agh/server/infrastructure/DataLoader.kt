@@ -701,20 +701,25 @@ class DataLoader(
                 lastName = "admin",
             ),
         )
-        val domainOptions = arrayOf("agh.edu.pl", "student.agh.edu.pl")
+//        val domainOptions = arrayOf("agh.edu.pl", "student.agh.edu.pl")
+//
+//        for (i in 500..530) {
+//            val emailDomain = domainOptions[i % domainOptions.size]
+//            val email = "user$i@$emailDomain"
+//
+//            authenticationService.register(
+//                RegisterRequest(
+//                    email = email,
+//                    password = "password$i",
+//                    firstName = "User",
+//                    lastName = "Surname$i",
+//                ),
+//            )
+//        }
 
-        for (i in 500..530) {
-            val emailDomain = domainOptions[i % domainOptions.size]
-            val email = "user$i@$emailDomain"
-
-            authenticationService.register(
-                RegisterRequest(
-                    email = email,
-                    password = "password$i",
-                    firstName = "User",
-                    lastName = "Surname$i",
-                ),
-            )
+        userRepository.findAll().forEach { user ->
+            user.apply { enabled = true }
+            userRepository.save(user)
         }
     }
 

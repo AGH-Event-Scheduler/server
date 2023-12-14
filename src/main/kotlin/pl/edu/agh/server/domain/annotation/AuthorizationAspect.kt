@@ -17,10 +17,10 @@ class AuthorizationAspect(
     private val eventRepository: EventRepository,
 ) {
 
-    @Before("@annotation(authorizeAccess) && args(request, organizationId, ..)")
+    @Before("@annotation(authorizeOrganizationAccess) && args(request, organizationId, ..)")
     fun beforeOrganizationMethodExecution(
         joinPoint: JoinPoint,
-        authorizeAccess: AuthorizeAccess,
+        authorizeOrganizationAccess: AuthorizeOrganizationAccess,
         request: HttpServletRequest,
         organizationId: Long,
     ) {
@@ -28,13 +28,13 @@ class AuthorizationAspect(
         val userAuthorities =
             organizationUserRoleRepository.findByOrganizationIdAndUserId(organizationId, userService.getUserId(request))
         userAuthorities.stream()
-            .anyMatch { it.role.name in authorizeAccess.allowedRoles } || throw AuthorizationException("User does not have required authority")
+            .anyMatch { it.role.name in authorizeOrganizationAccess.allowedRoles } || throw AuthorizationException("User does not have required authority")
     }
 
-    @Before("@annotation(authorizeAccess) && args(request, eventId, ..)")
+    @Before("@annotation(authorizeEventAccess) && args(request, eventId, ..)")
     fun beforeEventMethodExecution(
         joinPoint: JoinPoint,
-        authorizeAccess: AuthorizeAccess,
+        authorizeEventAccess: AuthorizeEventAccess,
         request: HttpServletRequest,
         eventId: Long,
     ) {
@@ -44,7 +44,7 @@ class AuthorizationAspect(
         val userAuthorities =
             organizationUserRoleRepository.findByOrganizationIdAndUserId(organizationId, userService.getUserId(request))
         userAuthorities.stream()
-            .anyMatch { it.role.name in authorizeAccess.allowedRoles } || throw AuthorizationException("User does not have required authority")
+            .anyMatch { it.role.name in authorizeEventAccess.allowedRoles } || throw AuthorizationException("User does not have required authority")
     }
 
     @Before("@annotation(adminRestricted) && args(request, ..)")

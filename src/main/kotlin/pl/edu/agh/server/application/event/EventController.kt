@@ -9,7 +9,8 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import pl.edu.agh.server.config.JwtService
-import pl.edu.agh.server.domain.annotation.AuthorizeAccess
+import pl.edu.agh.server.domain.annotation.AuthorizeEventAccess
+import pl.edu.agh.server.domain.annotation.AuthorizeOrganizationAccess
 import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.dto.FullEventDTO
 import pl.edu.agh.server.domain.event.Event
@@ -126,7 +127,7 @@ class EventController(
     }
 
     @PostMapping("/organization/{organizationId}")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
+    @AuthorizeOrganizationAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun createEventForOrganization(
         request: HttpServletRequest,
         @PathVariable organizationId: Long,
@@ -153,7 +154,7 @@ class EventController(
     }
 
     @PutMapping("/{eventId}")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
+    @AuthorizeEventAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun updateEventForOrganization(
         request: HttpServletRequest,
         @PathVariable eventId: Long,
@@ -203,7 +204,7 @@ class EventController(
     }
 
     @PostMapping("/cancel")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
+    @AuthorizeEventAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun cancelEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,
@@ -213,7 +214,7 @@ class EventController(
     }
 
     @PostMapping("/reactivate")
-    @AuthorizeAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
+    @AuthorizeEventAccess(allowedRoles = ["HEAD", "CONTENT_CREATOR"])
     fun reactivateEvent(
         request: HttpServletRequest,
         @RequestParam eventId: Long,

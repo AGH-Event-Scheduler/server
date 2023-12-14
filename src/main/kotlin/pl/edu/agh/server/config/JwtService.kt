@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import pl.edu.agh.server.domain.authentication.token.Token
 import pl.edu.agh.server.domain.authentication.token.TokenRepository
+import pl.edu.agh.server.domain.authentication.token.VerificationTokenType
 import java.security.Key
 import java.util.*
 
@@ -24,6 +25,9 @@ class JwtService(val tokenRepository: TokenRepository) {
 
     @Value("\${application.security.jwt.refresh-token.expirationTimeMs}")
     lateinit var refreshExpirationTime: Number
+
+    @Value("\${application.security.jwt.verification.expirationTimeMs}")
+    lateinit var verificationExpirationTime: Number
 
     fun extractUsername(token: String): String {
         return extractClaims(token, Claims::getSubject)
@@ -83,5 +87,36 @@ class JwtService(val tokenRepository: TokenRepository) {
     private fun getSigningKey(): Key {
         val keyBytes = Decoders.BASE64.decode(secretKey)
         return Keys.hmacShaKeyFor(keyBytes)
+    }
+
+    fun generateVerificationToken(): String {
+        return Jwts.builder()
+            .setIssuedAt(Date(System.currentTimeMillis()))
+            .setExpiration(Date(System.currentTimeMillis() + verificationExpirationTime.toLong()))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact()
+    }
+
+    fun generateVerificationToken(verificationType: VerificationTokenType): String {
+        val claims = mutableMapOf<String, Any>()
+        claims["verificationTokenType"] = verificationType.name
+
+        return Jwts.builder()
+            .setIssuedAt(Date(System.currentTimeMillis()))
+            .setExpiration(Date(System.currentTimeMillis() + verificationExpirationTime.toLong()))
+            .addClaims(claims)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact()
+    }
+
+    fun extractVerificationTokenType(verificationToken: String): VerificationTokenType {
+        val verificationTokenType: String = extractClaims(verificationToken) { claims ->
+            claims["verificationTokenType"] as String
+        }
+
+        return VerificationTokenType.valueOf(verificationTokenType)
+    }
+
+    fun isVerificationTokenValid(token: String): Boolean {
+        return isTokenSignedWithCorrectKey(token) && !isTokenExpired(token)
     }
 }

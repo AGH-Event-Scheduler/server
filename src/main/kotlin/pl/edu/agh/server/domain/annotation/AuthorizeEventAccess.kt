@@ -10,6 +10,6 @@ package pl.edu.agh.server.domain.annotation
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
-annotation class AuthorizeAccess(
+annotation class AuthorizeEventAccess(
     val allowedRoles: Array<String> = [],
 )
