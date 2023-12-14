@@ -18,6 +18,7 @@ import pl.edu.agh.server.domain.organization.Organization
 import pl.edu.agh.server.domain.organization.OrganizationService
 import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationFollowedByUser
 import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationIsArchived
+import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationIsNotArchived
 import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationWithNameLike
 import pl.edu.agh.server.domain.organization.OrganizationSpecification.Companion.organizationsWithAuthority
 import pl.edu.agh.server.domain.translation.LanguageOption
@@ -56,6 +57,7 @@ class OrganizationController(
         @RequestParam(name = "sort", defaultValue = "id,desc") sort: String,
         @RequestParam(name = "subscribedOnly", defaultValue = false.toString()) subscribedOnly: Boolean,
         @RequestParam(name = "showArchivedOnly", defaultValue = false.toString()) showArchivedOnly: Boolean,
+        @RequestParam(name = "showNotArchived", defaultValue = false.toString()) showNotArchived: Boolean,
         @RequestParam(name = "yourOrganizationsOnly", defaultValue = false.toString()) yourOrganizationsOnly: Boolean,
         @RequestParam(name = "name", required = false) name: String?,
         @RequestParam(name = "language", defaultValue = "PL") language: LanguageOption,
@@ -65,6 +67,7 @@ class OrganizationController(
         val organizationsPage: Page<Organization> = organizationService.getAllWithSpecificationPageable(
             Specification.allOf(
                 if (yourOrganizationsOnly) organizationsWithAuthority(getUserName(request)) else null,
+                if (showNotArchived) organizationIsNotArchived() else null,
                 if (showArchivedOnly) organizationIsArchived() else null,
                 if (subscribedOnly) organizationFollowedByUser(getUserName(request)) else null,
                 if (name != null) organizationWithNameLike(name, language) else null,
