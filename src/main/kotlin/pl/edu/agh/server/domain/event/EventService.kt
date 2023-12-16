@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile
 import pl.edu.agh.server.domain.dto.EventDTO
 import pl.edu.agh.server.domain.dto.FullEventDTO
 import pl.edu.agh.server.domain.dto.OrganizationDTO
+import pl.edu.agh.server.domain.exception.CreatingEventOnArchivedOrganizationException
 import pl.edu.agh.server.domain.exception.EventNotFoundException
 import pl.edu.agh.server.domain.exception.OrganizationNotFoundException
 import pl.edu.agh.server.domain.exception.UserNotFoundException
@@ -91,6 +92,10 @@ class EventService(
         var newSavedBackgroundImage: BackgroundImage? = null
         try {
             val organization = organizationRepository.findById(organizationId).orElseThrow { OrganizationNotFoundException(organizationId) }
+
+            if (organization.isArchived) {
+                throw CreatingEventOnArchivedOrganizationException(organizationId)
+            }
 
             if (backgroundImage != null) {
                 newSavedBackgroundImage = imageService.createBackgroundImage(backgroundImage)

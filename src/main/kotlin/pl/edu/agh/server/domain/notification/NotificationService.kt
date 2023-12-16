@@ -114,4 +114,26 @@ class NotificationService(
 
         return notificationRepository.save(newNotification)
     }
+
+    @Transactional
+    fun notifyAboutOrganizationArchive(organization: Organization): Notification {
+        val newNotification = Notification(
+            type = NotificationType.ORGANIZATION_ARCHIVE,
+            regardingOrganization = organization,
+            forAllUsers = true,
+        )
+
+        return notificationRepository.save(newNotification)
+    }
+
+    @Transactional
+    fun notifyAboutOrganizationReactivate(organization: Organization): Notification {
+        val newNotification = Notification(
+            type = NotificationType.ORGANIZATION_REACTIVATE,
+            regardingOrganization = organization,
+            forAllUsers = true,
+        )
+
+        return notificationRepository.save(newNotification)
+    }
 }

@@ -41,4 +41,5 @@ class Organization(
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     var organizationUserRoles: MutableList<OrganizationUserRole> = mutableListOf(),
 
+    var isArchived: Boolean = false,
 ) : BaseIdentifiableEntity()

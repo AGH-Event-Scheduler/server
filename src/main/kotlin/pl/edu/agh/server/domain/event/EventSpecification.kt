@@ -79,5 +79,12 @@ class EventSpecification {
                 criteriaBuilder.isFalse(root.get<Boolean>("canceled"))
             }
         }
+
+        fun organizationNotArchived(): Specification<Event> {
+            return Specification { root: Root<Event>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
+                val join = root.join<Event, Organization>("organization")
+                criteriaBuilder.isFalse(join.get<Boolean>("isArchived"))
+            }
+        }
     }
 }

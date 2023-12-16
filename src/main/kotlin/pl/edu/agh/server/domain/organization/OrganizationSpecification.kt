@@ -17,6 +17,18 @@ class OrganizationSpecification {
             }
         }
 
+        fun organizationIsNotArchived(): Specification<Organization> {
+            return Specification { root: Root<Organization>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
+                criteriaBuilder.isFalse(root.get<Boolean>("isArchived"))
+            }
+        }
+
+        fun organizationIsArchived(): Specification<Organization> {
+            return Specification { root: Root<Organization>, query: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder ->
+                criteriaBuilder.isTrue(root.get<Boolean>("isArchived"))
+            }
+        }
+
         fun organizationsWithAuthority(userName: String): Specification<Organization> {
             return Specification { root, query, cb ->
                 val joinUserRoles: Join<Organization, OrganizationUserRole> =
