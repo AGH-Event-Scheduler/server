@@ -1,5 +1,4 @@
-*
-
 !src/
 !build.gradle.kts
 !settings.gradle.kts
+!mock-images/
